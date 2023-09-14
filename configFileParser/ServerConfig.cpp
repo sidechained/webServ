@@ -10,19 +10,15 @@ ServerConfig::~ServerConfig() {
 
 }
 
-// what would be a better approach than gotLine here?
-// handover line from location
 void ServerConfig::extract(std::fstream &configFile) {
 	std::getline(configFile, _line);
+	// _line = server.line?
+	std::cout << _line << std::endl;
 	detectLine("server");
-	bool gotLine = false;
 	while(1) {
-		if (!gotLine)
-			std::getline(configFile, _line);
-		else
-			gotLine = false;
 		if (_line.empty())
 			break;
+		std::getline(configFile, _line);
 		detectAndStripTabIndents(1);
 		std::string key;
 		std::string value;
@@ -39,7 +35,7 @@ void ServerConfig::extract(std::fstream &configFile) {
 			std::istringstream iss(value);
 			iss >> client_max_body_size_mb;
 		} else if (key == "error_pages") {
-			extractErrorPages(configFile, gotLine);
+			extractErrorPages(configFile);
 		} else if (key == "locations") {
 			extractLocations(configFile);
 		}
@@ -73,7 +69,7 @@ void ServerConfig::extractPorts(std::string portString) {
 	}
 }
 
-void ServerConfig::extractErrorPages(std::fstream &configFile, bool &gotLine) {
+void ServerConfig::extractErrorPages(std::fstream &configFile) {
 	std::getline(configFile, _line);
 	while(countTabIndents(2))
 	{
@@ -85,7 +81,6 @@ void ServerConfig::extractErrorPages(std::fstream &configFile, bool &gotLine) {
 		extractValue(errorValue, errorColonPos);
 		error_pages[errorKey] = errorValue;
 		std::getline(configFile, _line);
-		gotLine = true;
 	}	
 }
 
@@ -124,6 +119,7 @@ bool ServerConfig::countTabIndents(int numTabs) {
 }
 
 void ServerConfig::detectAndStripTabIndents(int numTabs) {
+	std::cout << _line << std::endl;
 	if (_line.empty())
 		errorExit(ERR_PARSE, ERR_PARSE_EMPTY);
 	for (int i = 0; i < numTabs; i++)
@@ -134,9 +130,7 @@ void ServerConfig::detectAndStripTabIndents(int numTabs) {
 	_line.erase(0, numTabs);
 }
 
-
-void ServerConfig::print() {
-	// std::cout << "Server " << i + 1 << ":" << std::endl; // how to get index?
+void ServerConfig::print() const {
 	std::cout << "  Ports:";
 	for (std::vector<Port>::const_iterator it = ports.begin(); it != ports.end(); ++it) {
 		std::cout << " " << it->portNum << "(" << (it->dfault ? "default" : "non-default") << ")";

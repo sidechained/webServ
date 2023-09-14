@@ -31,13 +31,11 @@ class ServerConfig
 	private:
 		std::string _line;
 		ServerConfig();
-		ServerConfig(const ServerConfig &);
-		ServerConfig& operator=(const ServerConfig &);
 		void extract(std::fstream &configFile);
 		void extractKey(std::string &key, std::size_t &colonPos);
 		void extractValue(std::string &value, std::size_t &colonPos);
 		void extractPorts(std::string portString);
-		void extractErrorPages(std::fstream &configFile, bool &gotLine);
+		void extractErrorPages(std::fstream &configFile);
 		void extractLocations(std::fstream &configFile);
 		void detectLine(std::string keyToMatch);
 		void errorExit(std::string err1, std::string err2);
@@ -50,8 +48,10 @@ class ServerConfig
 		std::map<std::string, std::string> error_pages;
 		std::map<std::string, LocationConfig> locations;
 		ServerConfig(std::fstream &configFile);
+		// ServerConfig(const ServerConfig &);
+		// ServerConfig& operator=(const ServerConfig &);
 		~ServerConfig();
-		void print();
+		void print() const;
 };
 
 #endif

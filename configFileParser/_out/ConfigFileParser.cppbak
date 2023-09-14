@@ -1,0 +1,23 @@
+#include "ConfigFileParser.hpp"
+
+ConfigFileParser::ConfigFileParser(std::string filename) {
+	numServers = 0;
+    std::fstream configFile(filename.c_str());
+	if(!configFile.is_open())
+		errorExit(ERR_OPEN, ""); // "" correct way to handle?
+	while(1)
+	{
+		ServerConfig serverConfig(configFile);
+        serverConfigs.push_back(serverConfig);
+		numServers++;
+        if (configFile.eof())
+			break;
+	}
+	print(servers);
+	configFile.close();
+}
+
+ConfigFileParser::~ConfigFileParser() {
+
+}
+

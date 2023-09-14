@@ -1,5 +1,4 @@
-// #include "LocationConfig.hpp"
-#include "ServerConfig.hpp"
+#include "ConfigFileParser.hpp"
 
 #define ERR_OPEN "Unable to open config file"
 
@@ -17,18 +16,17 @@ int main(int argc, char **argv)
 		std::cout << "Wrong number of arguments" << std::endl;
 		return EXIT_FAILURE;
 	}
-    std::fstream configFile(argv[1]);
-	if(!configFile.is_open())
-		errorExit(ERR_OPEN, ""); // "" correct way to handle?
+    // std::fstream configFile(argv[1]);
+	// if(!configFile.is_open())
+	// 	errorExit(ERR_OPEN, ""); // "" correct way to handle?
 	// LocationConfig lc(configFile);
 	// lc.print();
 
-	ServerConfig sc(configFile);
-	sc.print();
-	configFile.close();
-}
+	// ServerConfig sc(configFile);
+	// sc.print();
 
-
+	ConfigFileParser cfp(argv[1]);
+	cfp.print();
 	// create and loop over array of servers, initialising them with the 
 	// std::vector<PollingServer> pollingServers;
 
@@ -40,3 +38,8 @@ int main(int argc, char **argv)
 	// 	// PollingServer(config.servers[i]) pollingServer;
 	// 	// pollingServers.push_back(pollingServer);
 	// }
+
+	// configFile.close();
+}
+
+

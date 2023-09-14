@@ -1,5 +1,5 @@
 NAME			= configFileParser
-SRCS			= ServerConfig.cpp LocationConfig.cpp main.cpp
+SRCS			= ConfigFileParser.cpp ServerConfig.cpp LocationConfig.cpp main.cpp
 OBJS			= $(SRCS:.cpp=.o)
 CXX				= c++
 CXXFLAGS		= -Wall -Wextra -Werror -std=c++98
