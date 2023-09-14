@@ -1,0 +1,8 @@
+		/eightyTest:
+			methods: GET
+			redir: /old-url /new-url
+			alias: /tmp
+			autoindex: true
+			uploads: /uploads
+		/:
+			index: index1.html
