@@ -26,7 +26,7 @@ struct Port
 	bool dfault;
 };
 
-class ServerConfig
+class ServerConfig : GenericConfig
 {
 	private:
 		std::string _line;
@@ -38,9 +38,6 @@ class ServerConfig
 		void extractErrorPages(std::fstream &configFile);
 		void extractLocations(std::fstream &configFile);
 		void detectLine(std::string keyToMatch);
-		void errorExit(std::string err1, std::string err2);
-		bool countTabIndents(int numTabs);
-		void detectAndStripTabIndents(int numTabs);
 	public:
 		std::string name;
 		int client_max_body_size_mb;

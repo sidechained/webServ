@@ -6,7 +6,8 @@
 # include <iostream>
 
 # include "ServerConfig.hpp"
-class ConfigFileParser
+
+class ConfigFileParser : public GenericConfig
 {
 	private:
 		ConfigFileParser();
@@ -17,7 +18,6 @@ class ConfigFileParser
 		~ConfigFileParser();
 		std::vector<ServerConfig> serverConfigs;
 		int numServers;
-		void errorExit(std::string err1, std::string err2);
 		void print() const;
 };
 

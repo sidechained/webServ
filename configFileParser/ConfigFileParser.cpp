@@ -35,12 +35,7 @@ ConfigFileParser::~ConfigFileParser()
 	
 }
 
-void ConfigFileParser::errorExit(std::string err1, std::string err2) {
-	std::cerr << err1 << std::endl;
-	if (!err2.empty())
-		std::cerr << "[" << err2 << "]" << std::endl;
-	exit(EXIT_FAILURE);
-}
+
 
 void ConfigFileParser::print() const {
 	for (std::vector<ServerConfig>::const_iterator it = serverConfigs.begin(); it != serverConfigs.end(); ++it) {

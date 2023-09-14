@@ -24,17 +24,13 @@ struct Redirection
 	std::string newURL;
 };
 
-class LocationConfig
+# include "GenericConfig.hpp"
+class LocationConfig : public GenericConfig
 {
 	private:
 		void extract(std::fstream &configFile);
-		void extractKey(std::string &key, std::size_t &colonPos);
-		void extractValue(std::string &value, std::size_t &colonPos);
 		void extractMethods(std::string methodString);
 		void extractRedir(std::string redirString);
-		void errorExit(std::string err1, std::string err2);
-		bool countTabIndents(int numTabs);
-		void detectAndStripTabIndents(int numTabs);	
 	public:
 		std::string line; // public because serverConfig needs to revisit the line that the location ended at
 		std::string key;
