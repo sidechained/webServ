@@ -10,6 +10,7 @@
 # include <errno.h>
 
 // this class takes a path on construction, and renders the directory listing at that path as a simple html index page, writing it to 'index.html'
+// TODO: in genLink make links render properly with server host and name (currently dummy values provided)
 
 class AutoIndexGenerator
 {
