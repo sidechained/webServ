@@ -1,8 +1,8 @@
 #include "PollingServer.hpp"
 
-PollingServer::PollingServer(int domain, int type, int protocol, int port, std::string ip, int backlog) : SimpleServer(domain, type, protocol, port, ip, backlog)
+PollingServer::PollingServer(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog) : SimpleServer(domain, type, protocol, ports, ip, backlog)
 {
-	_fds[0].fd = getSocket()->getSock();
+	_fds[0].fd = getSockets()[0]->getSock();
 	_fds[0].events = POLLIN;
 	_clients = 0;
 }
@@ -15,9 +15,9 @@ void PollingServer::accepter()
 {
 	if (_fds[0].revents & POLLIN)
 	{
-		sockaddr_in address = getSocket()->getAddress();
-		int addressSize = getSocket()->getAddressSize();
-		int newSocket = accept(getSocket()->getSock(), (struct sockaddr *)&address, (socklen_t *)&addressSize);
+		sockaddr_in address = getSockets()[0]->getAddress();
+		int addressSize = getSockets()[0]->getAddressSize();
+		int newSocket = accept(getSockets()[0]->getSock(), (struct sockaddr *)&address, (socklen_t *)&addressSize);
 		testConnection(newSocket);
 		if (_clients < MAX_CLIENTS)
 		{
