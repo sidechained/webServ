@@ -1,8 +1,10 @@
 #include "ServerConfig.hpp"
+#include "GenericConfig.hpp"
 
 ServerConfig::ServerConfig(std::fstream &configFile) {
 	name = "";
 	client_max_body_size_mb = 1;
+	skipGetLine = false;
 	extract(configFile);
 }
 
@@ -11,14 +13,18 @@ ServerConfig::~ServerConfig() {
 }
 
 void ServerConfig::extract(std::fstream &configFile) {
-	std::getline(configFile, _line);
-	// _line = server.line?
-	std::cout << _line << std::endl;
+	std::getline(configFile, line);
 	detectLine("server");
 	while(1) {
-		if (_line.empty())
+		if(skipGetLine == false)
+			std::getline(configFile, line);
+		else
+			skipGetLine = false;
+		if (line.empty()) // an empty line signifies the end of the server block (or EOF?)
+		{	
+			std::cout << "movingon..." << std::endl;
 			break;
-		std::getline(configFile, _line);
+		}
 		detectAndStripTabIndents(1);
 		std::string key;
 		std::string value;
@@ -40,8 +46,8 @@ void ServerConfig::extract(std::fstream &configFile) {
 			extractLocations(configFile);
 		}
 	}
-	if (!_line.empty())
-		errorExit(ERR_PARSE, ERR_PARSE_SERVER);
+	// if (!line.empty())
+	// 	errorExit(ERR_PARSE, ERR_PARSE_SERVER);
 }
 
 void ServerConfig::extractPorts(std::string portString) {
@@ -56,33 +62,39 @@ void ServerConfig::extractPorts(std::string portString) {
 }
 
 void ServerConfig::extractErrorPages(std::fstream &configFile) {
-	std::getline(configFile, _line);
-	while(countTabIndents(2))
+	while(1)
 	{
-		detectAndStripTabIndents(2);
+		std::getline(configFile, line);
+		if(!countTabIndents(2))
+			break;
+		detectAndStripTabIndents(2); // we don't need to detect here now, just strip
 		std::string errorKey;
 		std::string errorValue;
 		std::size_t errorColonPos;
 		extractKey(errorKey, errorColonPos);
 		extractValue(errorValue, errorColonPos);
 		error_pages[errorKey] = errorValue;
-		std::getline(configFile, _line);
-	}	
+	}
+	skipGetLine = true;
 }
 
 void ServerConfig::extractLocations(std::fstream &configFile) {
-	std::getline(configFile, _line);
-	while(countTabIndents(2))
+	std::cout << line << std::endl;
+	std::getline(configFile, line); // skip 'locations:' line
+	while(1)
 	{
-		LocationConfig location(configFile, _line);
-		_line = location.line; // pickup from where location left off
+		std::cout << line << std::endl;
+		if(!countTabIndents(2))
+			break;
+		LocationConfig location(configFile, line);
+		line = location.line; // serverConfig picks from where locationConfig left off
 		locations[location.key] = location;
 	}
 }
 
 void ServerConfig::detectLine(std::string keyToMatch) {
 	std::string err_str = std::string(ERR_PARSE_KEY) + "'" + keyToMatch + ":'";
-	if(_line != keyToMatch + ":")
+	if(line != keyToMatch + ":")
 		errorExit(ERR_PARSE, err_str);
 }
 

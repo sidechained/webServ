@@ -13,7 +13,7 @@ ConfigFileParser::ConfigFileParser(std::string filename) {
         if (configFile.eof())
 			break;
 	}
-	print();
+	// print();
 	configFile.close();
 }
 
@@ -35,10 +35,11 @@ ConfigFileParser::~ConfigFileParser()
 	
 }
 
-
-
 void ConfigFileParser::print() const {
+	int serverNum = 0;
 	for (std::vector<ServerConfig>::const_iterator it = serverConfigs.begin(); it != serverConfigs.end(); ++it) {
+		std::cout << "Server " << serverNum << ":" << std::endl;
 		it->print();
+		serverNum++;
 	}
 }

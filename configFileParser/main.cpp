@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 	// sc.print();
 
 	ConfigFileParser cfp(argv[1]);
-	cfp.print();
+	// cfp.print();
 	// create and loop over array of servers, initialising them with the 
 	// std::vector<PollingServer> pollingServers;
 
@@ -41,5 +41,3 @@ int main(int argc, char **argv)
 
 	// configFile.close();
 }
-
-

@@ -7,18 +7,10 @@
 # include <iostream>
 # include <vector>
 # include <map>
-
-# define ERR_OPEN "Unable to open config file"
-# define ERR_PARSE "Unable to parse config file"
-# define ERR_PARSE_KEY "First line of server block not "
-# define ERR_PARSE_EMPTY "Line empty"
-# define ERR_PARSE_INDENT "Line not indented by tab"
-# define ERR_PARSE_NOKEY "No key found in line"
-# define ERR_PARSE_SPACE "Space doesn't follow key"
-# define ERR_PARSE_REDIR "Redirections should only contain two elements"
-# define ERR_PARSE_SERVER "Server block should end with an empty line"
-
 # include "LocationConfig.hpp"
+
+# define ERR_PARSE_KEY "First line of server block not "
+// # define ERR_PARSE_SERVER "Server block should end with an empty line"
 
 struct Port
 {
@@ -26,14 +18,12 @@ struct Port
 	bool dfault;
 };
 
-class ServerConfig : GenericConfig
+class ServerConfig : public GenericConfig
 {
 	private:
-		std::string _line;
+		bool skipGetLine;
 		ServerConfig();
 		void extract(std::fstream &configFile);
-		void extractKey(std::string &key, std::size_t &colonPos);
-		void extractValue(std::string &value, std::size_t &colonPos);
 		void extractPorts(std::string portString);
 		void extractErrorPages(std::fstream &configFile);
 		void extractLocations(std::fstream &configFile);

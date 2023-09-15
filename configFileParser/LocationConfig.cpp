@@ -1,4 +1,5 @@
 #include "LocationConfig.hpp"
+#include "GenericConfig.hpp"
 
 LocationConfig::LocationConfig()
 {

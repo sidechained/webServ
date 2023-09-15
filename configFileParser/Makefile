@@ -1,8 +1,8 @@
 NAME			= configFileParser
-SRCS			= ConfigFileParser.cpp ServerConfig.cpp LocationConfig.cpp GenericConfig.cpp main.cpp
+SRCS			= GenericConfig.cpp LocationConfig.cpp ServerConfig.cpp ConfigFileParser.cpp main.cpp
 OBJS			= $(SRCS:.cpp=.o)
-CXX				= c++
-CXXFLAGS		= -Wall -Wextra -Werror -std=c++98
+CXX				= g++
+CXXFLAGS		= -g -O1 -Wall -Wextra -Werror -std=c++98
 
 all:			$(NAME)
 

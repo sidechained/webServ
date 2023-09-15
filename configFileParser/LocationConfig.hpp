@@ -8,15 +8,7 @@
 # include <vector>
 # include <map>
 
-# define ERR_OPEN "Unable to open config file"
-# define ERR_PARSE "Unable to parse config file"
-# define ERR_PARSE_KEY "First line of server block not "
-# define ERR_PARSE_EMPTY "Line empty"
-# define ERR_PARSE_INDENT "Line not indented by tab"
-# define ERR_PARSE_NOKEY "No key found in line"
-# define ERR_PARSE_SPACE "Space doesn't follow key"
 # define ERR_PARSE_REDIR "Redirections should only contain two elements"
-# define ERR_PARSE_SERVER "Server block should end with an empty line"
 
 struct Redirection
 {
@@ -32,7 +24,6 @@ class LocationConfig : public GenericConfig
 		void extractMethods(std::string methodString);
 		void extractRedir(std::string redirString);
 	public:
-		std::string line; // public because serverConfig needs to revisit the line that the location ended at
 		std::string key;
 		std::vector<std::string> methods;
 		Redirection redirection;
