@@ -6,8 +6,6 @@
 # include <iostream>
 # include "ServerConfig.hpp"
 
-# define ERR_OPEN "Unable to open config file"
-
 class ConfigFileParser : public GenericConfig
 {
 	private:

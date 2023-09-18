@@ -9,9 +9,6 @@
 # include <map>
 # include "LocationConfig.hpp"
 
-# define ERR_PARSE_KEY "First line of server block not "
-// # define ERR_PARSE_SERVER "Server block should end with an empty line"
-
 struct Port
 {
 	int portNum;
@@ -21,13 +18,14 @@ struct Port
 class ServerConfig : public GenericConfig
 {
 	private:
-		bool skipGetLine;
+		bool portFlag;
+		bool skipNextLine;
 		ServerConfig();
 		void extract(std::fstream &configFile);
 		void extractPorts(std::string portString);
 		void extractErrorPages(std::fstream &configFile);
 		void extractLocations(std::fstream &configFile);
-		void detectLine(std::string keyToMatch);
+		void detectKey(std::string keyToMatch);
 	public:
 		std::string name;
 		int client_max_body_size_mb;
@@ -39,6 +37,7 @@ class ServerConfig : public GenericConfig
 		// ServerConfig& operator=(const ServerConfig &);
 		~ServerConfig();
 		void print() const;
+		void printLocations() const;
 };
 
 #endif

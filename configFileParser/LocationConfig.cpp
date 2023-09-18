@@ -11,8 +11,7 @@ LocationConfig::LocationConfig(std::fstream &configFile, std::string &inLine) {
 	methods.push_back("GET");
 	methods.push_back("POST");
 	methods.push_back("DELETE");
-	redirection.oldURL = "";
-	redirection.newURL = "";
+	redirection = "";
 	alias = "";
 	uploads = "";
 	autoindex = false;
@@ -42,12 +41,25 @@ LocationConfig::~LocationConfig() {
 
 void LocationConfig::extract(std::fstream &configFile) {
 	std::size_t locationColonPos;
-	detectAndStripTabIndents(2);
+	stripTabIndents(line);
 	extractKey(key, locationColonPos);
 	std::getline(configFile, line);
-	while(countTabIndents(3))
+	bool firstLine = true;
+	while(1)
 	{
-		detectAndStripTabIndents(3);
+		// check for end of location entry
+		if (countTabIndents(line) != 3)
+		{
+			if (firstLine == true)
+				errorExit(ERR_PARSE, ERR_PARSE_SYNTAX);
+			else
+			{ // either next entry in locations or carriage return for end of server block
+				skipNextLine = true;
+				return;
+			}
+		}
+		// matching condition:
+		stripTabIndents(line);
 		std::string locEntryKey;
 		std::size_t locEntryColonPos;
 		extractKey(locEntryKey, locEntryColonPos);
@@ -57,7 +69,7 @@ void LocationConfig::extract(std::fstream &configFile) {
 			extractMethods(locEntryValue);
 		} else if (locEntryKey == "redir") {
 			extractValue(locEntryValue, locEntryColonPos);
-			extractRedir(locEntryValue);
+			redirection = locEntryValue;
 		} else if (locEntryKey == "alias") {
 			extractValue(locEntryValue, locEntryColonPos);
 			alias = locEntryValue;
@@ -72,6 +84,7 @@ void LocationConfig::extract(std::fstream &configFile) {
 			if (locEntryValue == "true")
 				autoindex = true;
 		}
+		firstLine = false;
 		std::getline(configFile, line);
 	}
 }
@@ -85,28 +98,13 @@ void LocationConfig::extractMethods(std::string methodString) {
 	}
 }
 
-void LocationConfig::extractRedir(std::string redirString) {
-	std::istringstream iss(redirString);
-	std::string redir;
-	int elementCount = 0;
-	while (iss >> redir) {
-		if (elementCount == 0)
-			redirection.oldURL = redir;
-		if (elementCount == 1)
-			redirection.newURL = redir;
-		elementCount++;
-		if (elementCount > 2)
-			errorExit(ERR_PARSE, ERR_PARSE_REDIR);
-	}
-}
-
 void LocationConfig::print() const {
 	std::cout << "      Methods:";
 	for (std::vector<std::string>::const_iterator it = methods.begin(); it != methods.end(); ++it) {
 		std::cout << " \"" << *it << "\"";
 	}
 	std::cout << std::endl;
-	std::cout << "      Redirection: oldURL = \"" << redirection.oldURL << "\", newURL = \"" << redirection.newURL << "\"" << std::endl;
+	std::cout << "      Redirection: \"" << redirection << "\"" << std::endl;
 	std::cout << "      Alias: \"" << alias << "\"" << std::endl;
 	std::cout << "      uploads: \"" << uploads << "\"" << std::endl;
 	std::cout << "      Autoindex: " << (autoindex ? "true" : "false") << std::endl;

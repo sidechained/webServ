@@ -13,7 +13,6 @@ ConfigFileParser::ConfigFileParser(std::string filename) {
         if (configFile.eof())
 			break;
 	}
-	// print();
 	configFile.close();
 }
 

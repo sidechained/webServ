@@ -8,25 +8,17 @@
 # include <vector>
 # include <map>
 
-# define ERR_PARSE_REDIR "Redirections should only contain two elements"
-
-struct Redirection
-{
-	std::string oldURL;
-	std::string newURL;
-};
-
 # include "GenericConfig.hpp"
 class LocationConfig : public GenericConfig
 {
 	private:
+		bool skipNextLine;
 		void extract(std::fstream &configFile);
 		void extractMethods(std::string methodString);
-		void extractRedir(std::string redirString);
 	public:
 		std::string key;
 		std::vector<std::string> methods;
-		Redirection redirection;
+		std::string redirection;
 		std::string alias;    
 		std::string uploads;
 		bool autoindex;

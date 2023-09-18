@@ -4,7 +4,6 @@
 ServerConfig::ServerConfig(std::fstream &configFile) {
 	name = "";
 	client_max_body_size_mb = 1;
-	skipGetLine = false;
 	extract(configFile);
 }
 
@@ -13,19 +12,27 @@ ServerConfig::~ServerConfig() {
 }
 
 void ServerConfig::extract(std::fstream &configFile) {
+	skipNextLine = false;
+	portFlag = false;
 	std::getline(configFile, line);
-	detectLine("server");
+	detectKey("server");
 	while(1) {
-		if(skipGetLine == false)
+		if (skipNextLine == false)
 			std::getline(configFile, line);
 		else
-			skipGetLine = false;
-		if (line.empty()) // an empty line signifies the end of the server block (or EOF?)
+			skipNextLine = false;
+		if (line.empty() || configFile.eof())
 		{	
-			std::cout << "movingon..." << std::endl;
-			break;
+			if (portFlag == true)
+				return ;
+			else
+				errorExit(ERR_PARSE, ERR_PARSE_PORTS);
 		}
-		detectAndStripTabIndents(1);
+		if(countTabIndents(line) != 1)
+		{
+			errorExit(ERR_PARSE, ERR_PARSE_SYNTAX);
+		}
+		stripTabIndents(line);
 		std::string key;
 		std::string value;
 		std::size_t colonPos;
@@ -33,6 +40,7 @@ void ServerConfig::extract(std::fstream &configFile) {
 		if (key == "ports") {
 			extractValue(value, colonPos);
 			extractPorts(value);
+			portFlag = true;
 		} else if (key == "name") {
 			extractValue(value, colonPos);
 			name = value;
@@ -46,8 +54,6 @@ void ServerConfig::extract(std::fstream &configFile) {
 			extractLocations(configFile);
 		}
 	}
-	// if (!line.empty())
-	// 	errorExit(ERR_PARSE, ERR_PARSE_SERVER);
 }
 
 void ServerConfig::extractPorts(std::string portString) {
@@ -62,37 +68,64 @@ void ServerConfig::extractPorts(std::string portString) {
 }
 
 void ServerConfig::extractErrorPages(std::fstream &configFile) {
+	bool firstLine = true;
 	while(1)
 	{
+		// here we can have one of three things:
+		// - a 2-tab indented key/value entry (error page)
+		// - a 1-tab indented key/value entry (next entry in server block)
+		// - a carriage return or EOF indicating the end of the server block
 		std::getline(configFile, line);
-		if(!countTabIndents(2))
-			break;
-		detectAndStripTabIndents(2); // we don't need to detect here now, just strip
+		if (firstLine == false && (countTabIndents(line) == 1 || line.empty() || configFile.eof()))
+		{ 
+			// if the indent count is 1 or line is empty we will return and skip reading of next line
+			// empty detection will be done by 
+			// this doesn't apply to first line as that MUST be an entry otherwise error
+			skipNextLine = true;
+			return;
+		}
+		if (countTabIndents(line) != 2)
+		{
+			errorExit(ERR_PARSE, ERR_PARSE_SYNTAX);
+		}
+		// here is the expected correct condition (2 tab indents)
+		firstLine = false;
 		std::string errorKey;
 		std::string errorValue;
 		std::size_t errorColonPos;
+		stripTabIndents(line);
 		extractKey(errorKey, errorColonPos);
 		extractValue(errorValue, errorColonPos);
 		error_pages[errorKey] = errorValue;
 	}
-	skipGetLine = true;
 }
 
 void ServerConfig::extractLocations(std::fstream &configFile) {
-	std::cout << line << std::endl;
 	std::getline(configFile, line); // skip 'locations:' line
+	bool firstLine = true;
 	while(1)
 	{
-		std::cout << line << std::endl;
-		if(!countTabIndents(2))
-			break;
+		if(countTabIndents(line) != 2)
+		{
+			if (firstLine == true)
+			{ // there must be an entry after first line, otherwise syntax error
+				errorExit(ERR_PARSE, ERR_PARSE_SYNTAX);
+			}
+			else
+			{ // this could be the next entry in the server or the end of the server block (carriage return)
+				skipNextLine = true;
+				return ;
+			}
+		}
+		// matching condition
+		firstLine = false;
 		LocationConfig location(configFile, line);
-		line = location.line; // serverConfig picks from where locationConfig left off
+		line = location.line; // pick up from where locationConfig left off
 		locations[location.key] = location;
 	}
 }
 
-void ServerConfig::detectLine(std::string keyToMatch) {
+void ServerConfig::detectKey(std::string keyToMatch) {
 	std::string err_str = std::string(ERR_PARSE_KEY) + "'" + keyToMatch + ":'";
 	if(line != keyToMatch + ":")
 		errorExit(ERR_PARSE, err_str);
@@ -110,6 +143,10 @@ void ServerConfig::print() const {
 	for (std::map<std::string, std::string>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
 		std::cout << "    \"" << it->first << "\": \"" << it->second << "\"" << std::endl;
 	}
+	printLocations();
+}
+
+void ServerConfig::printLocations() const {
 	std::cout << "  Locations:" << std::endl;
 	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
 		std::cout << "    \"" << it->first << "\":" << std::endl;

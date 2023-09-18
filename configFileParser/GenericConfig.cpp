@@ -21,24 +21,13 @@ void GenericConfig::errorExit(std::string err1, std::string err2) {
 	exit(EXIT_FAILURE);
 }
 
-bool GenericConfig::countTabIndents(int numTabs) {
-	if (line.empty())
-		return false;
-	for (int i = 0; i < numTabs; i++)
-	{
-		if (line[i] != '\t')
-			return false;
-	}
-	return true;
+int GenericConfig::countTabIndents(const std::string line) {
+	int numTabs = 0;
+	while(line[numTabs] == '\t')
+		numTabs++;
+	return(numTabs);
 }
 
-void GenericConfig::detectAndStripTabIndents(int numTabs) {
-	// if (line.empty())
-	// 	errorExit(ERR_PARSE, ERR_PARSE_EMPTY);
-	for (int i = 0; i < numTabs; i++)
-	{
-		if (line[i] != '\t')
-			errorExit(ERR_PARSE, ERR_PARSE_INDENT);
-	}
-	line.erase(0, numTabs);
+void GenericConfig::stripTabIndents(std::string &line) {
+	line.erase(0, countTabIndents(line));
 }
