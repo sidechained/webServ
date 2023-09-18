@@ -1,8 +1,8 @@
 #include "PollingServer.hpp"
 
-PollingServer::PollingServer(int domain, int type, int protocol, int port, std::string ip, int backlog) : SimpleServer(domain, type, protocol, port, ip, backlog)
+PollingServer::PollingServer(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog) : SimpleServer(domain, type, protocol, ports, ip, backlog)
 {
-	_fds[0].fd = getSocket()->getSock();
+	_fds[0].fd = getSockets()[0]->getSock();
 	_fds[0].events = POLLIN;
 	_clients = 0;
 }
@@ -15,15 +15,15 @@ void PollingServer::accepter()
 {
 	if (_fds[0].revents & POLLIN)
 	{
-		sockaddr_in address = getSocket()->getAddress();
-		int addressSize = getSocket()->getAddressSize();
-		int newSocket = accept(getSocket()->getSock(), (struct sockaddr *)&address, (socklen_t *)&addressSize);
+		sockaddr_in address = getSockets()[0]->getAddress();
+		int addressSize = getSockets()[0]->getAddressSize();
+		int newSocket = accept(getSockets()[0]->getSock(), (struct sockaddr *)&address, (socklen_t *)&addressSize);
 		testConnection(newSocket);
 		if (_clients < MAX_CLIENTS)
 		{
 			_clients++;
 			_fds[_clients].fd = newSocket;
-			_fds[_clients].events = POLLIN;
+			_fds[_clients].events = POLLIN | POLLOUT;
 			_fds[_clients].revents = 0;
 			printClientAddress(address);
 		}
@@ -64,45 +64,47 @@ void PollingServer::handler()
 
 void PollingServer::responder()
 {
-	// Still needs to use poll to check if the socket is writable
 	for (int i = 1; i <= _clients; i++)
 	{
-		int clientFd = _fds[i].fd;
-
-		SimpleResponse response = _pendingResponses[clientFd];
-
-		if (!response.isHeaderSent())
+		if (_fds[i].revents & POLLOUT)
 		{
-			std::string header = response.getHeader();
-			ssize_t bytes_sent = write(clientFd, header.c_str(), header.length());
-			if (bytes_sent == -1)
-			{
-				std::cerr << "Error sending HTTP response headers" << std::endl;
-				return;
-			}
-			if ((unsigned long)bytes_sent == header.length())
-				response.setHeaderSent(true);
-			else
-				response.updateHeaderOffset(bytes_sent);
-		}
+			int clientFd = _fds[i].fd;
 
-		if (!response.isBodySent())
-		{
-			std::string body = response.getBody();
-			ssize_t bytes_sent = write(clientFd, body.c_str(), body.length());
-			if (bytes_sent == -1)
+			SimpleResponse response = _pendingResponses[clientFd];
+
+			if (!response.isHeaderSent())
 			{
-				std::cerr << "Error sending HTTP response body" << std::endl;
-				return;
+				std::string header = response.getHeader();
+				ssize_t bytes_sent = write(clientFd, header.c_str(), header.length());
+				if (bytes_sent == -1)
+				{
+					std::cerr << "Error sending HTTP response headers" << std::endl;
+					return;
+				}
+				if ((unsigned long)bytes_sent == header.length())
+					response.setHeaderSent(true);
+				else
+					response.updateHeaderOffset(bytes_sent);
 			}
-			if ((unsigned long)bytes_sent == body.length())
-				response.setBodySent(true);
-			else
-				response.updateBodyOffset(bytes_sent);
+
+			if (!response.isBodySent())
+			{
+				std::string body = response.getBody();
+				ssize_t bytes_sent = write(clientFd, body.c_str(), body.length());
+				if (bytes_sent == -1)
+				{
+					std::cerr << "Error sending HTTP response body" << std::endl;
+					return;
+				}
+				if ((unsigned long)bytes_sent == body.length())
+					response.setBodySent(true);
+				else
+					response.updateBodyOffset(bytes_sent);
+			}
+			// Remove the response from the map if it has been sent
+			if (response.isHeaderSent() && response.isBodySent())
+				_pendingResponses.erase(clientFd);
 		}
-		// Remove the response from the map if it has been sent
-		if (response.isHeaderSent() && response.isBodySent())
-			_pendingResponses.erase(clientFd);
 	}
 }
 

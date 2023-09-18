@@ -1,20 +1,24 @@
 #include "SimpleServer.hpp"
 
 
-SimpleServer::SimpleServer(int domain, int type, int protocol, int port, std::string ip, int backlog)
+SimpleServer::SimpleServer(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog)
 {
-    _socket = new ListeningSocket(domain, type, protocol, port, ip, backlog);
+    for (unsigned long i = 0; i < ports.size(); i++)
+    {
+        _sockets.push_back(new ListeningSocket(domain, type, protocol, ports[i], ip, backlog));
+    }
 }
 
 SimpleServer::~SimpleServer()
 {
     std::cout << BG_BLUE << "SimpleServer destructor called" << RESET << std::endl;
-    delete _socket;
+    for (unsigned long i = 0; i < _sockets.size(); i++)
+        delete _sockets[i];
 }
 
-ListeningSocket *SimpleServer::getSocket() const
+std::vector<ListeningSocket *> SimpleServer::getSockets() const
 {
-    return _socket;
+    return _sockets;
 }
 
 void SimpleServer::log(std::string const &message)

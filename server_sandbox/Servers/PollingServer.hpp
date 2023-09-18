@@ -26,7 +26,7 @@ private:
     void responder();
 
 public:
-    PollingServer(int domain, int type, int protocol, int port, std::string ip, int backlog);
+    PollingServer(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog);
     ~PollingServer();
     void launch();
 };
