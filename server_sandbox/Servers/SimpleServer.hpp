@@ -7,16 +7,16 @@ class SimpleServer
 {
 private:
     std::vector<ListeningSocket *>_sockets;
-    virtual void accepter() = 0;
-    virtual void handler() = 0;
-    virtual void responder() = 0;
+    void accepter();
+    void handler();
+    void responder();
 protected:
     void log(std::string const &message);
     void printClientAddress(sockaddr_in const &address);
 public:
     SimpleServer(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog);
     ~SimpleServer();
-    virtual void launch() = 0;
-    std::vector<ListeningSocket *> getSockets() const;
+    void launch();
+    std::vector<ListeningSocket*> getSockets() const;
     void testConnection(int item);
 };

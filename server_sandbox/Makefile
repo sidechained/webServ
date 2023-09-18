@@ -1,6 +1,7 @@
 FILES = main.cpp \
         Servers/SimpleServer.cpp \
         Servers/PollingServer.cpp \
+        Servers/ServerManager.cpp \
         Sockets/SimpleSocket.cpp \
         Sockets/ListeningSocket.cpp \
         Requests/HttpRequest.cpp \
@@ -8,6 +9,7 @@ FILES = main.cpp \
         Responses/SimpleResponse.cpp \
 		Responses/ResponseFactory.cpp \
 		utils/ContentTypeUtils.cpp \
+
 
 
 CC = c++

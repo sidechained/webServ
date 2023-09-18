@@ -7,6 +7,8 @@
 #include <cstring>
 #include <poll.h>
 #include <map>
+#include <iostream>
+#include <cstdlib>
 #include <fstream>
 #include <csignal>
 #include "../WebServ.hpp"
@@ -17,14 +19,13 @@ class ServerManager
 {
 private:
 
-	std::vector<SimpleServer> _servers;
+	std::vector<SimpleServer *> _servers;
 	std::map<int, SimpleServer> _servers_map;
 	std::map<int, ListeningSocket> _clients_map;
 	fd_set     _recv_fd_pool;
 	fd_set     _write_fd_pool;
 	int        _biggest_fd;
 
-	void setupServers();
 
 
 	char _buffer[30000];
@@ -37,6 +38,12 @@ private:
 	void responder();
 
 public:
+	void setupServers();
+	void initializeSets();
+	void addToSet(const int i, fd_set &set);
+	void runServers();
+
+
 	ServerManager();
 	ServerManager(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog);
 	~ServerManager();

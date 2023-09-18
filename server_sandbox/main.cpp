@@ -4,6 +4,7 @@
 #include <netinet/in.h>  // for AF_INET
 #include <sys/socket.h>  // for SOCK_STREAM
 #include "Servers/PollingServer.hpp"
+#include "Servers/ServerManager.hpp"
 
 
 bool isRunning = true;
@@ -22,10 +23,17 @@ int main(int argc, char const *argv[])
     (void)argc;
     (void)argv;
     signal(SIGINT, sigIntHandler);
-    std::vector<int> ports;
+    /*std::vector<int> ports;
     ports.push_back(8080);
     PollingServer server(AF_INET, SOCK_STREAM, 0, ports, "0.0.0.0", 10);
-    server.launch();
+    server.launch();*/
+	std::vector<int> ports;
+    ports.push_back(8080);
+
+	ServerManager manager;
+
+	manager.setupServers();
+	manager.runServers();
     std::cout << BG_BLUE << "Server finished" << RESET << std::endl;
     return 0;
 }
