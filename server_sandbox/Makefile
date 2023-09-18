@@ -8,7 +8,10 @@ FILES = main.cpp \
         Responses/SimpleResponse.cpp \
 		Responses/ResponseFactory.cpp \
 		utils/ContentTypeUtils.cpp \
-
+		Parser/GenericConfig.cpp \
+		Parser/LocationConfig.cpp \
+		Parser/ServerConfig.cpp \
+		Parser/ConfigFileParser.cpp
 
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g

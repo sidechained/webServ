@@ -3,6 +3,7 @@
 #include "../Requests/HttpRequest.hpp"
 #include "../Responses/TextResponse.hpp"
 #include "../Responses/ResponseFactory.hpp"
+#include "../Parser/ServerConfig.hpp"
 #include "unistd.h"
 #include <cstring>
 #include <poll.h>
@@ -27,6 +28,7 @@ private:
 
 public:
     PollingServer(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog);
+    PollingServer(ServerConfig &config);
     ~PollingServer();
     void launch();
 };

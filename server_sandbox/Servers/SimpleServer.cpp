@@ -1,5 +1,13 @@
 #include "SimpleServer.hpp"
 
+SimpleServer::SimpleServer(ServerConfig &config)
+{
+    for (unsigned long i = 0; i < config.ports.size(); i++)
+    {
+        _sockets.push_back(new ListeningSocket(AF_INET, SOCK_STREAM, 0, config.ports[i].portNum, config.name, 10));
+    }
+    _config = &config;
+}
 
 SimpleServer::SimpleServer(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog)
 {

@@ -1,5 +1,12 @@
 #include "PollingServer.hpp"
 
+PollingServer::PollingServer(ServerConfig &config) : SimpleServer(config)
+{
+	_fds[0].fd = getSockets()[0]->getSock();
+	_fds[0].events = POLLIN;
+	_clients = 0;
+}
+
 PollingServer::PollingServer(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog) : SimpleServer(domain, type, protocol, ports, ip, backlog)
 {
 	_fds[0].fd = getSockets()[0]->getSock();
@@ -46,9 +53,11 @@ void PollingServer::handler()
 			if (bytesRead > 0)
 			{
 				std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
-				HttpRequest parsedRequest(_buffer);
+				std::cout << GREEN << "Request: " << _buffer << RESET << std::endl;
+				HttpRequest parsedRequest(_buffer, _config);
 				parsedRequest.printRequest();
 				_pendingResponses[_fds[i].fd] = TextResponse(parsedRequest);
+				_pendingResponses[_fds[i].fd].printResponse();
 			}
 			else
 			{
@@ -70,6 +79,9 @@ void PollingServer::responder()
 		{
 			int clientFd = _fds[i].fd;
 
+			if (_pendingResponses.find(clientFd) == _pendingResponses.end())
+				continue;
+
 			SimpleResponse response = _pendingResponses[clientFd];
 
 			if (!response.isHeaderSent())
@@ -82,7 +94,12 @@ void PollingServer::responder()
 					return;
 				}
 				if ((unsigned long)bytes_sent == header.length())
+				{
 					response.setHeaderSent(true);
+					std::cout << BG_BOLD_GREEN << "Header sent to client " << i << RESET << std::endl;
+					std::cout << BG_BOLD_MAGENTA << "Header: " << RESET << std::endl;
+					std::cout << header << std::endl;
+				}
 				else
 					response.updateHeaderOffset(bytes_sent);
 			}
@@ -97,13 +114,18 @@ void PollingServer::responder()
 					return;
 				}
 				if ((unsigned long)bytes_sent == body.length())
+				{
 					response.setBodySent(true);
+					std::cout << BG_BOLD_GREEN << "Body sent to client " << i << RESET << std::endl;
+				}
 				else
 					response.updateBodyOffset(bytes_sent);
 			}
 			// Remove the response from the map if it has been sent
 			if (response.isHeaderSent() && response.isBodySent())
+			{
 				_pendingResponses.erase(clientFd);
+			}
 		}
 	}
 }

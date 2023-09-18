@@ -3,6 +3,12 @@
 // Default constructor
 SimpleSocket::SimpleSocket(int domain, int type, int protocol, int port, std::string ip)
 {
+    std::cout << "Port" << port << std::endl;
+    std::cout << "IP" << ip << std::endl;
+    std::cout << "Domain" << domain << std::endl;
+    std::cout << "Type" << type << std::endl;
+    std::cout << "Protocol" << protocol << std::endl;
+    
     // Define address structure
     _address.sin_family = domain;
     _address.sin_port = htons(port);
@@ -13,6 +19,7 @@ SimpleSocket::SimpleSocket(int domain, int type, int protocol, int port, std::st
     _sock = socket(domain, type, protocol);
     testConnection(_sock);
 
+    std::cout << "Socket created" << std::endl;
     // Allow socket descriptor to be reuseable
     // Should allow to rerun ./server multiple times
     int reuse = 1;
@@ -20,9 +27,12 @@ SimpleSocket::SimpleSocket(int domain, int type, int protocol, int port, std::st
 
     // Set socket to be nonblocking?
 
+
     // Bind socket and IP
     _conection = bind(_sock, (struct sockaddr *)&_address, sizeof(_address));
     testConnection(_conection);
+
+    std::cout << "Bind " << std::endl;
 }
 
 SimpleSocket::~SimpleSocket()
