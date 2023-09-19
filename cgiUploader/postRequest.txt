@@ -1,0 +1,36 @@
+POST /cgi/upload.php HTTP/1.1
+Host: [hostname]
+Accept: */*
+Accept-Encoding: deflate, gzip
+User-Agent: [user-agent]
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryDE1CAymIcZ7TPEpr
+Origin: null
+Upgrade-Insecure-Requests: 1
+sec-ch-ua: "Chromium";v="116", "Not)A;Brand";v="24", "Google Chrome";v="116"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Linux"
+Content-Length: [content-length]
+
+------WebKitFormBoundaryDE1CAymIcZ7TPEpr
+Content-Disposition: form-data; name="fileToUpload"; filename="servers.txt"
+Content-Type: text/plain
+
+server:
+	ports: 80 90 100
+	name: eighty.com
+	client_max_body_size_mb: 10
+	error_pages:
+		404: /404.html
+		500: /50x.html
+		501: /50x.html
+	locations:
+		/eightyTest:
+			methods: GET
+			redir: /new-url
+			alias: /tmp
+			autoindex: true
+			uploads: /uploads
+		/:
+			index: index1.html
+
+------WebKitFormBoundaryDE1CAymIcZ7TPEpr--

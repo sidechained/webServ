@@ -2,8 +2,8 @@
 #include "GenericConfig.hpp"
 
 ServerConfig::ServerConfig(std::fstream &configFile) {
-	name = "";
-	client_max_body_size_mb = 1;
+	hostname = "";
+	clientMaxBodySizeMB = 1;
 	extract(configFile);
 }
 
@@ -41,13 +41,13 @@ void ServerConfig::extract(std::fstream &configFile) {
 			extractValue(value, colonPos);
 			extractPorts(value);
 			portFlag = true;
-		} else if (key == "name") {
+		} else if (key == "hostname") {
 			extractValue(value, colonPos);
-			name = value;
+			hostname = value;
 		} else if (key == "client_max_body_size_mb") {
 			extractValue(value, colonPos);
 			std::istringstream iss(value);
-			iss >> client_max_body_size_mb;
+			iss >> clientMaxBodySizeMB;
 		} else if (key == "error_pages") {
 			extractErrorPages(configFile);
 		} else if (key == "locations") {
@@ -59,9 +59,9 @@ void ServerConfig::extract(std::fstream &configFile) {
 void ServerConfig::extractPorts(std::string portString) {
 	Port port;
 	std::istringstream iss(portString);
-	int portNum;
-	while (iss >> portNum) {
-		port.portNum = portNum;
+	int number;
+	while (iss >> number) {
+		port.number = number;
 		port.dfault = false;
 		ports.push_back(port);
 	}
@@ -134,11 +134,11 @@ void ServerConfig::detectKey(std::string keyToMatch) {
 void ServerConfig::print() const {
 	std::cout << "  Ports:";
 	for (std::vector<Port>::const_iterator it = ports.begin(); it != ports.end(); ++it) {
-		std::cout << " " << it->portNum << "(" << (it->dfault ? "default" : "non-default") << ")";
+		std::cout << " " << it->number << "(" << (it->dfault ? "default" : "non-default") << ")";
 	}
 	std::cout << std::endl;
-	std::cout << "  Name: \"" << name << "\"" << std::endl;
-	std::cout << "  Client Max Body Size (MB): " << client_max_body_size_mb << std::endl;
+	std::cout << "  Name: \"" << hostname << "\"" << std::endl;
+	std::cout << "  Client Max Body Size (MB): " << clientMaxBodySizeMB << std::endl;
 	std::cout << "  Error Pages:" << std::endl;
 	for (std::map<std::string, std::string>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
 		std::cout << "    \"" << it->first << "\": \"" << it->second << "\"" << std::endl;

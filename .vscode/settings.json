@@ -50,6 +50,8 @@
         "optional": "cpp",
         "ranges": "cpp",
         "span": "cpp",
-        "*.cppbak": "cpp"
+        "*.cppbak": "cpp",
+        "csignal": "cpp",
+        "cstring": "cpp"
     }
 }

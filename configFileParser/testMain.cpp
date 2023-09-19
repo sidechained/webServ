@@ -23,13 +23,12 @@ int main(int argc, char **argv)
 
 	// NOTE: Presume below that we're using "servers.txt" as the config file...
 
-
 	// print whatever we feel like from the vector of serverConfigs:
 	std::cout << std::endl;
-	std::cout << cfp.serverConfigs[0].name << std::endl;
-	std::cout << cfp.serverConfigs[1].name << std::endl;
+	std::cout << cfp.serverConfigs[0].hostname << std::endl;
+	std::cout << cfp.serverConfigs[1].hostname << std::endl;
 	std::cout << "size:" << cfp.serverConfigs[0].locations.size() << std::endl;
-	std::cout << cfp.serverConfigs[0].locations["/eightyTest"].alias << std::endl;
+	std::cout << cfp.serverConfigs[0].locations["/eightyTest"].root << std::endl;
 
 	// lookup a location by path in server 0 (don't forget the preceding slash!)
 	std::cout << std::endl;
@@ -45,9 +44,9 @@ int main(int argc, char **argv)
 	std::vector<ServerConfig>::iterator it;
 	for (size_t i = 0; i < cfp.serverConfigs.size(); ++i) {
 		std::cout << "Server " << i + 1 << ":\n";
-		std::cout << " Name: " << cfp.serverConfigs[i].name << ", ";
+		std::cout << " Name: " << cfp.serverConfigs[i].hostname << ", ";
 		if (!cfp.serverConfigs[i].ports.empty())
-			std::cout << "First port num: " << cfp.serverConfigs[i].ports[0].portNum << "\n";
+			std::cout << "First port num: " << cfp.serverConfigs[i].ports[0].number << "\n";
 		cfp.serverConfigs[i].printLocations(); // convenience method
 	}
 }

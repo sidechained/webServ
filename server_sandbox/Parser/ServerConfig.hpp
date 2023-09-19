@@ -11,7 +11,7 @@
 
 struct Port
 {
-	int portNum;
+	int number;
 	bool dfault;
 };
 
@@ -27,7 +27,7 @@ class ServerConfig : public GenericConfig
 		void detectKey(std::string keyToMatch);
 		ServerConfig();
 	public:
-		std::string name;
+		std::string hostname;
 		int client_max_body_size_mb;
 		std::vector<Port> ports;
 		std::map<std::string, std::string> error_pages;

@@ -112,14 +112,14 @@ void HttpRequest::determineResource()
         if (locationIsSet(key))
         {
             std::cout << BG_YELLOW << "resource is a directory and is in the map: " << _config->locations[resource].index << RESET << std::endl;
-             if (!_config->locations[key].alias.empty())
+             if (!_config->locations[key].root.empty())
              {
-                std::cout << YELLOW << "alias: " << _config->locations[key].alias << RESET << std::endl;
+                std::cout << YELLOW << "root: " << _config->locations[key].root << RESET << std::endl;
                 std::cout << GREEN << "resource: " << resource << " i: " << i << RESET << std::endl;
                 if (key == "/")
-                    resource = _config->locations[key].alias + resource;
+                    resource = _config->locations[key].root + resource;
                 else
-                    resource = _config->locations[key].alias + "/" + resource.substr(i);
+                    resource = _config->locations[key].root + "/" + resource.substr(i);
                 std::cout << BLUE << "new resource: " << resource << RESET << std::endl;
                 if (resource[0] == '/')
                     resource = resource.substr(1);
@@ -129,7 +129,7 @@ void HttpRequest::determineResource()
         }
     }
 
-    //check if location has alias
+    //check if location has root
     //search for location in map starting with the string before the last slash and ending with the last slash
     //if found, append the index to the resource
     //if not found, append the index to the resource
@@ -156,12 +156,12 @@ void HttpRequest::determineResource()
 //         }
 //     }
 
-//     std::cout << BG_YELLOW << "resource: " << resource << _config->locations[resource].alias << RESET << std::endl;
+//     std::cout << BG_YELLOW << "resource: " << resource << _config->locations[resource].root << RESET << std::endl;
 
 //     if (_config->locations.find(resource) != _config->locations.end())
 //     {
-//         if (!_config->locations[resource].alias.empty())
-//             _request["Resource"] = _config->locations[resource].alias;
+//         if (!_config->locations[resource].root.empty())
+//             _request["Resource"] = _config->locations[resource].root;
 //     }
 // }
 

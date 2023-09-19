@@ -4,9 +4,9 @@
 #include <fstream>
 #include <sstream>
 
-void loadContentTypesFromFile(const std::string &filename, std::map<std::string, std::string> &_contentTypes)
+void loadContentTypesFromFile(const std::string &filehostname, std::map<std::string, std::string> &_contentTypes)
 {
-    std::ifstream file(filename.c_str());
+    std::ifstream file(filehostname.c_str());
     if (file.is_open())
     {
         std::string line;
@@ -23,7 +23,7 @@ void loadContentTypesFromFile(const std::string &filename, std::map<std::string,
     }
     else
     {
-        std::cerr << "Unable to open file " << filename << std::endl;
+        std::cerr << "Unable to open file " << filehostname << std::endl;
     }
 }
 

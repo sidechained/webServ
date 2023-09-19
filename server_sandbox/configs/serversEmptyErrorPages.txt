@@ -1,13 +1,13 @@
 server:
 	ports: 80 90 100
-	name: eighty.com
+	hostname: eighty.com
 	client_max_body_size_mb: 10
 	error_pages:
 	locations:
 		/eightyTest:
 			methods: GET
 			redir: /new-url
-			alias: /tmp
+			root: /tmp
 			autoindex: true
 			uploads: /uploads
 		/:
@@ -15,7 +15,7 @@ server:
 
 server:
 	ports: 82
-	name: eightytwo.com
+	hostname: eightytwo.com
 	client_max_body_size_mb: 10
 	error_pages:
 		404: /404.html
@@ -25,7 +25,7 @@ server:
 		/eightyTwoTest:
 			methods: POST DELETE
 			redir: /new-url
-			alias: /tmp
+			root: /tmp
 			autoindex: true
 			uploads: /uploads
 		/:

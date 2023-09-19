@@ -1,6 +1,6 @@
 server:
 	ports: 8080 4545
-	name: 127.0.0.1
+	hostname: 127.0.0.1
 	client_max_body_size_mb: 10
 	error_pages:
 		404: /404.html
@@ -12,20 +12,20 @@ server:
 		/eightyTest:
 			methods: GET
 			redir: /new-url
-			alias: /tmp
+			root: /tmp
 			autoindex: true
 			uploads: /uploads
 		/:
 			index: index1.html
-			alias: /www
+			root: /www
 		/my_game:
-			alias: /tictactoe
+			root: /tictactoe
 		/my_game/hello:
-			alias: /other_location
+			root: /other_location
 
 server:
 	ports: 82
-	name: eightytwo.com
+	hostname: eightytwo.com
 	client_max_body_size_mb: 10
 	error_pages:
 		404: /404.html
@@ -35,7 +35,7 @@ server:
 		/eightyTwoTest:
 			methods: POST DELETE
 			redir: /old-url /new-url
-			alias: /tmp
+			root: /tmp
 			autoindex: true
 			uploads: /uploads
 		/:

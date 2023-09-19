@@ -1,6 +1,6 @@
 		/eightyTest:
 			methods: GET
 			redir: /new-url
-			alias: /tmp
+			root: /tmp
 			autoindex: true
 			uploads: /uploads

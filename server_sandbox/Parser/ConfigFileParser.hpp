@@ -11,7 +11,7 @@ class ConfigFileParser : public GenericConfig
 	private:
 		ConfigFileParser();
 	public:
-		ConfigFileParser(std::string filename);
+		ConfigFileParser(std::string filehostname);
 		ConfigFileParser(const ConfigFileParser &);
 		ConfigFileParser& operator=(const ConfigFileParser &);
 		~ConfigFileParser();
