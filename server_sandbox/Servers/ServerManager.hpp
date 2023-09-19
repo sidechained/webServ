@@ -20,7 +20,7 @@ class ServerManager
 private:
 
 	std::vector<SimpleServer *> _servers;
-	std::map<int, SimpleServer> _servers_map;
+	std::map<int, SimpleServer*> _servers_map;
 	std::map<int, ListeningSocket> _clients_map;
 	fd_set     _recv_fd_pool;
 	fd_set     _write_fd_pool;
