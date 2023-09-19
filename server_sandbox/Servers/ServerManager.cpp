@@ -160,9 +160,9 @@ void    ServerManager::acceptNewConnection(int fd)
 	std::cout << "socket found" << new_client << std::endl;
 	if (new_client)
 	{
-		std::cout << "adding client to map" << std::endl;
+		//std::cout << "adding client to map" << std::endl;
 		_clients_map.insert(std::make_pair(client_sock, new_client));
-		std::cout << "client added to map" << std::endl;
+		std::cout << "client added to map, socket: " << client_sock << fd << _biggest_fd << std::endl;
 
 	}
 
@@ -220,7 +220,9 @@ void    ServerManager::readRequest(const int &i)
 		std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
 		HttpRequest parsedRequest(_buffer);
 		parsedRequest.printRequest();
-		_pendingResponses[_fds[i].fd] = TextResponse(parsedRequest);
+		_pendingResponses[i] = TextResponse(parsedRequest);
+		removeFromSet(i, _recv_fd_pool);
+        addToSet(i, _write_fd_pool);
 	}
     /*else if (bytes_read < 0)
     {
