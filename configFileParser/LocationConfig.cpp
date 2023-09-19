@@ -12,7 +12,7 @@ LocationConfig::LocationConfig(std::fstream &configFile, std::string &inLine) {
 	methods.push_back("POST");
 	methods.push_back("DELETE");
 	redirection = "";
-	alias = "";
+	root = "";
 	uploads = "";
 	autoindex = false;
 	index = "";
@@ -28,7 +28,7 @@ LocationConfig& LocationConfig::operator=(const LocationConfig &o)
 {
 	methods = o.methods;
 	redirection = o.redirection;
-	alias = o.alias;
+	root = o.root;
 	uploads = o.uploads;
 	autoindex = o.autoindex;
 	index = o.index;
@@ -70,9 +70,9 @@ void LocationConfig::extract(std::fstream &configFile) {
 		} else if (locEntryKey == "redir") {
 			extractValue(locEntryValue, locEntryColonPos);
 			redirection = locEntryValue;
-		} else if (locEntryKey == "alias") {
+		} else if (locEntryKey == "root") {
 			extractValue(locEntryValue, locEntryColonPos);
-			alias = locEntryValue;
+			root = locEntryValue;
 		} else if (locEntryKey == "uploads") {
 			extractValue(locEntryValue, locEntryColonPos);
 			uploads = locEntryValue;	
@@ -105,7 +105,7 @@ void LocationConfig::print() const {
 	}
 	std::cout << std::endl;
 	std::cout << "      Redirection: \"" << redirection << "\"" << std::endl;
-	std::cout << "      Alias: \"" << alias << "\"" << std::endl;
+	std::cout << "      root: \"" << root << "\"" << std::endl;
 	std::cout << "      uploads: \"" << uploads << "\"" << std::endl;
 	std::cout << "      Autoindex: " << (autoindex ? "true" : "false") << std::endl;
 	std::cout << "      Index: \"" << index << "\"" << std::endl;

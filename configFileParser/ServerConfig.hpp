@@ -11,7 +11,7 @@
 
 struct Port
 {
-	int portNum;
+	int number;
 	bool dfault;
 };
 
@@ -27,8 +27,8 @@ class ServerConfig : public GenericConfig
 		void extractLocations(std::fstream &configFile);
 		void detectKey(std::string keyToMatch);
 	public:
-		std::string name;
-		int client_max_body_size_mb;
+		std::string hostname;
+		int clientMaxBodySizeMB;
 		std::vector<Port> ports;
 		std::map<std::string, std::string> error_pages;
 		std::map<std::string, LocationConfig> locations;

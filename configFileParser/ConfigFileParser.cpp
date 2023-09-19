@@ -28,7 +28,6 @@ ConfigFileParser& ConfigFileParser::operator=(const ConfigFileParser &o)
 	return *this;
 }
 
-
 ConfigFileParser::~ConfigFileParser()
 {
 	

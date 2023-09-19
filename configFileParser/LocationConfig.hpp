@@ -19,7 +19,7 @@ class LocationConfig : public GenericConfig
 		std::string key;
 		std::vector<std::string> methods;
 		std::string redirection;
-		std::string alias;    
+		std::string root;    
 		std::string uploads;
 		bool autoindex;
 		std::string index;
