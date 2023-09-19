@@ -1,7 +1,9 @@
 #ifndef CGIUPLOADER_HPP
 # define CGIUPLOADER_HPP
 
-
+# include <cstdlib>
+# include <unistd.h>
+# include "../configFileParser/ConfigFileParser.hpp"
 
 class CGIUploader {
 	private:
@@ -14,14 +16,13 @@ class CGIUploader {
 			std::string accept;
 			std::string connection;
 		};
+		bool matchResource(const std::string& firstLine, const std::string& resourceToMatch, HttpRequest &request);
+		void prepareData();
+		void prepareEnvironment(HttpRequest &request);
+		int executePhpScript(const char *filePath);
+	public:
 		CGIUploader();
 		~CGIUploader();
-		receiveFileUploadRequest();
-		unchunk();
-		prepData();
-		runScript();
-		sendResponse();
-	public:
 };
 
 #endif

@@ -81,7 +81,6 @@ For example, if the URL is http://example.com/cgi-bin/my_script/some/additional/
 
 In summary, this guidance is suggesting that if the CGI script is not accessed directly via a URL, but rather through a different method, any additional path information in the URL should be interpreted as PATH_INFO and passed to the CGI script for appropriate handling. This is a way to provide input or context to the CGI script based on the URL's path structure.
 
-
 # example PHP scripts for upload
 
 Example: https://www.w3schools.com/Php/php_file_upload.asp
