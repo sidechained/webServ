@@ -1,5 +1,7 @@
 #pragma once
 #include "../Requests/HttpRequest.hpp"
+#include "Headers/MovedHeader.hpp"
+#include "Headers/OkHeader.hpp"
 #include <fstream>
 
 

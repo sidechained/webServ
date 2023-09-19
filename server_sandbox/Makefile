@@ -7,6 +7,9 @@ FILES = main.cpp \
         Responses/TextResponse.cpp \
         Responses/SimpleResponse.cpp \
 		Responses/ResponseFactory.cpp \
+		Responses/Headers/SimpleHeader.cpp \
+		Responses/Headers/MovedHeader.cpp \
+		Responses/Headers/OkHeader.cpp \
 		utils/ContentTypeUtils.cpp \
 		Parser/GenericConfig.cpp \
 		Parser/LocationConfig.cpp \
