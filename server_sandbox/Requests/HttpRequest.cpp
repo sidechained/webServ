@@ -6,6 +6,13 @@ HttpRequest::HttpRequest(std::string const &request, ServerConfig *config) : _in
     extractRequestFields();
     determineResource();
     determineContentType();
+    cleanUp();
+}
+
+void HttpRequest::cleanUp()
+{
+    for (std::map<std::string, std::string>::iterator it = _request.begin(); it != _request.end(); ++it)
+        removeNonPrintableChars(it->second);
 }
 
 HttpRequest::HttpRequest()

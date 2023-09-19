@@ -8,6 +8,7 @@
 # include <vector>
 # include <map>
 # include "LocationConfig.hpp"
+# include "../WebServ.hpp"
 
 struct Port
 {
@@ -38,6 +39,7 @@ class ServerConfig : public GenericConfig
 		~ServerConfig();
 		void print() const;
 		void printLocations() const;
+		void cleanUp();
 };
 
 #endif

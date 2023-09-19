@@ -110,3 +110,17 @@ void LocationConfig::print() const {
 	std::cout << "      Autoindex: " << (autoindex ? "true" : "false") << std::endl;
 	std::cout << "      Index: \"" << index << "\"" << std::endl;
 }
+
+void LocationConfig::cleanUp() {
+	//go through all strings and maps and call removeNonPrintableChars
+	removeNonPrintableChars(key);
+	for (std::vector<std::string>::iterator it = methods.begin(); it != methods.end(); ++it) {
+		removeNonPrintableChars(*it);
+	}
+	removeNonPrintableChars(redirection);
+	removeNonPrintableChars(root);
+	removeNonPrintableChars(uploads);
+	removeNonPrintableChars(index);
+
+
+}

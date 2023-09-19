@@ -21,7 +21,6 @@ MovedHeader::MovedHeader(std::string const &host, std::string const &resource)
 	this->_status = findStatusCode(this->_statusCode);
 	this->_location = "http://" + host + resource + "/";
 	this->_contentLength = "0";
-	this->_location = removeNonPrintableChars(this->_location);
 	this->createHeader();
 }
 

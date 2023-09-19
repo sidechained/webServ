@@ -32,4 +32,5 @@ public:
     std::string const &getMethod();
     std::string const &getContentType() const;
     bool isNoSlash() const;
+    void cleanUp();
 };
