@@ -41,7 +41,11 @@ public:
 	void setupServers();
 	void initializeSets();
 	void addToSet(const int i, fd_set &set);
+	void removeFromSet(const int i, fd_set &set);
 	void runServers();
+	void checkTimeout();
+	void closeConnection(const int i);
+	void acceptNewConnection(int fd);
 
 
 	ServerManager();
