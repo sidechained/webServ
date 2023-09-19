@@ -14,6 +14,7 @@
 #include "../WebServ.hpp"
 
 #define MAX_CLIENTS 10
+#define MESSAGE_BUFFER 4000
 
 class ServerManager
 {
@@ -21,7 +22,7 @@ private:
 
 	std::vector<SimpleServer *> _servers;
 	std::map<int, SimpleServer*> _servers_map;
-	std::map<int, ListeningSocket> _clients_map;
+	std::map<int, ListeningSocket*> _clients_map;
 	fd_set     _recv_fd_pool;
 	fd_set     _write_fd_pool;
 	int        _biggest_fd;
@@ -37,6 +38,8 @@ private:
 	void handler();
 	void responder();
 
+	ListeningSocket* findSocket(int fd);
+
 public:
 	void setupServers();
 	void initializeSets();
@@ -46,6 +49,7 @@ public:
 	void checkTimeout();
 	void closeConnection(const int i);
 	void acceptNewConnection(int fd);
+	void readRequest(const int &i);
 
 
 	ServerManager();

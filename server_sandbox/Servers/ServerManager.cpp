@@ -19,6 +19,21 @@ void    ServerManager::setupServers()
 
 }
 
+ListeningSocket* ServerManager::findSocket(int fd)
+{
+	for(std::vector<SimpleServer *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
+    {
+		std::vector<ListeningSocket *> sockets = (*it)->getSockets();
+		for(std::vector<ListeningSocket *>::iterator it2 = sockets.begin(); it2 != sockets.end(); ++it2)
+		{
+			int sock = (*it2)->getSock();
+			if (sock == fd)
+				return *it2;
+		}
+    }
+	return NULL;
+}
+
 void    ServerManager::initializeSets()
 {
     FD_ZERO(&_recv_fd_pool);
@@ -79,6 +94,7 @@ void    ServerManager::runServers()
     struct timeval timer;
     while (true)
     {
+		//std::cout << "infinite loop" << std::endl;
         timer.tv_sec = 1;
         timer.tv_usec = 0;
         recv_set_cpy = _recv_fd_pool;
@@ -96,8 +112,8 @@ void    ServerManager::runServers()
             if (FD_ISSET(i, &recv_set_cpy) && _servers_map.count(i))
 				acceptNewConnection(i);
                 //acceptNewConnection(_servers_map.find(i)->second);
-            else if (FD_ISSET(i, &recv_set_cpy) && _clients_map.count(i)) {}
-                //readRequest(i, _clients_map[i]);
+            else if (FD_ISSET(i, &recv_set_cpy) && _clients_map.count(i))
+                readRequest(i);
             else if (FD_ISSET(i, &write_set_cpy) && _clients_map.count(i))
             {
                 /*int cgi_state = _clients_map[i].response.getCgiState(); // 0->NoCGI 1->CGI write/read to/from script 2-CGI read/write done
@@ -140,11 +156,100 @@ void    ServerManager::acceptNewConnection(int fd)
         close(client_sock);
         return ;
     }
+	ListeningSocket* new_client = findSocket(fd);
+	std::cout << "socket found" << new_client << std::endl;
+	if (new_client)
+	{
+		std::cout << "adding client to map" << std::endl;
+		_clients_map.insert(std::make_pair(client_sock, new_client));
+		std::cout << "client added to map" << std::endl;
+
+	}
+
 	// ADDING THE SOCKETS TO THE coresponding MAP
     /*new_client.setSocket(client_sock);
     if (_clients_map.count(client_sock) != 0)
         _clients_map.erase(client_sock);
     _clients_map.insert(std::make_pair(client_sock, new_client));*/
+}
+
+/*void PollingServer::handler()
+{
+	for (int i = 1; i <= _clients; i++)
+	{
+		if (_fds[i].revents & POLLIN)
+		{
+			memset(_buffer, 0, sizeof(_buffer));
+			int bytesRead = read(_fds[i].fd, _buffer, sizeof(_buffer));
+			if (bytesRead > 0)
+			{
+				std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
+				HttpRequest parsedRequest(_buffer);
+				parsedRequest.printRequest();
+				_pendingResponses[_fds[i].fd] = TextResponse(parsedRequest);
+			}
+			else
+			{
+				std::cout << BG_GREEN << "Client " << i << " disconnected" << RESET << std::endl;
+				close(_fds[i].fd);
+				if (i < _clients)
+					_fds[i] = _fds[_clients];
+				_clients--;
+			}
+		}
+	}
+}*/
+
+void    ServerManager::readRequest(const int &i)
+{
+	//(void) c;
+	std::cout << "read request" << std::endl;
+
+
+    char    buffer[MESSAGE_BUFFER];
+    int     bytes_read = 0;
+    bytes_read = read(i, buffer, MESSAGE_BUFFER);
+    if (bytes_read <= 0)
+    {
+        //Logger::logMsg(YELLOW, CONSOLE_OUTPUT, "webserv: Client %d Closed Connection", i);
+        closeConnection(i);
+        return ;
+    }
+	else
+	{
+		std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
+		HttpRequest parsedRequest(_buffer);
+		parsedRequest.printRequest();
+		_pendingResponses[_fds[i].fd] = TextResponse(parsedRequest);
+	}
+    /*else if (bytes_read < 0)
+    {
+        Logger::logMsg(RED, CONSOLE_OUTPUT, "webserv: fd %d read error %s", i, strerror(errno));
+        closeConnection(i);
+        return ;
+    }
+    else if (bytes_read != 0)
+    {
+        c.updateTime();
+        c.request.feed(buffer, bytes_read);
+        memset(buffer, 0, sizeof(buffer));
+    }
+
+    if (c.request.parsingCompleted() || c.request.errorCode()) // 1 = parsing completed and we can work on the response.
+    {
+        assignServer(c);
+        Logger::logMsg(CYAN, CONSOLE_OUTPUT, "Request Recived From Socket %d, Method=<%s>  URI=<%s>"
+        , i, c.request.getMethodStr().c_str(), c.request.getPath().c_str());
+        c.buildResponse();
+        if (c.response.getCgiState())
+        {
+            handleReqBody(c);
+            addToSet(c.response._cgi_obj.pipe_in[1],  _write_fd_pool);
+            addToSet(c.response._cgi_obj.pipe_out[0],  _recv_fd_pool);
+        }
+        removeFromSet(i, _recv_fd_pool);
+        addToSet(i, _write_fd_pool);
+    }*/
 }
 
 void    ServerManager::closeConnection(const int i)

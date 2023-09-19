@@ -49,7 +49,7 @@ void PollingServer::handler()
 				HttpRequest parsedRequest(_buffer);
 				parsedRequest.printRequest();
 				_pendingResponses[_fds[i].fd] = TextResponse(parsedRequest);
-			}
+			} 
 			else
 			{
 				std::cout << BG_GREEN << "Client " << i << " disconnected" << RESET << std::endl;

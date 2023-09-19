@@ -30,6 +30,17 @@ SimpleSocket::~SimpleSocket()
     close(_sock);
 }
 
+SimpleSocket::SimpleSocket(const SimpleSocket &other)
+{
+	if (this != &other)
+	{
+		_address = other._address;
+		_sock = other._sock;
+		_conection = other._conection;
+		_addressSize = other._addressSize;
+	}
+}
+
 void SimpleSocket::testConnection(int item)
 {
     if (item < 0)

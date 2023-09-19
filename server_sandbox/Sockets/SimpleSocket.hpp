@@ -18,6 +18,9 @@ private:
 public:
     SimpleSocket(int domain, int type, int protocol, int port, std::string ip);
     ~SimpleSocket();
+	SimpleSocket(const SimpleSocket &other);
+	//SimpleSocket &operator=(const SimpleSocket &other);
+
     void bindSocket();
     void testConnection(int item);
     sockaddr_in getAddress() const;
