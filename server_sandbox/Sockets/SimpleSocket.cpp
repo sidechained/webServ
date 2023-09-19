@@ -3,13 +3,7 @@
 // Default constructor
 SimpleSocket::SimpleSocket(int domain, int type, int protocol, int port, std::string ip)
 {
-    std::cout << "Port" << port << std::endl;
-    std::cout << "IP" << ip << std::endl;
-    std::cout << "Domain" << domain << std::endl;
-    std::cout << "Type" << type << std::endl;
-    std::cout << "Protocol" << protocol << std::endl;
-    
-    // Define address structure
+     // Define address structure
     _address.sin_family = domain;
     _address.sin_port = htons(port);
     _address.sin_addr.s_addr = inet_addr(ip.c_str());

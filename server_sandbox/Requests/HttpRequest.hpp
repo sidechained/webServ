@@ -31,6 +31,7 @@ public:
     std::string const &getResource();
     std::string const &getMethod();
     std::string const &getContentType() const;
+    std::string const &getRedirection() const;
     bool isNoSlash() const;
     void cleanUp();
 };

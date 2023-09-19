@@ -18,6 +18,12 @@ void TextResponse::createResponse()
 
     std::cout << BG_BOLD_MAGENTA << "Creating HTML response for resource" << request.getResource() << RESET << std::endl;
 
+    if (request.getRedirection() != "")
+    {
+        setHeader(MovedHeader(request.getRequest()["Host"], request.getRedirection()).getHeader());
+        setBodySent(true);
+        return;
+    }
     if (request.isNoSlash())
     {
         setHeader(MovedHeader(request.getRequest()["Host"], request.getResource()).getHeader());
@@ -41,7 +47,7 @@ void TextResponse::createResponse()
     setBody(body);
 
     std::cout << BG_BOLD_MAGENTA << "Header: " << RESET << this->getHeader().substr(0, 1000) << std::endl;
-    std::cout << BG_BOLD_MAGENTA << "Body: " << RESET << this->getBody().substr(0, 1000) << std::endl;
+    std::cout << BG_BOLD_MAGENTA << "Body: " << RESET << this->getBody().substr(0, 100) << std::endl;
 
     // clear and reset htmlFile
     htmlFile.clear();

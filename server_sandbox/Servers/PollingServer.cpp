@@ -32,6 +32,7 @@ void PollingServer::accepter()
 			_fds[_clients].fd = newSocket;
 			_fds[_clients].events = POLLIN | POLLOUT;
 			_fds[_clients].revents = 0;
+			std::cout << BG_GREEN << "New client connected" << RESET << std::endl;
 			printClientAddress(address);
 		}
 		else
@@ -50,6 +51,7 @@ void PollingServer::handler()
 		{
 			memset(_buffer, 0, sizeof(_buffer));
 			int bytesRead = read(_fds[i].fd, _buffer, sizeof(_buffer));
+			std::cout << "Reading from client " << i << std::endl;
 			if (bytesRead > 0)
 			{
 				std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;

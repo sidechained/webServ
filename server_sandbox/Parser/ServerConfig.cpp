@@ -5,7 +5,7 @@ ServerConfig::ServerConfig(std::fstream &configFile) {
 	hostname = "";
 	client_max_body_size_mb = 1;
 	extract(configFile);
-	//print();
+	print();
 	cleanUp();
 }
 
