@@ -15,10 +15,8 @@ TextResponse::~TextResponse()
 void TextResponse::createResponse()
 {
     HttpRequest request = this->getRequest();
-    std::string filePath = request.getResource();
 
     std::cout << BG_BOLD_MAGENTA << "Creating HTML response for resource" << request.getResource() << RESET << std::endl;
-    std::cout << BG_BOLD_MAGENTA << "Looking for resource at " << filePath << RESET << std::endl;
 
     if (request.isNoSlash())
     {
@@ -27,7 +25,7 @@ void TextResponse::createResponse()
         return;
     }
 
-    std::ifstream htmlFile(filePath.c_str(), std::ios::binary);
+    std::ifstream htmlFile(request.getResource().c_str(), std::ios::binary);
     if (!htmlFile)
     {
         std::cerr << "Error opening HTML file" << std::endl;

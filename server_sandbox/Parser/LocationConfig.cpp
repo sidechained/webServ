@@ -15,10 +15,8 @@ LocationConfig::LocationConfig(std::fstream &configFile, std::string &inLine) {
 	root = "";
 	uploads = "";
 	autoindex = false;
-	index = "";
+	index = "index.html";
 	extract(configFile);
-	if (index == "")
-		index = "index.html";
 }
 
 LocationConfig::LocationConfig(const LocationConfig &o)

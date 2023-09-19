@@ -11,6 +11,8 @@ FILES = main.cpp \
 		Responses/Headers/MovedHeader.cpp \
 		Responses/Headers/OkHeader.cpp \
 		utils/ContentTypeUtils.cpp \
+		utils/LoadMapFromFile.cpp \
+		utils/StatusCodeUtils.cpp \
 		Parser/GenericConfig.cpp \
 		Parser/LocationConfig.cpp \
 		Parser/ServerConfig.cpp \

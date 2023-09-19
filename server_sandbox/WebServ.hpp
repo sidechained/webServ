@@ -3,10 +3,15 @@
 #define WEBSERV_HPP
 #include <string>
 #include <map>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 extern bool isRunning;
 
+void loadMapFromFile(const std::string &filename, std::map<std::string, std::string> &map);
 std::string findContentType(const std::string &resource);
-void loadContentTypesFromFile(const std::string &filename, std::map<std::string, std::string> &_contentTypes);
+std::string findStatusCode(std::string const &code);
+
 
 #endif // WEBSERV_HPP
