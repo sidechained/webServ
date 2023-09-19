@@ -16,9 +16,9 @@ server:
 			autoindex: true
 			uploads: /uploads
 		/new-url:
+			index: test.html
 			root: /tmp
 		/:
-			index: index.html
 			root: /www
 		/my_game:
 			root: /tictactoe

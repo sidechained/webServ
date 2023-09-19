@@ -18,15 +18,15 @@ void TextResponse::createResponse()
 
     std::cout << BG_BOLD_MAGENTA << "Creating HTML response for resource" << request.getResource() << RESET << std::endl;
 
-    if (request.getRedirection() != "")
-    {
-        setHeader(MovedHeader(request.getRequest()["Host"], request.getRedirection()).getHeader());
-        setBodySent(true);
-        return;
-    }
     if (request.isNoSlash())
     {
         setHeader(MovedHeader(request.getRequest()["Host"], request.getResource()).getHeader());
+        setBodySent(true);
+        return;
+    }
+    if (request.getRedirection() != "")
+    {
+        setHeader(MovedHeader(request.getRequest()["Host"], request.getRedirection()).getHeader());
         setBodySent(true);
         return;
     }

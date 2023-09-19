@@ -19,7 +19,6 @@ HttpRequest::HttpRequest()
 {
 }
 
-
 HttpRequest::~HttpRequest()
 {
 }
@@ -84,113 +83,66 @@ bool HttpRequest::locationIsSet(std::string const &key)
 
 void HttpRequest::determineResource()
 {
-    // Get the requested resource from the HTTP request
     std::string resource = _request["Resource"];
-    std::cout << BG_YELLOW << "resource: " << resource << RESET << std::endl;
 
-    // Check if the resource doesn't end with a slash and is not a file
+    // Return if the resource is not a directory and does not have a file extension
     if (!isDirectory(resource) && !hasFileExtension(resource))
     {
-        // Set _noSlash to true and return
         _noSlash = true;
         return;
     }
 
-    std::string index;
-    std::string root;
-    std::string redirection;
+    std::string key, index, root, redirection;
+    bool autoindex;
+    std::vector<std::string> methods;
+    
+    long i = resource.size();
 
-    //loop trough resource from the end to the beginning to find the correct root, index and redirection
-    // std::cout << BG_RED << "Looping trough resource from the end to the beginning to find the correct root, index and redirection" << RESET << std::endl;
-    // for (long i = resource.size(); i >= 0; i--)
-    // {
-    //     std::string key = resource.substr(0, i);
-    //     std::cout << BG_RED << "key: " << key << RESET << std::endl;
-    //     if (locationIsSet(key))
-    //     {
-    //         index = _config->locations[key].index;
-    //         root = _config->locations[key].root;
-    //         redirection = _config->locations[key].redirection;
-    //     }
-    // } 
+    std::cout << BG_RED << "Looping trough resource from the end to the beginning to find the correct root, index and redirection" << RESET << std::endl;
+    while (i > 0)
+    {
+        key = resource.substr(0, i);
+        std::cout << BG_RED << "key: " << key << RESET << std::endl;
+        if (locationIsSet(key))
+        {
+            redirection = _config->locations[key].redirection;
+            root = _config->locations[key].root;
+            index = _config->locations[key].index;
+            autoindex = _config->locations[key].autoindex;
+            methods = _config->locations[key].methods;
+            break;
+        }
+        i--;
+    }
 
-    // If the resource is a directory
+    if (redirection != "")
+    {
+        _request["Redirection"] = redirection;
+        return;
+    }
+
+    if (root != "")
+    {
+        if (key == "/")
+            resource = root + resource;
+        else
+            resource = root + resource.substr(i);
+
+        if (resource[0] == '/')
+            resource = resource.substr(1);
+
+        std::cout << RED << "Found root for: " << resource << RESET << std::endl;
+    }
+
     if (isDirectory(resource))
     {
-        std::cout << BG_YELLOW << "resource is a directory" << RESET << std::endl;
-        std::string key = resource;
+        std::cout << BG_GREEN << "resource is a directory: " << resource << RESET << std::endl;
+        std::cout << BG_GREEN << "index: " << index << RESET << std::endl;
 
-        // Remove trailing slash if it exists
-        if (key.length() > 1 && key[key.length() - 1] == '/')
-            key = key.substr(0, key.length() - 1);
-
-        // Check if there is a location configuration for this directory
-        if (locationIsSet(key))
-        {
-            // Update the resource by appending the index from the location configuration
-            std::cout << BG_BLUE  << "Appending index to direcotry resource" << std::endl;
-            resource = resource + _config->locations[key].index;
-            std::cout << BG_BLUE << "resource: " << resource << std::endl;
-        }
-        else
-        {
-            // If there is no location configuration for this directory, append "index.html" to the resource
-            std::cout << BG_BLUE << "Appending index.html to direcotry resource" << std::endl;
-            resource = resource + "index.html";
-            std::cout << BG_BLUE << "resource: " << resource << std::endl;
-        }
+        if (index != "")
+            resource = resource + index;
     }
 
-    // Loop to find the correct root for the resource
-    for (long i = resource.size(); i >= 0; i--)
-    {
-        std::string key = resource.substr(0, i);
-
-        // Remove trailing slash if it exists
-        if (key.length() > 1 && key[key.length() - 1] == '/')
-            key = key.substr(0, key.length() - 1);
-
-        // Check if there is a location configuration for this directory
-        if (locationIsSet(key))
-        {
-            std::cout << BG_YELLOW << "Found location configuration for: " << key << RESET << std::endl;
-            std::cout << BG_YELLOW << _config->locations[key].root << RESET << std::endl;
-
-
-            if (!_config->locations[key].redirection.empty())
-            {
-                std::cout << BG_YELLOW << "Found redirection for: " << key << RESET << std::endl;
-                std::cout << BG_YELLOW << _config->locations[key].redirection << RESET << std::endl;
-                _request["Redirection"] = _config->locations[key].redirection;
-                return;
-            }
-            // If a root is specified in the location configuration
-            if (!_config->locations[key].root.empty())
-            {
-                std::cout << YELLOW << "root: " << _config->locations[key].root << RESET << std::endl;
-                std::cout << GREEN << "resource: " << resource << " i: " << i << RESET << std::endl;
-
-                // Update the resource path by combining the root and the remaining path
-                if (key == "/")
-                    resource = _config->locations[key].root + resource;
-                else
-                    resource = _config->locations[key].root + "/" + resource.substr(i);
-
-                std::cout << BLUE << "new resource: " << resource << RESET << std::endl;
-
-                // Remove a leading slash if it exists
-                if (resource[0] == '/')
-                    resource = resource.substr(1);
-
-                std::cout << RED << "new resource: " << resource << RESET << std::endl;
-
-                // Break out of the loop
-                break;
-            }
-        }
-    }
-
-    // Update the "Resource" field in the HTTP request with the final resource path
     _request["Resource"] = resource;
 }
 
