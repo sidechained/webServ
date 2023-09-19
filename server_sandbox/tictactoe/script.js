@@ -1,14 +1,14 @@
 class player {
-  constructor(name, marker, score) {
-    this.name = name;
+  constructor(hostname, marker, score) {
+    this.hostname = hostname;
     this.marker = marker;
     this.score = score;
   }
   addPoint() {
     this.score++;
   }
-  get myName() {
-    return this.name;
+  get myhostname() {
+    return this.hostname;
   }
   get myMarker() {
     return this.marker;
@@ -19,8 +19,8 @@ class player {
 }
 
 class ai extends player {
-  constructor(name, marker, score, level) {
-    super(name, marker, score);
+  constructor(hostname, marker, score, level) {
+    super(hostname, marker, score);
     this.level = level;
   }
   set newLevel(level) {
@@ -384,7 +384,7 @@ const title = (() => {
   const animateTurn = (currentPlayer) => {
     _resetAnimation(_animationClass);
     _resetAnimation("title-game-over");
-    currentPlayer.myName === "human"
+    currentPlayer.myhostname === "human"
       ? (_animationClass = "title-animate")
       : (_animationClass = "title-reverse");
     for (let i = 0; i < _titles.length; i++) {

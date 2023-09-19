@@ -1,8 +1,8 @@
 #include "ConfigFileParser.hpp"
 
-ConfigFileParser::ConfigFileParser(std::string filename) {
+ConfigFileParser::ConfigFileParser(std::string filehostname) {
 	numServers = 0;
-    std::fstream configFile(filename.c_str());
+    std::fstream configFile(filehostname.c_str());
 	if(!configFile.is_open())
 		errorExit(ERR_OPEN, ""); // "" correct way to handle?
 	while(1)
