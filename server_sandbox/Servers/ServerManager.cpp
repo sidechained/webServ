@@ -116,6 +116,9 @@ void    ServerManager::runServers()
                 readRequest(i);
             else if (FD_ISSET(i, &write_set_cpy) && _clients_map.count(i))
             {
+				sendResponse(i);
+				//closeConnection(i);
+				std::cout << "response sent" << std::endl;
                 /*int cgi_state = _clients_map[i].response.getCgiState(); // 0->NoCGI 1->CGI write/read to/from script 2-CGI read/write done
                 if (cgi_state == 1 && FD_ISSET(_clients_map[i].response._cgi_obj.pipe_in[1], &write_set_cpy))
                     sendCgiBody(_clients_map[i], _clients_map[i].response._cgi_obj);
@@ -218,11 +221,12 @@ void    ServerManager::readRequest(const int &i)
 	else
 	{
 		std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
-		HttpRequest parsedRequest(_buffer);
+		HttpRequest parsedRequest(buffer);
+		std::cout << BG_BOLD_WHITE << buffer << RESET << std::endl;
 		parsedRequest.printRequest();
 		_pendingResponses[i] = TextResponse(parsedRequest);
 		removeFromSet(i, _recv_fd_pool);
-        addToSet(i, _write_fd_pool);
+		addToSet(i, _write_fd_pool);
 	}
     /*else if (bytes_read < 0)
     {
@@ -251,6 +255,165 @@ void    ServerManager::readRequest(const int &i)
         }
         removeFromSet(i, _recv_fd_pool);
         addToSet(i, _write_fd_pool);
+    }*/
+}
+
+/*void PollingServer::responder()
+{
+	for (int i = 1; i <= _clients; i++)
+	{
+		if (_fds[i].revents & POLLOUT)
+		{
+			int clientFd = _fds[i].fd;
+
+			SimpleResponse response = _pendingResponses[clientFd];
+
+			if (!response.isHeaderSent())
+			{
+				std::string header = response.getHeader();
+				ssize_t bytes_sent = write(clientFd, header.c_str(), header.length());
+				if (bytes_sent == -1)
+				{
+					std::cerr << "Error sending HTTP response headers" << std::endl;
+					return;
+				}
+				if ((unsigned long)bytes_sent == header.length())
+					response.setHeaderSent(true);
+				else
+					response.updateHeaderOffset(bytes_sent);
+			}
+
+			if (!response.isBodySent())
+			{
+				std::string body = response.getBody();
+				ssize_t bytes_sent = write(clientFd, body.c_str(), body.length());
+				if (bytes_sent == -1)
+				{
+					std::cerr << "Error sending HTTP response body" << std::endl;
+					return;
+				}
+				if ((unsigned long)bytes_sent == body.length())
+					response.setBodySent(true);
+				else
+					response.updateBodyOffset(bytes_sent);
+			}
+			// Remove the response from the map if it has been sent
+			if (response.isHeaderSent() && response.isBodySent())
+				_pendingResponses.erase(clientFd);
+		}
+	}
+}*/
+
+void    ServerManager::sendResponse(const int &i)
+{
+	std::cout << BG_GREEN "sendResponse call fd: " RESET << i << std::endl;
+	
+	/*int clientFd = i;
+
+			SimpleResponse response = _pendingResponses[clientFd];
+
+			if (!response.isHeaderSent())
+			{
+				std::string header = response.getHeader();
+				ssize_t bytes_sent = write(clientFd, header.c_str(), header.length());
+				if (bytes_sent == -1)
+				{
+					std::cerr << "Error sending HTTP response headers" << std::endl;
+					return;
+				}
+				if ((unsigned long)bytes_sent == header.length())
+					response.setHeaderSent(true);
+				else
+					response.updateHeaderOffset(bytes_sent);
+				std::cout << "header bytes sent are: " << bytes_sent << std::endl;
+			}
+
+			if (!response.isBodySent())
+			{
+				std::string body = response.getBody();
+				ssize_t bytes_sent = write(clientFd, body.c_str(), body.length());
+				if (bytes_sent == -1)
+				{
+					std::cerr << "Error sending HTTP response body" << std::endl;
+					return;
+				}
+				if ((unsigned long)bytes_sent == body.length())
+					response.setBodySent(true);
+				else
+					response.updateBodyOffset(bytes_sent);
+				std::cout << "body bytes sent are: " << bytes_sent << std::endl;
+			}
+			std::cout << "the response header is: " << response.getHeader() << std::endl;
+			// Remove the response from the map if it has been sent
+			if (response.isHeaderSent() && response.isBodySent())
+			{
+				_pendingResponses.erase(clientFd);
+				closeConnection(i);
+				std::cout << "connection closed" << std::endl;
+			}*/
+			//std::cout << "send response is done" << std::endl;
+	
+// END
+
+	int bytes_sent;
+
+	SimpleResponse responsePtr = _pendingResponses[i];
+    std::string response = responsePtr.getResponse();
+	std::cout << BG_BOLD_MAGENTA << response << RESET << std::endl;
+    if (response.length() >= MESSAGE_BUFFER)
+        bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);
+    else
+        bytes_sent = write(i, response.c_str(), response.length());
+
+    if (bytes_sent < 0)
+    {
+        std::cout << "Problem sending" << std::endl;
+        closeConnection(i);
+    }
+    else if ((size_t) bytes_sent == response.length())
+    {
+		_pendingResponses.erase(i);
+		closeConnection(i);
+		std::cout << "connection closed" << std::endl;
+    }
+	else 
+	std::cout << BG_BOLD_RED "NOT entire data sent" RESET << std::endl;
+
+
+
+    /*int bytes_sent;
+    std::string response = c.response.getRes();
+    if (response.length() >= MESSAGE_BUFFER)
+        bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);
+    else
+        bytes_sent = write(i, response.c_str(), response.length());
+
+    if (bytes_sent < 0)
+    {
+        Logger::logMsg(RED, CONSOLE_OUTPUT, "sendResponse(): error sending : %s", strerror(errno));
+        closeConnection(i);
+    }
+    else if (bytes_sent == 0 || (size_t) bytes_sent == response.length())
+    {
+        // Logger::logMsg(LIGHTMAGENTA, CONSOLE_OUTPUT, "sendResponse() Done sending ");
+        Logger::logMsg(CYAN, CONSOLE_OUTPUT, "Response Sent To Socket %d, Stats=<%d>"
+        , i, c.response.getCode());
+        if (c.request.keepAlive() == false || c.request.errorCode() || c.response.getCgiState())
+        {
+            Logger::logMsg(YELLOW, CONSOLE_OUTPUT, "Client %d: Connection Closed.", i);
+            closeConnection(i);
+        }
+        else
+        {
+            removeFromSet(i, _write_fd_pool);
+            addToSet(i, _recv_fd_pool);
+            c.clearClient();
+        }
+    }
+    else
+    {
+        c.updateTime();
+        c.response.cutRes(bytes_sent);
     }*/
 }
 

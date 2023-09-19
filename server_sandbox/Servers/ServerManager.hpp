@@ -50,6 +50,7 @@ public:
 	void closeConnection(const int i);
 	void acceptNewConnection(int fd);
 	void readRequest(const int &i);
+	void sendResponse(const int &i);
 
 
 	ServerManager();

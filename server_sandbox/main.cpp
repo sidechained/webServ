@@ -23,6 +23,7 @@ int main(int argc, char const *argv[])
     (void)argc;
     (void)argv;
     signal(SIGINT, sigIntHandler);
+	signal(SIGPIPE, SIG_IGN);
     /*std::vector<int> ports;
     ports.push_back(8080);
     PollingServer server(AF_INET, SOCK_STREAM, 0, ports, "0.0.0.0", 10);
