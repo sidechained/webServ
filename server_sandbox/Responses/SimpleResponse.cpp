@@ -1,6 +1,6 @@
 #include "SimpleResponse.hpp"
 
-SimpleResponse::SimpleResponse() : _request(""), _headerSent(false), _bodySent(false)
+SimpleResponse::SimpleResponse() : _request(), _headerSent(false), _bodySent(false)
 {
 }
 
@@ -100,4 +100,10 @@ int SimpleResponse::fileLength(std::ifstream &file)
     file.seekg(0, std::ios::beg);
 
     return fileLength;
+}
+
+void SimpleResponse::printResponse()
+{
+    std::cout << BG_BOLD_MAGENTA << "Header: " << RESET << getHeader() << std::endl;
+    std::cout << BG_BOLD_MAGENTA << "Body: " << RESET << getBody() << std::endl;
 }

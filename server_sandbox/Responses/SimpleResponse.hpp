@@ -32,5 +32,6 @@ public:
     void updateHeaderOffset(size_t offset);
     void updateBodyOffset(size_t offset);
     int fileLength(std::ifstream &htmlFile);
+    void printResponse();
 };
 

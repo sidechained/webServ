@@ -4,6 +4,7 @@
 #include <netinet/in.h>  // for AF_INET
 #include <sys/socket.h>  // for SOCK_STREAM
 #include "Servers/PollingServer.hpp"
+#include "Parser/ConfigFileParser.hpp"
 
 
 bool isRunning = true;
@@ -19,12 +20,19 @@ void sigIntHandler(int sig)
 
 int main(int argc, char const *argv[])
 {
-    (void)argc;
-    (void)argv;
+    if (argc != 2)
+	{
+		std::cout << "Wrong number of arguments" << std::endl;
+		return EXIT_FAILURE;
+	}
+	ConfigFileParser cfp(argv[1]);
+
     signal(SIGINT, sigIntHandler);
+    signal(SIGPIPE, SIG_IGN);
     std::vector<int> ports;
     ports.push_back(8080);
-    PollingServer server(AF_INET, SOCK_STREAM, 0, ports, "0.0.0.0", 10);
+    PollingServer server(cfp.serverConfigs[0]);
+    //PollingServer server(AF_INET, SOCK_STREAM, 0, ports, "0.0.0.0", 10);
     server.launch();
     std::cout << BG_BLUE << "Server finished" << RESET << std::endl;
     return 0;
