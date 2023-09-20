@@ -331,8 +331,11 @@ void    ServerManager::sendResponse(const int &i)
 		closeConnection(i);
 		std::cout << "connection closed" << std::endl;
     }
-	else 
-	std::cout << BG_BOLD_RED "NOT entire data sent" RESET << std::endl;
+	else
+	{
+		responsePtr.cutRes(bytes_sent);
+		std::cout << BG_BOLD_RED "NOT entire data sent" RESET << std::endl;
+	}
 
 
 

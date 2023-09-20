@@ -14,7 +14,7 @@
 #include "../WebServ.hpp"
 
 #define MAX_CLIENTS 10
-#define MESSAGE_BUFFER 4000
+#define MESSAGE_BUFFER 40000
 
 class ServerManager
 {

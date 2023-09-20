@@ -96,6 +96,10 @@ std::string const &SimpleResponse::getResponse() const
     response = _header + _body;
     return response;
 }*/
+void SimpleResponse::cutRes(size_t i)
+{
+	_response = _response.substr(i);
+}
 
 int SimpleResponse::fileLength(std::ifstream &file)
 {
