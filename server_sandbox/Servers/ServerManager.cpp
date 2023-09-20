@@ -228,8 +228,8 @@ void    ServerManager::readRequest(const int &i)
 	{
 		std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
 		HttpRequest parsedRequest(buffer);
-		std::cout << BG_BOLD_WHITE << buffer << RESET << std::endl;
-		parsedRequest.printRequest();
+		//std::cout << BG_BOLD_WHITE << buffer << RESET << std::endl;
+		//parsedRequest.printRequest();
 		_pendingResponses[i] = TextResponse(parsedRequest);
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
@@ -318,7 +318,7 @@ void    ServerManager::sendResponse(const int &i)
 
 	SimpleResponse responsePtr = _pendingResponses[i];
     std::string response = responsePtr.getResponse();
-	std::cout << BG_BOLD_MAGENTA << response << RESET << std::endl;
+	//std::cout << BG_BOLD_MAGENTA << response << RESET << std::endl;
     if (response.length() >= MESSAGE_BUFFER)
         bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);
     else
