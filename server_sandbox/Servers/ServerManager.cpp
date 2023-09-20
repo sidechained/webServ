@@ -49,8 +49,10 @@ void    ServerManager::initializeSets()
     for(std::vector<SimpleServer *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
     {
 		std::vector<ListeningSocket *> sockets = (*it)->getSockets();
+		
 		for(std::vector<ListeningSocket *>::iterator it2 = sockets.begin(); it2 != sockets.end(); ++it2)
 		{
+			//(*it2)->updateTime();
 			int sock = (*it2)->getSock();
 			if (listen(sock, MAX_CLIENTS) == -1)
 			{
@@ -127,6 +129,7 @@ void    ServerManager::runServers()
 
             }
         }
+		std::cout << "check timeout" << std::endl;
         checkTimeout();
     }
 }
@@ -134,6 +137,7 @@ void    ServerManager::checkTimeout()
 {
     for(std::map<int, ListeningSocket*>::iterator it = _clients_map.begin() ; it != _clients_map.end(); ++it)
 	{
+		std::cout << "checking timeout" << std::endl;
     
         if (time(NULL) - (*it->second).getLastTime() > CONNECTION_TIMEOUT)
         {
@@ -308,7 +312,9 @@ void    ServerManager::sendResponse(const int &i)
 	else
 	{
 		ListeningSocket* client = findSocket(i);
-		client->updateTime();
+		(void)	client;
+		//client->updateTime();
+		//std::cout << "time updated" << std::endl;
 		responsePtr.cutRes(bytes_sent);
 		std::cout << BG_BOLD_RED "NOT entire data sent" RESET << std::endl;
 	}
