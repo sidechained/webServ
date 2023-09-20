@@ -86,7 +86,7 @@ void SimpleResponse::createResponse()
 {
 }
 
-std::string const &SimpleResponse::getResponse() const
+std::string SimpleResponse::getResponse() const
 {
 	return _response;
 }
@@ -96,9 +96,10 @@ std::string const &SimpleResponse::getResponse() const
     response = _header + _body;
     return response;
 }*/
-void SimpleResponse::cutRes(size_t i)
+void SimpleResponse::cutRes(std::string& response, size_t i)
 {
-	_response = _response.substr(i);
+    _response = response.substr(i);
+    std::cout << BG_BOLD_MAGENTA << "RESPONSE UPDATED size: " << response.size() << RESET << std::endl;
 }
 
 int SimpleResponse::fileLength(std::ifstream &file)

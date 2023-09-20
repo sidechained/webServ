@@ -209,85 +209,12 @@ void    ServerManager::readRequest(const int &i, ListeningSocket* client)
 			client->updateTime();
 			//std::cout << BG_RED "socket null" RESET << std::endl;
 		//(void)	client;
-		_pendingResponses[i] = TextResponse(parsedRequest);
+		_pendingResponses[i] = new TextResponse(parsedRequest);
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
 	}
-    /*else if (bytes_read < 0)
-    {
-        Logger::logMsg(RED, CONSOLE_OUTPUT, "webserv: fd %d read error %s", i, strerror(errno));
-        closeConnection(i);
-        return ;
-    }
-    else if (bytes_read != 0)
-    {
-        c.updateTime();
-        c.request.feed(buffer, bytes_read);
-        memset(buffer, 0, sizeof(buffer));
-    }
 
-    if (c.request.parsingCompleted() || c.request.errorCode()) // 1 = parsing completed and we can work on the response.
-    {
-        assignServer(c);
-        Logger::logMsg(CYAN, CONSOLE_OUTPUT, "Request Recived From Socket %d, Method=<%s>  URI=<%s>"
-        , i, c.request.getMethodStr().c_str(), c.request.getPath().c_str());
-        c.buildResponse();
-        if (c.response.getCgiState())
-        {
-            handleReqBody(c);
-            addToSet(c.response._cgi_obj.pipe_in[1],  _write_fd_pool);
-            addToSet(c.response._cgi_obj.pipe_out[0],  _recv_fd_pool);
-        }
-        removeFromSet(i, _recv_fd_pool);
-        addToSet(i, _write_fd_pool);
-    }*/
 }
-
-/*void PollingServer::responder()
-{
-	for (int i = 1; i <= _clients; i++)
-	{
-		if (_fds[i].revents & POLLOUT)
-		{
-			int clientFd = _fds[i].fd;
-
-			SimpleResponse response = _pendingResponses[clientFd];
-
-			if (!response.isHeaderSent())
-			{
-				std::string header = response.getHeader();
-				ssize_t bytes_sent = write(clientFd, header.c_str(), header.length());
-				if (bytes_sent == -1)
-				{
-					std::cerr << "Error sending HTTP response headers" << std::endl;
-					return;
-				}
-				if ((unsigned long)bytes_sent == header.length())
-					response.setHeaderSent(true);
-				else
-					response.updateHeaderOffset(bytes_sent);
-			}
-
-			if (!response.isBodySent())
-			{
-				std::string body = response.getBody();
-				ssize_t bytes_sent = write(clientFd, body.c_str(), body.length());
-				if (bytes_sent == -1)
-				{
-					std::cerr << "Error sending HTTP response body" << std::endl;
-					return;
-				}
-				if ((unsigned long)bytes_sent == body.length())
-					response.setBodySent(true);
-				else
-					response.updateBodyOffset(bytes_sent);
-			}
-			// Remove the response from the map if it has been sent
-			if (response.isHeaderSent() && response.isBodySent())
-				_pendingResponses.erase(clientFd);
-		}
-	}
-}*/
 
 void    ServerManager::sendResponse(const int &i, ListeningSocket* client)
 {
@@ -295,9 +222,12 @@ void    ServerManager::sendResponse(const int &i, ListeningSocket* client)
 
 	int bytes_sent;
 
-	SimpleResponse responsePtr = _pendingResponses[i];
-    std::string response = responsePtr.getResponse();
+	SimpleResponse* responsePtr = _pendingResponses[i];
+    std::string response = responsePtr->getResponse();
+
 	//std::cout << BG_BOLD_MAGENTA << response << RESET << std::endl;
+	std::cout << "pointer is " << &responsePtr << std::endl;
+	std::cout << BG_BOLD_YELLOW "size response" << response.size() << "fd is " << i  << RESET << std::endl;
     if (response.length() >= MESSAGE_BUFFER)
         bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);
     else
@@ -305,7 +235,7 @@ void    ServerManager::sendResponse(const int &i, ListeningSocket* client)
 
     if (bytes_sent < 0)
     {
-        std::cout << "Problem sending" << std::endl;
+        std::cout << BG_BOLD_YELLOW "Problem sending" RESET << std::endl;
         closeConnection(i);
     }
     else if (bytes_sent == 0 ||(size_t) bytes_sent == response.length())
@@ -320,46 +250,10 @@ void    ServerManager::sendResponse(const int &i, ListeningSocket* client)
 		//(void)	client;
 		client->updateTime();
 		std::cout << BG_RED "time updated" << client->getLastTime() << RESET << std::endl;
-		responsePtr.cutRes(bytes_sent);
-		std::cout << BG_BOLD_RED "NOT entire data sent" RESET << std::endl;
+		std::cout << BG_BOLD_RED "NOT entire data sent, bytes: " << bytes_sent << "  " << responsePtr->getResponse().size() << RESET << std::endl;
+		responsePtr->cutRes(response, bytes_sent);
+		std::cout << BG_BOLD_RED "NOT entire data sent, bytes: " << bytes_sent << "  " << responsePtr->getResponse().size() << RESET << std::endl;
 	}
-
-
-
-    /*int bytes_sent;
-    std::string response = c.response.getRes();
-    if (response.length() >= MESSAGE_BUFFER)
-        bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);
-    else
-        bytes_sent = write(i, response.c_str(), response.length());
-
-    if (bytes_sent < 0)
-    {
-        Logger::logMsg(RED, CONSOLE_OUTPUT, "sendResponse(): error sending : %s", strerror(errno));
-        closeConnection(i);
-    }
-    else if (bytes_sent == 0 || (size_t) bytes_sent == response.length())
-    {
-        // Logger::logMsg(LIGHTMAGENTA, CONSOLE_OUTPUT, "sendResponse() Done sending ");
-        Logger::logMsg(CYAN, CONSOLE_OUTPUT, "Response Sent To Socket %d, Stats=<%d>"
-        , i, c.response.getCode());
-        if (c.request.keepAlive() == false || c.request.errorCode() || c.response.getCgiState())
-        {
-            Logger::logMsg(YELLOW, CONSOLE_OUTPUT, "Client %d: Connection Closed.", i);
-            closeConnection(i);
-        }
-        else
-        {
-            removeFromSet(i, _write_fd_pool);
-            addToSet(i, _recv_fd_pool);
-            c.clearClient();
-        }
-    }
-    else
-    {
-        c.updateTime();
-        c.response.cutRes(bytes_sent);
-    }*/
 }
 
 void    ServerManager::closeConnection(const int i)

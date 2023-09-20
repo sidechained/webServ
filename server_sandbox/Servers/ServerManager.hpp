@@ -15,8 +15,8 @@
 #include <cstddef>
 
 #define MAX_CLIENTS 10
-#define MESSAGE_BUFFER 40000
-#define CONNECTION_TIMEOUT 60
+#define MESSAGE_BUFFER 20000
+#define CONNECTION_TIMEOUT 600
 
 class ServerManager
 {
@@ -35,7 +35,7 @@ private:
 	struct pollfd _fds[MAX_CLIENTS + 1];
 	int _clients;
 	int _poll;
-	std::map<int, SimpleResponse> _pendingResponses;
+	std::map<int, SimpleResponse *> _pendingResponses;
 	void accepter();
 	void handler();
 	void responder();

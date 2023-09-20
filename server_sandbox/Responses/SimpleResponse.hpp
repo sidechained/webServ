@@ -21,7 +21,7 @@ public:
     HttpRequest const &getRequest() const;
     std::string const &getHeader() const;
     std::string const &getBody() const;
-    std::string const &getResponse() const;
+    std::string getResponse() const;
     int const &getBodyLength() const;
     void setHeader(std::string const &header);
     void setBody(std::string const &body);
@@ -34,6 +34,6 @@ public:
     void updateBodyOffset(size_t offset);
     int fileLength(std::ifstream &htmlFile);
 
-	void cutRes(size_t i);
+	void cutRes(std::string& response, size_t i);
 };
 
