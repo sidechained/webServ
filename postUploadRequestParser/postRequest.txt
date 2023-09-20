@@ -1,28 +1,24 @@
 POST /cgi/upload.php HTTP/1.1
 Host: myHost
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryDE1CAymIcZ7TPEpr
-Content-Length: 449
+Content-Type: multipart/form-data; boundary=----MyBoundary123
+Content-Length: 1234
 
-------WebKitFormBoundaryDE1CAymIcZ7TPEpr
-Content-Disposition: form-data; name="fileToUpload"; filename="servers.txt"
+------MyBoundary123
+Content-Disposition: form-data; name="file1"; filename="file1.txt"
 Content-Type: text/plain
 
-server:
-	ports: 80 90 100
-	name: eighty.com
-	client_max_body_size_mb: 10
-	error_pages:
-		404: /404.html
-		500: /50x.html
-		501: /50x.html
-	locations:
-		/eightyTest:
-			methods: GET
-			redir: /new-url
-			alias: /tmp
-			autoindex: true
-			uploads: /uploads
-		/:
-			index: index1.html
+This is the content of file 1.
 
-------WebKitFormBoundaryDE1CAymIcZ7TPEpr--
+------MyBoundary123
+Content-Disposition: form-data; name="file2"; filename="file2.txt"
+Content-Type: text/plain
+
+This is the content of file 2.
+
+------MyBoundary123
+Content-Disposition: form-data; name="file3"; filename="file3.txt"
+Content-Type: text/plain
+
+This is the content of file 3.
+
+------MyBoundary123--
