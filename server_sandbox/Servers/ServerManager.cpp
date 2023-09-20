@@ -61,7 +61,6 @@ void    ServerManager::initializeSets()
 		
 		for(std::vector<ListeningSocket *>::iterator it2 = sockets.begin(); it2 != sockets.end(); ++it2)
 		{
-			//(*it2)->updateTime();
 			int sock = (*it2)->getSock();
 			if (listen(sock, MAX_CLIENTS) == -1)
 			{
@@ -151,7 +150,6 @@ void    ServerManager::checkTimeout()
         if (time(NULL) - (*it->second).getLastTime() > CONNECTION_TIMEOUT)
         {
 			std::cout << BG_RED "client timeout " << time(NULL) - (*it->second).getLastTime() << RESET << std::endl;
-            //Logger::logMsg(YELLOW, CONSOLE_OUTPUT, "Client %d Timeout, Closing Connection..", it->first);
             closeConnection(it->first);
             return ;
         }
@@ -215,7 +213,7 @@ void    ServerManager::readRequest(const int &i, ListeningSocket* client)
 		//parsedRequest.printRequest();
 		//ListeningSocket* new_client = findSocket(i);
 		//if (client)
-			client->updateTime();
+		client->updateTime();
 			//std::cout << BG_RED "socket null" RESET << std::endl;
 		//(void)	client;
 		_pendingResponses[i] = new TextResponse(parsedRequest);
@@ -274,16 +272,3 @@ void    ServerManager::closeConnection(const int i)
     close(i);
     _clients_map.erase(i);
 }
-
-/*void    ServerManager::checkTimeout()
-{
-    for(std::map<int, ListeningSocket>::iterator it = _clients_map.begin() ; it != _clients_map.end(); ++it)
-    {
-        if (time(NULL) - it->second.getLastTime() > CONNECTION_TIMEOUT)
-        {
-            //Logger::logMsg(YELLOW, CONSOLE_OUTPUT, "Client %d Timeout, Closing Connection..", it->first);
-            closeConnection(it->first);
-            return ;
-        }
-    }
-}*/
