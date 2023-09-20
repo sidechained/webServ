@@ -125,13 +125,6 @@ void    ServerManager::runServers()
 				sendResponse(i);
 				//closeConnection(i);
 				std::cout << "response sent" << std::endl;
-                /*int cgi_state = _clients_map[i].response.getCgiState(); // 0->NoCGI 1->CGI write/read to/from script 2-CGI read/write done
-                if (cgi_state == 1 && FD_ISSET(_clients_map[i].response._cgi_obj.pipe_in[1], &write_set_cpy))
-                    sendCgiBody(_clients_map[i], _clients_map[i].response._cgi_obj);
-                else if (cgi_state == 1 && FD_ISSET(_clients_map[i].response._cgi_obj.pipe_out[0], &recv_set_cpy))
-                    readCgiResponse(_clients_map[i], _clients_map[i].response._cgi_obj);
-                else if ((cgi_state == 0 || cgi_state == 2)  && FD_ISSET(i, &write_set_cpy))
-                    sendResponse(i, _clients_map[i]);*/
             }
         }
         //checkTimeout();
