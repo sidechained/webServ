@@ -12,10 +12,14 @@ void    ServerManager::setupServers()
 
 	std::vector<int> ports;
     ports.push_back(8002);
+    ports.push_back(8003);
+	std::vector<int> ports2;
+    ports2.push_back(8004);
 	//SimpleServer* server1 = new SimpleServer(AF_INET, SOCK_STREAM, 0, ports, "127.0.0.2", MAX_CLIENTS);
     //_servers.push_back(server1);
 	std::cout << "server 1 not created" << std::endl;
     _servers.push_back(new SimpleServer(AF_INET, SOCK_STREAM, 0, ports, "127.0.0.1", MAX_CLIENTS));
+    _servers.push_back(new SimpleServer(AF_INET, SOCK_STREAM, 0, ports2, "127.0.0.3", MAX_CLIENTS));
 	std::cout << "server 1 created" << std::endl;
     //_servers.push_back(new SimpleServer(AF_INET, SOCK_STREAM, 0, ports, "127.0.0.3", MAX_CLIENTS));
 
