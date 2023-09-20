@@ -2,7 +2,16 @@
 
 ServerManager::ServerManager(){}
 ServerManager::~ServerManager(){
-	// DELETE THE SERVERS!
+	// delete _servers
+	for (std::vector<SimpleServer *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
+	{
+		delete *it;
+	}
+	// iterate and delete _pendingResponses
+	for (std::map<int, SimpleResponse*>::iterator it = _pendingResponses.begin(); it != _pendingResponses.end(); ++it)
+	{
+		delete it->second;
+	}
 }
 
 void    ServerManager::setupServers()
