@@ -12,10 +12,11 @@
 #include <fstream>
 #include <csignal>
 #include "../WebServ.hpp"
+#include <cstddef>
 
 #define MAX_CLIENTS 10
 #define MESSAGE_BUFFER 40000
-#define CONNECTION_TIMEOUT 600
+#define CONNECTION_TIMEOUT 60
 
 class ServerManager
 {
@@ -50,8 +51,8 @@ public:
 	void checkTimeout();
 	void closeConnection(const int i);
 	void acceptNewConnection(int fd);
-	void readRequest(const int &i);
-	void sendResponse(const int &i);
+	void readRequest(const int &i, ListeningSocket* client);
+	void sendResponse(const int &i, ListeningSocket* client);
 
 
 	ServerManager();

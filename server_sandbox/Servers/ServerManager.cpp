@@ -121,15 +121,15 @@ void    ServerManager::runServers()
 				acceptNewConnection(i);
                 //acceptNewConnection(_servers_map.find(i)->second);
             else if (FD_ISSET(i, &recv_set_cpy) && _clients_map.count(i))
-                readRequest(i);
+                readRequest(i, _clients_map[i]);
             else if (FD_ISSET(i, &write_set_cpy) && _clients_map.count(i))
             {
-				sendResponse(i);
+				sendResponse(i, _clients_map[i]);
 				std::cout << "response sent" << std::endl;
 
             }
         }
-		std::cout << "check timeout" << std::endl;
+		//std::cout << "check timeout" << std::endl;
         checkTimeout();
     }
 }
@@ -141,7 +141,7 @@ void    ServerManager::checkTimeout()
     
         if (time(NULL) - (*it->second).getLastTime() > CONNECTION_TIMEOUT)
         {
-			std::cout << "client timeout" << std::endl;
+			std::cout << BG_RED "client timeout " << time(NULL) - (*it->second).getLastTime() << RESET << std::endl;
             //Logger::logMsg(YELLOW, CONSOLE_OUTPUT, "Client %d Timeout, Closing Connection..", it->first);
             closeConnection(it->first);
             return ;
@@ -185,7 +185,7 @@ void    ServerManager::acceptNewConnection(int fd)
 	}
 }
 
-void    ServerManager::readRequest(const int &i)
+void    ServerManager::readRequest(const int &i, ListeningSocket* client)
 {
 	std::cout << "read request" << std::endl;
 
@@ -204,6 +204,11 @@ void    ServerManager::readRequest(const int &i)
 		HttpRequest parsedRequest(buffer);
 		//std::cout << BG_BOLD_WHITE << buffer << RESET << std::endl;
 		//parsedRequest.printRequest();
+		//ListeningSocket* new_client = findSocket(i);
+		//if (client)
+			client->updateTime();
+			//std::cout << BG_RED "socket null" RESET << std::endl;
+		//(void)	client;
 		_pendingResponses[i] = TextResponse(parsedRequest);
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
@@ -284,7 +289,7 @@ void    ServerManager::readRequest(const int &i)
 	}
 }*/
 
-void    ServerManager::sendResponse(const int &i)
+void    ServerManager::sendResponse(const int &i, ListeningSocket* client)
 {
 	std::cout << BG_GREEN "sendResponse call fd: " RESET << i << std::endl;
 
@@ -292,7 +297,7 @@ void    ServerManager::sendResponse(const int &i)
 
 	SimpleResponse responsePtr = _pendingResponses[i];
     std::string response = responsePtr.getResponse();
-	std::cout << BG_BOLD_MAGENTA << response << RESET << std::endl;
+	//std::cout << BG_BOLD_MAGENTA << response << RESET << std::endl;
     if (response.length() >= MESSAGE_BUFFER)
         bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);
     else
@@ -311,10 +316,10 @@ void    ServerManager::sendResponse(const int &i)
     }
 	else
 	{
-		ListeningSocket* client = findSocket(i);
-		(void)	client;
-		//client->updateTime();
-		//std::cout << "time updated" << std::endl;
+		//ListeningSocket* client = findSocket(i);
+		//(void)	client;
+		client->updateTime();
+		std::cout << BG_RED "time updated" << client->getLastTime() << RESET << std::endl;
 		responsePtr.cutRes(bytes_sent);
 		std::cout << BG_BOLD_RED "NOT entire data sent" RESET << std::endl;
 	}
