@@ -5,10 +5,11 @@
 
 class SimpleResponse
 {
-private:
+protected:
     HttpRequest _request;
     std::string _header;
     std::string _body;
+    std::string _response;
     int _bodyLength;
     bool _headerSent;
     bool _bodySent;

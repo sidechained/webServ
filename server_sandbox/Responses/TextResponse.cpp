@@ -41,6 +41,9 @@ void TextResponse::createResponse()
     std::string body = oss2.str();
     setBody(body);
 
+	_response = _header + _body;
+
+    std::cout << BG_BOLD_YELLOW<< "RESPONSE" << RESET << header.substr(0, 1000) << std::endl;
     std::cout << BG_BOLD_MAGENTA << "Header: " << RESET << header.substr(0, 1000) << std::endl;
     std::cout << BG_BOLD_MAGENTA << "Body: " << RESET << body.substr(0, 1000) << std::endl;
 

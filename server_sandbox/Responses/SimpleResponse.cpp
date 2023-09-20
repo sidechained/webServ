@@ -1,6 +1,6 @@
 #include "SimpleResponse.hpp"
 
-SimpleResponse::SimpleResponse() : _request(""), _headerSent(false), _bodySent(false)
+SimpleResponse::SimpleResponse() : _request(""), _response(""), _headerSent(false), _bodySent(false)
 {
 }
 
@@ -88,10 +88,14 @@ void SimpleResponse::createResponse()
 
 std::string const &SimpleResponse::getResponse() const
 {
+	return _response;
+}
+/*std::string const &SimpleResponse::getResponse() const
+{
     static std::string response;
     response = _header + _body;
     return response;
-}
+}*/
 
 int SimpleResponse::fileLength(std::ifstream &file)
 {

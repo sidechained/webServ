@@ -309,53 +309,6 @@ void    ServerManager::readRequest(const int &i)
 void    ServerManager::sendResponse(const int &i)
 {
 	std::cout << BG_GREEN "sendResponse call fd: " RESET << i << std::endl;
-	
-	/*int clientFd = i;
-
-			SimpleResponse response = _pendingResponses[clientFd];
-
-			if (!response.isHeaderSent())
-			{
-				std::string header = response.getHeader();
-				ssize_t bytes_sent = write(clientFd, header.c_str(), header.length());
-				if (bytes_sent == -1)
-				{
-					std::cerr << "Error sending HTTP response headers" << std::endl;
-					return;
-				}
-				if ((unsigned long)bytes_sent == header.length())
-					response.setHeaderSent(true);
-				else
-					response.updateHeaderOffset(bytes_sent);
-				std::cout << "header bytes sent are: " << bytes_sent << std::endl;
-			}
-
-			if (!response.isBodySent())
-			{
-				std::string body = response.getBody();
-				ssize_t bytes_sent = write(clientFd, body.c_str(), body.length());
-				if (bytes_sent == -1)
-				{
-					std::cerr << "Error sending HTTP response body" << std::endl;
-					return;
-				}
-				if ((unsigned long)bytes_sent == body.length())
-					response.setBodySent(true);
-				else
-					response.updateBodyOffset(bytes_sent);
-				std::cout << "body bytes sent are: " << bytes_sent << std::endl;
-			}
-			std::cout << "the response header is: " << response.getHeader() << std::endl;
-			// Remove the response from the map if it has been sent
-			if (response.isHeaderSent() && response.isBodySent())
-			{
-				_pendingResponses.erase(clientFd);
-				closeConnection(i);
-				std::cout << "connection closed" << std::endl;
-			}*/
-			//std::cout << "send response is done" << std::endl;
-	
-// END
 
 	int bytes_sent;
 
@@ -372,7 +325,7 @@ void    ServerManager::sendResponse(const int &i)
         std::cout << "Problem sending" << std::endl;
         closeConnection(i);
     }
-    else if ((size_t) bytes_sent == response.length())
+    else if (bytes_sent == 0 ||(size_t) bytes_sent == response.length())
     {
 		_pendingResponses.erase(i);
 		closeConnection(i);
