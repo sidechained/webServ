@@ -23,6 +23,18 @@ SimpleSocket::SimpleSocket(int domain, int type, int protocol, int port, std::st
     // Bind socket and IP
     _conection = bind(_sock, (struct sockaddr *)&_address, sizeof(_address));
     testConnection(_conection);
+	std::cout << "Socket created" << std::endl;
+	_last_request_time = time(NULL);
+	std::cout << "Last request time set to " << _last_request_time << std::endl;
+}
+
+const time_t &SimpleSocket::getLastTime() const
+{
+	return _last_request_time;
+}
+void SimpleSocket::updateTime()
+{
+	_last_request_time = time(NULL);
 }
 
 SimpleSocket::~SimpleSocket()

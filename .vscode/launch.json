@@ -1,0 +1,18 @@
+{
+    //UseIntelliSensetolearnaboutpossibleattributes.
+    //Hovertoviewdescriptionsofexistingattributes.
+    //Formoreinformation,visit:https://go.microsoft.com/fwlink/?linkid=830387
+    "version":"0.2.0",
+    "configurations":[
+    {
+    "name":"Launch",
+    "type":"cppdbg",
+    "program":"${workspaceFolder}/server_sandbox/server",
+    //"args":["scenes/scene1.rt"],
+    "cwd":"${workspaceFolder}",
+    "request":"launch",
+    "MIMode":"gdb"
+    
+    }
+    ]
+}

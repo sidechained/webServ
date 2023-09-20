@@ -15,6 +15,7 @@
 
 #define MAX_CLIENTS 10
 #define MESSAGE_BUFFER 40000
+#define CONNECTION_TIMEOUT 600
 
 class ServerManager
 {

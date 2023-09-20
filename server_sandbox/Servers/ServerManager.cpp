@@ -54,18 +54,18 @@ void    ServerManager::initializeSets()
 			int sock = (*it2)->getSock();
 			if (listen(sock, MAX_CLIENTS) == -1)
 			{
-				//Logger::logMsg(RED, CONSOLE_OUTPUT, "webserv: listen error: %s   Closing....", strerror(errno));
+				std::cerr << "listen error" << std::endl;
 				exit(EXIT_FAILURE);
 			}
 			if (fcntl(sock, F_SETFL, O_NONBLOCK) < 0)
 			{
-				//Logger::logMsg(RED, CONSOLE_OUTPUT, "webserv: fcntl error: %s   Closing....", strerror(errno));
+				std::cerr << "fcntl error" << std::endl;
 				exit(EXIT_FAILURE);
 			}
 			addToSet(sock, _recv_fd_pool);
 			_servers_map.insert(std::make_pair(sock, *it));
 
-			std::cout << "sock n: " << sock << " added to server" << std::endl;
+			std::cout << BG_BOLD_BLUE "sock n: " << sock << " added to server" RESET << std::endl; // add server name
 			
 			if (sock > _biggest_fd)
 				_biggest_fd = sock;
@@ -90,7 +90,7 @@ void	ServerManager::removeFromSet(const int i, fd_set &set)
 
 void    ServerManager::runServers()
 {
-	std::cout << "runservers function" << std::endl;
+	//std::cout << "runservers function" << std::endl;
     fd_set  recv_set_cpy;
     fd_set  write_set_cpy;
     int     select_ret;
@@ -123,18 +123,25 @@ void    ServerManager::runServers()
             else if (FD_ISSET(i, &write_set_cpy) && _clients_map.count(i))
             {
 				sendResponse(i);
-				//closeConnection(i);
 				std::cout << "response sent" << std::endl;
-                /*int cgi_state = _clients_map[i].response.getCgiState(); // 0->NoCGI 1->CGI write/read to/from script 2-CGI read/write done
-                if (cgi_state == 1 && FD_ISSET(_clients_map[i].response._cgi_obj.pipe_in[1], &write_set_cpy))
-                    sendCgiBody(_clients_map[i], _clients_map[i].response._cgi_obj);
-                else if (cgi_state == 1 && FD_ISSET(_clients_map[i].response._cgi_obj.pipe_out[0], &recv_set_cpy))
-                    readCgiResponse(_clients_map[i], _clients_map[i].response._cgi_obj);
-                else if ((cgi_state == 0 || cgi_state == 2)  && FD_ISSET(i, &write_set_cpy))
-                    sendResponse(i, _clients_map[i]);*/
+
             }
         }
-        //checkTimeout();
+        checkTimeout();
+    }
+}
+void    ServerManager::checkTimeout()
+{
+    for(std::map<int, ListeningSocket*>::iterator it = _clients_map.begin() ; it != _clients_map.end(); ++it)
+	{
+    
+        if (time(NULL) - (*it->second).getLastTime() > CONNECTION_TIMEOUT)
+        {
+			std::cout << "client timeout" << std::endl;
+            //Logger::logMsg(YELLOW, CONSOLE_OUTPUT, "Client %d Timeout, Closing Connection..", it->first);
+            closeConnection(it->first);
+            return ;
+        }
     }
 }
 
@@ -154,13 +161,12 @@ void    ServerManager::acceptNewConnection(int fd)
         return ;
     }
 	std::cout << BG_BOLD_CYAN << "connection from " << inet_ntop(AF_INET, &client_address, buf, INET_ADDRSTRLEN) << "assigned socket " << client_sock << RESET << std::endl;
-    //Logger::logMsg(YELLOW, CONSOLE_OUTPUT, "New Connection From %s, Assigned Socket %d",inet_ntop(AF_INET, &client_address, buf, INET_ADDRSTRLEN), client_sock);
 
     addToSet(client_sock, _recv_fd_pool);
 
     if (fcntl(client_sock, F_SETFL, O_NONBLOCK) < 0)
     {
-        //Logger::logMsg(RED, CONSOLE_OUTPUT, "webserv: fcntl error %s", strerror(errno));
+		std::cout << "fcntl error" << std::endl;
         removeFromSet(client_sock, _recv_fd_pool);
         close(client_sock);
         return ;
@@ -172,55 +178,19 @@ void    ServerManager::acceptNewConnection(int fd)
 		//std::cout << "adding client to map" << std::endl;
 		_clients_map.insert(std::make_pair(client_sock, new_client));
 		std::cout << "client added to map, socket: " << client_sock << fd << _biggest_fd << std::endl;
-
 	}
-
-	// ADDING THE SOCKETS TO THE coresponding MAP
-    /*new_client.setSocket(client_sock);
-    if (_clients_map.count(client_sock) != 0)
-        _clients_map.erase(client_sock);
-    _clients_map.insert(std::make_pair(client_sock, new_client));*/
 }
-
-/*void PollingServer::handler()
-{
-	for (int i = 1; i <= _clients; i++)
-	{
-		if (_fds[i].revents & POLLIN)
-		{
-			memset(_buffer, 0, sizeof(_buffer));
-			int bytesRead = read(_fds[i].fd, _buffer, sizeof(_buffer));
-			if (bytesRead > 0)
-			{
-				std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
-				HttpRequest parsedRequest(_buffer);
-				parsedRequest.printRequest();
-				_pendingResponses[_fds[i].fd] = TextResponse(parsedRequest);
-			}
-			else
-			{
-				std::cout << BG_GREEN << "Client " << i << " disconnected" << RESET << std::endl;
-				close(_fds[i].fd);
-				if (i < _clients)
-					_fds[i] = _fds[_clients];
-				_clients--;
-			}
-		}
-	}
-}*/
 
 void    ServerManager::readRequest(const int &i)
 {
-	//(void) c;
 	std::cout << "read request" << std::endl;
-
 
     char    buffer[MESSAGE_BUFFER];
     int     bytes_read = 0;
     bytes_read = read(i, buffer, MESSAGE_BUFFER);
     if (bytes_read <= 0)
     {
-        //Logger::logMsg(YELLOW, CONSOLE_OUTPUT, "webserv: Client %d Closed Connection", i);
+		std::cout << "bytes read <= 0" << std::endl;
         closeConnection(i);
         return ;
     }
@@ -228,8 +198,8 @@ void    ServerManager::readRequest(const int &i)
 	{
 		std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
 		HttpRequest parsedRequest(buffer);
-		std::cout << BG_BOLD_WHITE << buffer << RESET << std::endl;
-		parsedRequest.printRequest();
+		//std::cout << BG_BOLD_WHITE << buffer << RESET << std::endl;
+		//parsedRequest.printRequest();
 		_pendingResponses[i] = TextResponse(parsedRequest);
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
@@ -337,6 +307,8 @@ void    ServerManager::sendResponse(const int &i)
     }
 	else
 	{
+		ListeningSocket* client = findSocket(i);
+		client->updateTime();
 		responsePtr.cutRes(bytes_sent);
 		std::cout << BG_BOLD_RED "NOT entire data sent" RESET << std::endl;
 	}
