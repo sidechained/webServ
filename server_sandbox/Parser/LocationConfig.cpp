@@ -111,16 +111,6 @@ void LocationConfig::print() const {
 	std::cout << "      Index: \"" << index << "\"" << std::endl;
 }
 
-static void removeNonPrintableChars(std::string& input) {
-    std::string result;
-    for (size_t i = 0; i < input.length(); ++i) {
-        char c = input[i];
-        if (c >= 32 && c <= 126) {
-            result += c;
-        }
-    }
-    input = result;
-}
 
 void LocationConfig::cleanUp() {
 	//go through all strings and maps and call removeNonPrintableChars
