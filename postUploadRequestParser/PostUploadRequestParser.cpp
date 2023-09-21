@@ -22,6 +22,18 @@ PostUploadRequestParser::PostUploadRequestParser(std::string inputFilename, std:
 	requestFile.close();
 	printPartHeaders();
 	//
+	if(postUploadRequest.method != "POST") {
+		std::cout << "Request is not a post request" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	if(postUploadRequest.resource != "/cgi/upload.php") { // hardcoded for now
+		std::cout << "Resource requested does not match server-side resource" << std::endl;
+		exit(EXIT_FAILURE);
+	}		
+	if(postUploadRequest.httpVersion != "HTTP/1.1") {
+		std::cout << "HTTP version is not HTTP/1.1" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	checkContentTypes();
 	makeOutputFile();
 }
