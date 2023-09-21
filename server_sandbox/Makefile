@@ -1,14 +1,21 @@
 FILES = main.cpp \
         Servers/SimpleServer.cpp \
-        Servers/PollingServer.cpp \
         Servers/ServerManager.cpp \
+        Servers/PollingServer.cpp \
         Sockets/SimpleSocket.cpp \
         Sockets/ListeningSocket.cpp \
         Requests/HttpRequest.cpp \
         Responses/TextResponse.cpp \
         Responses/SimpleResponse.cpp \
 		Responses/ResponseFactory.cpp \
+		Parser/GenericConfig.cpp \
+		Parser/LocationConfig.cpp \
+		Parser/ServerConfig.cpp \
+		Parser/ConfigFileParser.cpp \
 		utils/ContentTypeUtils.cpp \
+		utils/LoadMapFromFile.cpp \
+		utils/StatusCodeUtils.cpp \
+		utils/RemoveNonPrintable.cpp 
 
 
 

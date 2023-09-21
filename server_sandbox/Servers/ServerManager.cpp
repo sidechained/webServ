@@ -20,7 +20,7 @@ void ServerManager::setupServers()
 	std::cout << std::endl;
 	std::cout << BG_BOLD_CYAN << "Initializing servers..." << RESET << std::endl;
 
-	std::vector<int> ports;
+	/*std::vector<int> ports;
 	ports.push_back(8002);
 	ports.push_back(8003);
 	std::vector<int> ports2;
@@ -30,8 +30,18 @@ void ServerManager::setupServers()
 	std::cout << "server 1 not created" << std::endl;
 	_servers.push_back(new SimpleServer(AF_INET, SOCK_STREAM, 0, ports, "127.0.0.1", MAX_CLIENTS));
 	_servers.push_back(new SimpleServer(AF_INET, SOCK_STREAM, 0, ports2, "127.0.0.3", MAX_CLIENTS));
-	std::cout << "server 1 created" << std::endl;
-	//_servers.push_back(new SimpleServer(AF_INET, SOCK_STREAM, 0, ports, "127.0.0.3", MAX_CLIENTS));
+	std::cout << "server 1 created" << std::endl;*/
+
+	// iterates through _config->serverConfigs and pushes back to _servers a new SimpleServer for each serverConfig
+	for (std::vector<ServerConfig >::iterator it = _config->serverConfigs.begin(); it != _config->serverConfigs.end(); ++it)
+	{
+		_servers.push_back(new SimpleServer(*it));
+	}
+	
+	std::cout << "servers 1 created" << std::endl;
+
+
+
 }
 
 ListeningSocket *ServerManager::findSocket(int fd)

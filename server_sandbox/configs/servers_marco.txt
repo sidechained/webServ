@@ -1,0 +1,44 @@
+server:
+	ports: 8002 8003
+	hostname: 127.0.0.1
+	client_max_body_size_mb: 10
+	error_pages:
+		404: /404.html
+		500: /50x.html
+		501: /50x.html
+	locations:
+		/tictactoe:
+			index: index.html
+		/test:
+			methods: GET
+			redir: /new-url
+			root: /tmp
+			autoindex: true
+			uploads: /uploads
+		/new-url:
+			index: test.html
+			root: /tmp
+		/:
+			root: /www
+		/my_game:
+			root: /tictactoe
+		/my_game/hello:
+			root: /other_location
+
+server:
+	ports: 8004
+	hostname: 127.0.0.3
+	client_max_body_size_mb: 10
+	error_pages:
+		404: /404.html
+		500: /50x.html
+		501: /50x.html
+	locations:
+		/eightyTwoTest:
+			methods: POST DELETE
+			redir: /old-url /new-url
+			root: /tmp
+			autoindex: true
+			uploads: /uploads
+		/:
+			index: index2.html

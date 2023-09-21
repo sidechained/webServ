@@ -13,6 +13,7 @@
 #include <csignal>
 #include "../WebServ.hpp"
 #include <cstddef>
+#include "../Parser/ConfigFileParser.hpp"
 
 #define MAX_CLIENTS 10
 #define MESSAGE_BUFFER 20000
@@ -28,6 +29,8 @@ private:
 	fd_set     _recv_fd_pool;
 	fd_set     _write_fd_pool;
 	int        _biggest_fd;
+	ConfigFileParser* _config;
+	
 
 
 	std::map<int, SimpleResponse *> _pendingResponses;

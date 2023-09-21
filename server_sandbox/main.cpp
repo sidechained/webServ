@@ -5,6 +5,7 @@
 #include <sys/socket.h>  // for SOCK_STREAM
 #include "Servers/PollingServer.hpp"
 #include "Servers/ServerManager.hpp"
+#include "Parser/ConfigFileParser.hpp"
 
 
 bool isRunning = true;
@@ -30,6 +31,7 @@ int main(int argc, char const *argv[])
     server.launch();*/
 	//std::vector<int> ports;
     //ports.push_back(8080);
+	ConfigFileParser cfp(argv[1]);
 
 	ServerManager manager;
 
