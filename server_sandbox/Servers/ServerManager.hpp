@@ -26,6 +26,7 @@ private:
 	std::vector<Server *> _servers;
 	std::map<int, Server *> _servers_map;
 	std::map<int, Socket *> _clients_map;
+	std::map<int, Server *> _clients_map_server;
 	fd_set _recv_fd_pool;
 	fd_set _write_fd_pool;
 	int _biggest_fd;
@@ -36,6 +37,7 @@ private:
 
 	Socket *findSocket(int fd);
 	Server *findserver(int fd);
+	Server* findServer(Socket* client);
 
 public:
 	ServerManager(ConfigFileParser *config);

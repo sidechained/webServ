@@ -208,16 +208,38 @@ void ServerManager::acceptNewConnection(int fd)
 		return;
 	}
 	Socket *new_client = findSocket(fd);
-
+	Server *server = findserver(fd);
 	
 	std::cout << "socket found" << new_client << std::endl;
 	if (new_client)
 	{
 		// std::cout << "adding client to map" << std::endl;
+		_clients_map_server.insert(std::make_pair(client_sock, server));
 		_clients_map.insert(std::make_pair(client_sock, new_client));
 		std::cout << "client added to map, socket: " << client_sock << fd << _biggest_fd << std::endl;
 	}
 }
+
+Server* ServerManager::findServer(Socket* client)
+{
+	// std::cout << "find server function" << std::endl;
+	for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
+	{
+		std::vector<Socket *> sockets = (*it)->getSockets();
+		for (std::vector<Socket *>::iterator it2 = sockets.begin(); it2 != sockets.end(); ++it2)
+		{
+			int sock = (*it2)->getSock();
+			if (sock == client->getSock())
+			{
+				std::cout << "server found" << std::endl;
+				std::cout << "index is " << it - _servers.begin() << std::endl;
+				return *it;
+			}
+		}
+	}
+	return NULL;
+}
+
 
 void ServerManager::readRequest(const int &i, Socket *client)
 {
@@ -236,11 +258,12 @@ void ServerManager::readRequest(const int &i, Socket *client)
 	{
 		std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
 		std::cout << "Before I segfault" << std::endl;
-		Server *server = findserver(i);
+		//Server *server = _servers[0];
+		Server *server = findServer(client);
 
 		std::cout << "After I segfault" << std::endl;
 		if (!server)
-			return;
+			std::cout << "server null" << std::endl;
 		ServerConfig *config = server->getConfig();
 		HttpRequest parsedRequest(buffer, config);
 		// std::cout << BG_BOLD_WHITE << buffer << RESET << std::endl;
