@@ -6,12 +6,18 @@ HttpRequest::HttpRequest(std::string const &request, ServerConfig *config) : _in
     extractRequestFields();
     determineResource();
     determineContentType();
+    cleanUp();
+}
+
+void HttpRequest::cleanUp()
+{
+    for (std::map<std::string, std::string>::iterator it = _request.begin(); it != _request.end(); ++it)
+        removeNonPrintableChars(it->second);
 }
 
 HttpRequest::HttpRequest()
 {
 }
-
 
 HttpRequest::~HttpRequest()
 {
@@ -48,7 +54,7 @@ void HttpRequest::extractRequestFields()
             _request[key] = value;
         }
     }
-
+    _request["Redirection"] = "";
 }
 
 bool HttpRequest::hasFileExtension(std::string const &resource)
@@ -78,63 +84,64 @@ bool HttpRequest::locationIsSet(std::string const &key)
 void HttpRequest::determineResource()
 {
     std::string resource = _request["Resource"];
-    std::cout << BG_YELLOW << "resource: " << resource << RESET << std::endl;
-    // if resource ends without a slash and it is not a file, set _noSlash to true
+
+    // Return if the resource is not a directory and does not have a file extension
     if (!isDirectory(resource) && !hasFileExtension(resource))
     {
         _noSlash = true;
         return;
     }
 
-    // if (!hasFileExtension(resource) && !isDirectory(resource))
-    //     resource = resource + "/";
-    // std::cout << BG_YELLOW << "resource after adding slash: " << resource << RESET << std::endl;
+    std::string key, index, root, redirection;
+    bool autoindex;
+    std::vector<std::string> methods;
+    
+    long i = resource.size();
+
+    std::cout << BG_RED << "Looping trough resource from the end to the beginning to find the correct root, index and redirection" << RESET << std::endl;
+    while (i > 0)
+    {
+        key = resource.substr(0, i);
+        std::cout << BG_RED << "key: " << key << RESET << std::endl;
+        if (locationIsSet(key))
+        {
+            redirection = _config->locations[key].redirection;
+            root = _config->locations[key].root;
+            index = _config->locations[key].index;
+            autoindex = _config->locations[key].autoindex;
+            methods = _config->locations[key].methods;
+            break;
+        }
+        i--;
+    }
+
+    if (redirection != "")
+    {
+        _request["Redirection"] = redirection;
+        return;
+    }
+
+    if (root != "")
+    {
+        if (key == "/")
+            resource = root + resource;
+        else
+            resource = root + resource.substr(i);
+
+        if (resource[0] == '/')
+            resource = resource.substr(1);
+
+        std::cout << RED << "Found root for: " << resource << RESET << std::endl;
+    }
+
     if (isDirectory(resource))
     {
-        std::cout << BG_YELLOW << "resource is a directory" << RESET << std::endl;
-        std::string key = resource;
-        if (key.length() > 1 && key[key.length() - 1] == '/')
-            key = key.substr(0, key.length() - 1);
-        if (locationIsSet(key))
-        {
-            std::cout << BG_YELLOW << "resource is a directory and is in the map: " << _config->locations[resource].index << RESET << std::endl;
-            resource = resource + _config->locations[key].index;
-        }
+        std::cout << BG_GREEN << "resource is a directory: " << resource << RESET << std::endl;
+        std::cout << BG_GREEN << "index: " << index << RESET << std::endl;
+
+        if (index != "")
+            resource = resource + index;
     }
-    std::cout << BG_YELLOW << "new resource: " << resource << RESET << std::endl;
-
-    for(long i = resource.size(); i >= 0; i--)
-    {
-        std::string key = resource.substr(0, i);
-        if (key.length() > 1 && key[key.length() - 1] == '/')
-            key = key.substr(0, key.length() - 1);
-        std::cout << BG_YELLOW << key << RESET << std::endl;
-        if (locationIsSet(key))
-        {
-            std::cout << BG_YELLOW << "resource is a directory and is in the map: " << _config->locations[resource].index << RESET << std::endl;
-             if (!_config->locations[key].root.empty())
-             {
-                std::cout << YELLOW << "root: " << _config->locations[key].root << RESET << std::endl;
-                std::cout << GREEN << "resource: " << resource << " i: " << i << RESET << std::endl;
-                if (key == "/")
-                    resource = _config->locations[key].root + resource;
-                else
-                    resource = _config->locations[key].root + "/" + resource.substr(i);
-                std::cout << BLUE << "new resource: " << resource << RESET << std::endl;
-                if (resource[0] == '/')
-                    resource = resource.substr(1);
-                std::cout << RED << "new resource: " << resource << RESET << std::endl;
-                break;
-             }
-        }
-    }
-
-    //check if location has root
-    //search for location in map starting with the string before the last slash and ending with the last slash
-    //if found, append the index to the resource
-    //if not found, append the index to the resource
-    
-
 
     _request["Resource"] = resource;
 }
@@ -197,7 +204,11 @@ std::string const &HttpRequest::getMethod()
 std::string const &HttpRequest::getContentType() const
 {
     return _request.at("Content-Type");
+}
 
+std::string const &HttpRequest::getRedirection() const
+{
+    return _request.at("Redirection");
 }
 
 bool HttpRequest::isNoSlash() const

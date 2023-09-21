@@ -10,11 +10,14 @@ FILES = main.cpp \
 		Responses/Headers/SimpleHeader.cpp \
 		Responses/Headers/MovedHeader.cpp \
 		Responses/Headers/OkHeader.cpp \
-		utils/ContentTypeUtils.cpp \
 		Parser/GenericConfig.cpp \
 		Parser/LocationConfig.cpp \
 		Parser/ServerConfig.cpp \
-		Parser/ConfigFileParser.cpp
+		Parser/ConfigFileParser.cpp \
+		utils/ContentTypeUtils.cpp \
+		utils/LoadMapFromFile.cpp \
+		utils/StatusCodeUtils.cpp \
+		utils/RemoveNonPrintable.cpp \
 
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g

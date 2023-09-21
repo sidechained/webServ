@@ -15,10 +15,8 @@ LocationConfig::LocationConfig(std::fstream &configFile, std::string &inLine) {
 	root = "";
 	uploads = "";
 	autoindex = false;
-	index = "";
+	index = "index.html";
 	extract(configFile);
-	if (index == "")
-		index = "index.html";
 }
 
 LocationConfig::LocationConfig(const LocationConfig &o)
@@ -111,4 +109,18 @@ void LocationConfig::print() const {
 	std::cout << "      uploads: \"" << uploads << "\"" << std::endl;
 	std::cout << "      Autoindex: " << (autoindex ? "true" : "false") << std::endl;
 	std::cout << "      Index: \"" << index << "\"" << std::endl;
+}
+
+void LocationConfig::cleanUp() {
+	//go through all strings and maps and call removeNonPrintableChars
+	removeNonPrintableChars(key);
+	for (std::vector<std::string>::iterator it = methods.begin(); it != methods.end(); ++it) {
+		removeNonPrintableChars(*it);
+	}
+	removeNonPrintableChars(redirection);
+	removeNonPrintableChars(root);
+	removeNonPrintableChars(uploads);
+	removeNonPrintableChars(index);
+
+
 }

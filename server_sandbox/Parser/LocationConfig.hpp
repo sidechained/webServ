@@ -7,6 +7,8 @@
 # include <iostream>
 # include <vector>
 # include <map>
+# include "../WebServ.hpp"
+
 
 # include "GenericConfig.hpp"
 class LocationConfig : public GenericConfig
@@ -29,6 +31,7 @@ class LocationConfig : public GenericConfig
 		LocationConfig& operator=(const LocationConfig &);		
 		~LocationConfig();
 		void print() const;
+		void cleanUp();
 };
 
 #endif

@@ -5,11 +5,25 @@ ServerConfig::ServerConfig(std::fstream &configFile) {
 	hostname = "";
 	client_max_body_size_mb = 1;
 	extract(configFile);
+	print();
+	cleanUp();
+}
+
+void ServerConfig::cleanUp() {
+	removeNonPrintableChars(hostname);
+	for (std::map<std::string, std::string>::iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
+		removeNonPrintableChars(it->second);
+	}
+	for (std::map<std::string, LocationConfig>::iterator it = locations.begin(); it != locations.end(); ++it) {
+		it->second.cleanUp();
+	}
 }
 
 ServerConfig::~ServerConfig() {
 
 }
+
+
 
 void ServerConfig::extract(std::fstream &configFile) {
 	skipNextLine = false;

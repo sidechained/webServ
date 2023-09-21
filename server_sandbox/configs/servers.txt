@@ -9,14 +9,16 @@ server:
 	locations:
 		/tictactoe:
 			index: index.html
-		/eightyTest:
+		/test:
 			methods: GET
 			redir: /new-url
 			root: /tmp
 			autoindex: true
 			uploads: /uploads
+		/new-url:
+			index: test.html
+			root: /tmp
 		/:
-			index: index1.html
 			root: /www
 		/my_game:
 			root: /tictactoe
