@@ -13,46 +13,48 @@
 class PostUploadRequestParser
 {
 	private:
-		// struct PostUploadRequest {
-		// 	std::string method;
-		// 	std::string resource;
-		// 	std::string httpVersion;
-		// 	std::map<std::string, std::string> headerMap;
-		// 	std::vector<std::map> parts;
-		// };
-		struct HttpRequest {
+		struct Part {
+			std::map<std::string, std::string> headers;
+			std::string data;
+		};
+		struct PostUploadRequest {
 			std::string method;
 			std::string resource;
 			std::string httpVersion;
-			std::string host;
-			std::string userAgent;
-			std::string accept;
-			std::string connection;
+			std::map<std::string, std::string> headers;
+			std::vector<Part> parts;
 		};
+		PostUploadRequest postUploadRequest;
 		std::string _outputFilename;
-		std::map<std::string, std::string> headerMap;
 		std::vector<std::string> headerAcceptedFields;
 		std::vector<std::string> partsAcceptedFields;
 		std::string boundary;
 		std::vector<std::string> acceptedFields;
-		bool isValidMethod(const std::string& method);
-		bool isValidResource(const std::string& resource);
-		bool isValidHttpVersion(const std::string& httpVersion);
-		void parseHttpRequest(const std::string& requestLine, HttpRequest& httpRequest);
+		void initAcceptedFields();
+		void parsePostUploadRequest(const std::string& requestLine, PostUploadRequest& PostUploadRequest);
 		bool isAcceptedField(std::string field, std::vector<std::string> acceptedFields);
-		void parseHeaderLine(const std::string& header, std::map<std::string, std::string> &headerMap, std::vector<std::string> acceptedFields);
-		void parseHeaderBlock(std::fstream &requestFile, std::string &line, std::map<std::string, std::string> &headerMap, std::vector<std::string> acceptedFields);
-		void parseHeaderBlockFromString(std::string& inputString, std::string& line, std::map<std::string, std::string>& headerMap, std::vector<std::string> acceptedFields);
+		void parseHeaderLine(const std::string& header, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields);
+		void parseHeaderBlock(std::fstream &requestFile, std::string &line, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields);
+		void parseHeaderBlockFromString(std::string& inputString, std::string& line, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields);
 		void parseContentTypeValue();
 		void parseBody(std::fstream &requestFile);
-		void parseContentDisposition(std::map<std::string, std::string> &partMap);	
+		void parseContentDisposition(std::map<std::string, std::string> &partMap);
+		bool isContentOfType(std::map<std::string, std::string> headers, std::string typeToMatch);
+		bool arePartContentsOfType(std::string typeToMatch);
+		void checkContentTypes();
+		void makeOutputFile();
+		// utility functions:
+		bool isValidMethod(const std::string& method);
+		bool isValidResource(const std::string& resource);
+		bool isValidHttpVersion(const std::string& httpVersion);		
 		void toLowerCase(std::string& str);
 		void splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output);
 		void trimWhitespace(std::string& str);
 		bool startsWith(const std::string& fullString, const std::string& start);
 		void removeFromStringStart(std::string& fullString, const std::string& prefix);
-		void printHttpRequest(HttpRequest& httpRequest);
-		void printMap(std::map<std::string, std::string> map);
+		void printPostUploadRequest();
+		void printPartHeaders();
+		void printHeaders(std::map<std::string, std::string> map);
 	public:
 		PostUploadRequestParser(std::string inputFile, std::string outputFile);
 		~PostUploadRequestParser();

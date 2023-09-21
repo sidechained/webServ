@@ -1,15 +1,12 @@
 #include "PostUploadRequestParser.hpp"
 
+// TODO:
+// - correctly parse content disposition
+// - handle unexpected amount of semicolons or elements when splitting Content-Type and Content-Disposition
+
 PostUploadRequestParser::PostUploadRequestParser(std::string inputFilename, std::string outputFilename) : _outputFilename(outputFilename)
 {
-	// init accepted field for header
-	headerAcceptedFields.push_back("host");
-	headerAcceptedFields.push_back("content-type");
-	headerAcceptedFields.push_back("content-length");
-	// init accepted fields for parts (multipart)
-	partsAcceptedFields.push_back("content-disposition");
-	partsAcceptedFields.push_back("content-type");
-	// 
+	initAcceptedFields();
 	std::fstream requestFile(inputFilename.c_str());
 	if(!requestFile.is_open()) {
 		std::cout << "Could not open file" << std::endl;
@@ -17,14 +14,16 @@ PostUploadRequestParser::PostUploadRequestParser(std::string inputFilename, std:
 	}	
 	std::string line;
 	getline(requestFile, line);	
-	HttpRequest httpRequest;
-	parseHttpRequest(line, httpRequest);
-	// printHttpRequest(httpRequest);
-	parseHeaderBlock(requestFile, line, headerMap, headerAcceptedFields);
-	// printMap();
+	parsePostUploadRequest(line, postUploadRequest);
+	printPostUploadRequest();
+	parseHeaderBlock(requestFile, line, postUploadRequest.headers, headerAcceptedFields);
 	parseContentTypeValue();
 	parseBody(requestFile);
 	requestFile.close();
+	printPartHeaders();
+	//
+	checkContentTypes();
+	makeOutputFile();
 }
 
 PostUploadRequestParser::~PostUploadRequestParser()
@@ -32,35 +31,29 @@ PostUploadRequestParser::~PostUploadRequestParser()
 	
 }
 
-// Check if the method consists of uppercase and lowercase letters only
-bool PostUploadRequestParser::isValidMethod(const std::string& method) {
-	return std::string::npos == method.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+void PostUploadRequestParser::initAcceptedFields()
+{
+	headerAcceptedFields.push_back("host");
+	headerAcceptedFields.push_back("content-type");
+	headerAcceptedFields.push_back("content-length");
+	partsAcceptedFields.push_back("content-disposition");
+	partsAcceptedFields.push_back("content-type");
 }
 
-// Check if the resource contains valid characters (letters, digits, '/', '.', '-', '_', '~')
-bool PostUploadRequestParser::isValidResource(const std::string& resource) {
-	return std::string::npos == resource.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/._-~");
-}
-
-// Check if the HTTP version follows the format HTTP/x.y
-bool PostUploadRequestParser::isValidHttpVersion(const std::string& httpVersion) {
-	return (httpVersion.length() >= 8 && httpVersion.substr(0, 5) == "HTTP/" && httpVersion[5] == '1' && httpVersion[6] == '.' && httpVersion[7] >= '0' && httpVersion[7] <= '9');
-}
-
-void PostUploadRequestParser::parseHttpRequest(const std::string& line, HttpRequest& httpRequest) {
+void PostUploadRequestParser::parsePostUploadRequest(const std::string& line, PostUploadRequest& PostUploadRequest) {
 	size_t firstSpace = line.find(' ');
 	size_t lastSpace = line.rfind(' ');
 
 	if (firstSpace != std::string::npos && lastSpace != std::string::npos && firstSpace < lastSpace) {
-		httpRequest.method = line.substr(0, firstSpace);
-		httpRequest.resource = line.substr(firstSpace + 1, lastSpace - firstSpace - 1);
-		httpRequest.httpVersion = line.substr(lastSpace + 1);
+		PostUploadRequest.method = line.substr(0, firstSpace);
+		PostUploadRequest.resource = line.substr(firstSpace + 1, lastSpace - firstSpace - 1);
+		PostUploadRequest.httpVersion = line.substr(lastSpace + 1);
 
-		if (!isValidMethod(httpRequest.method) || !isValidResource(httpRequest.resource) || !isValidHttpVersion(httpRequest.httpVersion)) {
+		if (!isValidMethod(PostUploadRequest.method) || !isValidResource(PostUploadRequest.resource) || !isValidHttpVersion(PostUploadRequest.httpVersion)) {
 			std::cerr << "Error: Invalid HTTP request line." << std::endl;
-			httpRequest.method.clear();
-			httpRequest.resource.clear();
-			httpRequest.httpVersion.clear();
+			PostUploadRequest.method.clear();
+			PostUploadRequest.resource.clear();
+			PostUploadRequest.httpVersion.clear();
 		}
 	} else {
 		std::cerr << "Error: Invalid HTTP request line." << std::endl;
@@ -73,7 +66,7 @@ bool PostUploadRequestParser::isAcceptedField(std::string field, std::vector<std
 	return false;
 }
 
-void PostUploadRequestParser::parseHeaderLine(const std::string& line, std::map<std::string, std::string> &headerMap, std::vector<std::string> acceptedFields) {
+void PostUploadRequestParser::parseHeaderLine(const std::string& line, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields) {
 	std::string::size_type colonPos = line.find(':');
 	if (colonPos != std::string::npos) {
 		std::string field = line.substr(0, colonPos);
@@ -86,37 +79,38 @@ void PostUploadRequestParser::parseHeaderLine(const std::string& line, std::map<
 			if (valueStart != std::string::npos)
 				value = value.substr(valueStart);
 			// Store the field and value in the map
-			headerMap[field] = value;
+			headers[field] = value;
 		}
 	}
 }
 
-void PostUploadRequestParser::parseHeaderBlock(std::fstream &requestFile, std::string &line, std::map<std::string, std::string> &headerMap, std::vector<std::string> acceptedFields)
+void PostUploadRequestParser::parseHeaderBlock(std::fstream &requestFile, std::string &line, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields)
 {
 	while(!line.empty())
 	{
 		getline(requestFile, line);
-		parseHeaderLine(line, headerMap, acceptedFields);
+		parseHeaderLine(line, headers, acceptedFields);
 	}
 }
 
-void PostUploadRequestParser::parseHeaderBlockFromString(std::string& inputString, std::string& line, std::map<std::string, std::string>& headerMap, std::vector<std::string> acceptedFields)
+void PostUploadRequestParser::parseHeaderBlockFromString(std::string& inputString, std::string& line, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields)
 {
-    std::istringstream iss(inputString);  // Treat the input string as a stream
-    // Read lines from the stringstream
-    while (std::getline(iss, line) && !line.empty()) {
-        parseHeaderLine(line, headerMap, acceptedFields);
+	std::istringstream iss(inputString);  // Treat the input string as a stream
+	// Read lines from the stringstream
+	while (std::getline(iss, line) && !line.empty()) {
+		parseHeaderLine(line, headers, acceptedFields);
 		removeFromStringStart(inputString, line);
-    }
+	}
 }
 
+// what if there are more than two elements given here?
 void PostUploadRequestParser::parseContentTypeValue()
 {
 	std::string contentType;
 	std::vector<std::string> tokens;
 
 	// 1. Split the "Content-Type" header value by the semicolon (;)
-	splitString(headerMap["content-type"], ";", tokens);
+	splitString(postUploadRequest.headers["content-type"], ";", tokens);
 	if (tokens.size() != 2)
 	{
 		std::cout << "syntax error1!" << std::endl;
@@ -130,11 +124,11 @@ void PostUploadRequestParser::parseContentTypeValue()
 	// 3. Check each part to find the one that starts with "boundary=". This part contains the boundary string.
 	if(startsWith(tokens[0], "boundary=")) {
 		boundary = tokens[0];
-		contentType = tokens[1];
+		postUploadRequest.headers["content-type"] = tokens[1];
 	} 
 	else if(startsWith(tokens[1], "boundary=")) {
 		boundary = tokens[1];
-		contentType = tokens[0];
+		postUploadRequest.headers["content-type"] = tokens[0];
 	}
 	else {
 		std::cout << "syntax error2!" << std::endl;
@@ -142,11 +136,6 @@ void PostUploadRequestParser::parseContentTypeValue()
 	}
 	// 4. Extract the boundary string by splitting the part that starts with "boundary=" and retrieves the value after the equal sign (=).	
 	removeFromStringStart(boundary, "boundary=");
-	// 5. Check if content type matches "multipart/form-data"
-	if (contentType != "multipart/form-data") {
-		std::cout << "syntax error3!" << std::endl;
-		exit(EXIT_FAILURE);
-	}
 }
 
 void PostUploadRequestParser::parseBody(std::fstream &requestFile)
@@ -166,22 +155,15 @@ void PostUploadRequestParser::parseBody(std::fstream &requestFile)
 	boundary = "--" + boundary + '\n';
 	std::vector<std::string> parts;
 	splitString(body, boundary, parts);
-	// open a file, loop over the parts, write to data payload to the file, close the file
-	std::cout << _outputFilename.c_str() << std::endl;
-	std::ofstream outputFile(_outputFilename.c_str());  // Opens a file named "output.txt" for writing
-	if (!outputFile.is_open()) {
-		std::cerr << "Failed to open the file for writing." << std::endl;
-	}
-	std::map<std::string, std::string> partMap;
 	for(size_t i = 0; i < parts.size(); i++)
 	{
 		std::string line;
-		parseHeaderBlockFromString(parts[i], line, partMap, partsAcceptedFields);
-		parseContentDisposition(partMap);
-		outputFile << parts[i];
-		printMap(partMap);
+		Part part;
+		postUploadRequest.parts.push_back(part);
+		parseHeaderBlockFromString(parts[i], line, postUploadRequest.parts[i].headers, partsAcceptedFields);
+		parseContentDisposition(postUploadRequest.parts[i].headers);
+		postUploadRequest.parts[i].data = parts[i];
 	}
-	outputFile.close();
 }
 
 void PostUploadRequestParser::parseContentDisposition(std::map<std::string, std::string> &partMap)
@@ -215,12 +197,77 @@ void PostUploadRequestParser::parseContentDisposition(std::map<std::string, std:
 		std::cout << "syntax error2!" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	std::cout << dispositionType << std::endl;
-	std::cout << name << std::endl;
-	std::cout << filename << std::endl;		
+	// std::cout << dispositionType << std::endl;
+	// std::cout << name << std::endl;
+	// std::cout << filename << std::endl;		
+}
+
+
+bool PostUploadRequestParser::isContentOfType(std::map<std::string, std::string> headers, std::string typeToMatch)
+{
+	if (headers["content-type"] != typeToMatch) {
+		return false;
+	}
+	return true;
+}
+
+// 5. Check if content type of all parts matches give type
+bool PostUploadRequestParser::arePartContentsOfType(std::string typeToMatch)
+{
+	for(size_t i = 0; i < postUploadRequest.parts.size(); i++)
+	{
+		if (!isContentOfType(postUploadRequest.parts[i].headers, typeToMatch))
+			return false;
+	}
+	return true;
+}
+
+// check file type are as expected in header and parts
+void PostUploadRequestParser::checkContentTypes()
+{
+	if (!isContentOfType(postUploadRequest.headers, "multipart/form-data"))
+	{
+		std::cout << "syntax error3!" << std::endl;
+		exit(EXIT_FAILURE);
+	}	
+	if (!arePartContentsOfType("text/plain"))
+	{
+		std::cout << "syntax error3!" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
+// open a file, loop over the parts, write to data payload to the file, close the file
+void PostUploadRequestParser::makeOutputFile()
+{
+	std::ofstream outputFile(_outputFilename.c_str());
+	if (!outputFile.is_open()) {
+		std::cerr << "Failed to open the file for writing." << std::endl;
+	}	
+	for(size_t i = 0; i < postUploadRequest.parts.size(); i++)
+	{
+		outputFile << postUploadRequest.parts[i].data;
+	}
+	outputFile.close();
+	std::cout << "Output file written to: " << _outputFilename << std::endl;
 }
 
 // utility functions
+
+// Check if the method consists of uppercase and lowercase letters only
+bool PostUploadRequestParser::isValidMethod(const std::string& method) {
+	return std::string::npos == method.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+}
+
+// Check if the resource contains valid characters (letters, digits, '/', '.', '-', '_', '~')
+bool PostUploadRequestParser::isValidResource(const std::string& resource) {
+	return std::string::npos == resource.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/._-~");
+}
+
+// Check if the HTTP version follows the format HTTP/x.y
+bool PostUploadRequestParser::isValidHttpVersion(const std::string& httpVersion) {
+	return (httpVersion.length() >= 8 && httpVersion.substr(0, 5) == "HTTP/" && httpVersion[5] == '1' && httpVersion[6] == '.' && httpVersion[7] >= '0' && httpVersion[7] <= '9');
+}
 
 void PostUploadRequestParser::toLowerCase(std::string& str) {
 	for (std::string::iterator it = str.begin(); it != str.end(); ++it) {
@@ -276,27 +323,33 @@ bool PostUploadRequestParser::startsWith(const std::string& fullString, const st
 }
 
 void PostUploadRequestParser::removeFromStringStart(std::string& fullString, const std::string& line) {
-    std::string::size_type foundPos = fullString.find(line);
+	std::string::size_type foundPos = fullString.find(line);
 
-    if (foundPos == 0) {
-        // Line found at the start, erase it
-        fullString.erase(0, line.length());
-
-        // Additionally, remove any leading whitespace or newline
-        while (!fullString.empty() && (fullString[0] == ' ' || fullString[0] == '\t' || fullString[0] == '\n' || fullString[0] == '\r'))
-            fullString.erase(0, 1);
-    }
+	if (foundPos == 0) {
+		// Line found at the start, erase it
+		fullString.erase(0, line.length());
+		// Additionally, remove any leading whitespace or newline
+		while (!fullString.empty() && (fullString[0] == ' ' || fullString[0] == '\t' || fullString[0] == '\n' || fullString[0] == '\r'))
+			fullString.erase(0, 1);
+	}
 }
 
-void PostUploadRequestParser::printHttpRequest(HttpRequest& httpRequest) {
-	if (!httpRequest.method.empty()) {
-		std::cout << "Method: " << httpRequest.method << std::endl;
-		std::cout << "Resource: " << httpRequest.resource << std::endl;
-		std::cout << "HTTP Version: " << httpRequest.httpVersion << std::endl;
+void PostUploadRequestParser::printPostUploadRequest() {
+	if (!postUploadRequest.method.empty()) {
+		std::cout << "Method: " << postUploadRequest.method << std::endl;
+		std::cout << "Resource: " << postUploadRequest.resource << std::endl;
+		std::cout << "HTTP Version: " << postUploadRequest.httpVersion << std::endl;
 	}
 }	
 
-void PostUploadRequestParser::printMap(std::map<std::string, std::string> map) {
+void PostUploadRequestParser::printPartHeaders() {
+	for(size_t i = 0; i < postUploadRequest.parts.size(); i++)
+	{
+		printHeaders(postUploadRequest.parts[i].headers);
+	}
+}
+
+void PostUploadRequestParser::printHeaders(std::map<std::string, std::string> map) {
 	std::map<std::string, std::string>::iterator it;
 	for (it = map.begin(); it != map.end(); ++it) {
 		std::cout << "Field: " << it->first << ", Value: " << it->second << std::endl;
