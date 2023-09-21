@@ -39,6 +39,7 @@ private:
 	ListeningSocket* findSocket(int fd);
 
 public:
+	ServerManager(ConfigFileParser *config);
 	void setupServers();
 	void initializeSets();
 	void addToSet(const int i, fd_set &set);

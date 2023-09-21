@@ -1,6 +1,10 @@
 #include "ServerManager.hpp"
 
 ServerManager::ServerManager() {}
+
+// constructor that accepts ConfigFileParser* config as argument and assinges it to _config
+ServerManager::ServerManager(ConfigFileParser *config) : _config(config) {}
+
 ServerManager::~ServerManager()
 {
 	// delete _servers
