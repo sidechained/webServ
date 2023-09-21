@@ -144,7 +144,7 @@ void ServerManager::checkTimeout()
 {
 	for (std::map<int, ListeningSocket *>::iterator it = _clients_map.begin(); it != _clients_map.end(); ++it)
 	{
-		std::cout << "checking timeout" << std::endl;
+		//std::cout << "checking timeout" << std::endl;
 
 		if (time(NULL) - (*it->second).getLastTime() > CONNECTION_TIMEOUT)
 		{

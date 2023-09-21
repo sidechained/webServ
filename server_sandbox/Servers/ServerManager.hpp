@@ -16,7 +16,7 @@
 
 #define MAX_CLIENTS 10
 #define MESSAGE_BUFFER 20000
-#define CONNECTION_TIMEOUT 600
+#define CONNECTION_TIMEOUT 60
 
 class ServerManager
 {
@@ -30,15 +30,8 @@ private:
 	int        _biggest_fd;
 
 
-
-	char _buffer[30000];
-	struct pollfd _fds[MAX_CLIENTS + 1];
-	int _clients;
-	int _poll;
 	std::map<int, SimpleResponse *> _pendingResponses;
-	void accepter();
-	void handler();
-	void responder();
+
 
 	ListeningSocket* findSocket(int fd);
 
@@ -56,7 +49,6 @@ public:
 
 
 	ServerManager();
-	ServerManager(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog);
 	~ServerManager();
-	void launch();
+	//void launch();
 };
