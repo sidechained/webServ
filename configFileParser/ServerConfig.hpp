@@ -28,7 +28,7 @@ class ServerConfig : public GenericConfig
 		void detectKey(std::string keyToMatch);
 	public:
 		std::string hostname;
-		int clientMaxBodySizeMB;
+		unsigned int clientMaxBodySizeMB;
 		std::vector<Port> ports;
 		std::map<std::string, std::string> error_pages;
 		std::map<std::string, LocationConfig> locations;

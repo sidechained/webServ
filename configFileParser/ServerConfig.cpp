@@ -1,6 +1,8 @@
 #include "ServerConfig.hpp"
 #include "GenericConfig.hpp"
 
+// modify so that a struct is filled which represents the serverConfigs
+
 ServerConfig::ServerConfig(std::fstream &configFile) {
 	hostname = "";
 	clientMaxBodySizeMB = 1;
