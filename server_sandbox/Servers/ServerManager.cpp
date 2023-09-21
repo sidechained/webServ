@@ -2,7 +2,7 @@
 
 ServerManager::ServerManager() {}
 
-//ServerManager::ServerManager(ConfigFileParser *config) : _config(config) {}
+// ServerManager::ServerManager(ConfigFileParser *config) : _config(config) {}
 
 ServerManager::~ServerManager()
 {
@@ -40,7 +40,7 @@ void ServerManager::setupServers()
 	{
 		_servers.push_back(new SimpleServer(*it));
 	}
-	
+
 	std::cout << "servers 1 created" << std::endl;*/
 }
 
@@ -154,7 +154,7 @@ void ServerManager::checkTimeout()
 {
 	for (std::map<int, Socket *>::iterator it = _clients_map.begin(); it != _clients_map.end(); ++it)
 	{
-		//std::cout << "checking timeout" << std::endl;
+		// std::cout << "checking timeout" << std::endl;
 
 		if (time(NULL) - (*it->second).getLastTime() > CONNECTION_TIMEOUT)
 		{

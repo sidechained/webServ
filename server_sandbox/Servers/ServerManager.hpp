@@ -13,7 +13,7 @@
 #include <csignal>
 #include "../WebServ.hpp"
 #include <cstddef>
-//#include "../Parser/ConfigFileParser.hpp"
+// #include "../Parser/ConfigFileParser.hpp"
 
 #define MAX_CLIENTS 10
 #define MESSAGE_BUFFER 20000
@@ -22,24 +22,21 @@
 class ServerManager
 {
 private:
-
 	std::vector<Server *> _servers;
-	std::map<int, Server*> _servers_map;
-	std::map<int, Socket*> _clients_map;
-	fd_set     _recv_fd_pool;
-	fd_set     _write_fd_pool;
-	int        _biggest_fd;
+	std::map<int, Server *> _servers_map;
+	std::map<int, Socket *> _clients_map;
+	fd_set _recv_fd_pool;
+	fd_set _write_fd_pool;
+	int _biggest_fd;
 
-	//ConfigFileParser* _config;
-
+	// ConfigFileParser* _config;
 
 	std::map<int, SimpleResponse *> _pendingResponses;
 
-
-	Socket* findSocket(int fd);
+	Socket *findSocket(int fd);
 
 public:
-	//ServerManager(ConfigFileParser *config) : _config(config) {}
+	// ServerManager(ConfigFileParser *config) : _config(config) {}
 	void setupServers();
 	void initializeSets();
 	void addToSet(const int i, fd_set &set);
@@ -48,11 +45,10 @@ public:
 	void checkTimeout();
 	void closeConnection(const int i);
 	void acceptNewConnection(int fd);
-	void readRequest(const int &i, Socket* client);
-	void sendResponse(const int &i, Socket* client);
-
+	void readRequest(const int &i, Socket *client);
+	void sendResponse(const int &i, Socket *client);
 
 	ServerManager();
 	~ServerManager();
-	//void launch();
+	// void launch();
 };
