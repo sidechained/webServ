@@ -16,22 +16,22 @@ void TextResponse::createResponse()
 {
     HttpRequest request = this->getRequest();
 
-    std::cout << BG_BOLD_MAGENTA << "Creating HTML response for resource" << request.getResource() << RESET << std::endl;
+    std::cout << BG_BOLD_MAGENTA << "Creating HTML response for resource" << RESET << std::endl;
 
     if (request.isNoSlash())
     {
-        setHeader(MovedHeader(request.getRequest()["Host"], request.getResource()).getHeader());
+        setHeader(MovedHeader(request.getHost(), request.getPath()).getHeader());
         setBodySent(true);
         return;
     }
     if (request.getRedirection() != "")
     {
-        setHeader(MovedHeader(request.getRequest()["Host"], request.getRedirection()).getHeader());
+        setHeader(MovedHeader(request.getHost(), request.getRedirection()).getHeader());
         setBodySent(true);
         return;
     }
 
-    std::ifstream htmlFile(request.getResource().c_str(), std::ios::binary);
+    std::ifstream htmlFile(request.getPath().c_str(), std::ios::binary);
     if (!htmlFile)
     {
         std::cerr << "Error opening HTML file" << std::endl;

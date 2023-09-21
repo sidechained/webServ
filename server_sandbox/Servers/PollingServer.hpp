@@ -2,7 +2,6 @@
 #include "SimpleServer.hpp"
 #include "../Requests/HttpRequest.hpp"
 #include "../Responses/TextResponse.hpp"
-#include "../Responses/ResponseFactory.hpp"
 #include "../Parser/ServerConfig.hpp"
 #include "unistd.h"
 #include <cstring>

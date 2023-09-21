@@ -6,7 +6,6 @@ FILES = main.cpp \
         Requests/HttpRequest.cpp \
         Responses/TextResponse.cpp \
         Responses/SimpleResponse.cpp \
-		Responses/ResponseFactory.cpp \
 		Responses/Headers/SimpleHeader.cpp \
 		Responses/Headers/MovedHeader.cpp \
 		Responses/Headers/OkHeader.cpp \
