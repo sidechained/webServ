@@ -1,7 +1,7 @@
-#include "SimpleSocket.hpp"
+#include "Socket.hpp"
 
 // Default constructor
-SimpleSocket::SimpleSocket(int domain, int type, int protocol, int port, std::string ip, int backlog)
+Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int backlog)
 {
 	(void) backlog;
     // Define address structure
@@ -29,21 +29,21 @@ SimpleSocket::SimpleSocket(int domain, int type, int protocol, int port, std::st
 	std::cout << "Last request time set to " << _last_request_time << std::endl;
 }
 
-const time_t &SimpleSocket::getLastTime() const
+const time_t &Socket::getLastTime() const
 {
 	return _last_request_time;
 }
-void SimpleSocket::updateTime()
+void Socket::updateTime()
 {
 	_last_request_time = time(NULL);
 }
 
-SimpleSocket::~SimpleSocket()
+Socket::~Socket()
 {
     close(_sock);
 }
 
-SimpleSocket::SimpleSocket(const SimpleSocket &other)
+Socket::Socket(const Socket &other)
 {
 	if (this != &other)
 	{
@@ -54,7 +54,7 @@ SimpleSocket::SimpleSocket(const SimpleSocket &other)
 	}
 }
 
-void SimpleSocket::testConnection(int item)
+void Socket::testConnection(int item)
 {
     if (item < 0)
     {
@@ -64,22 +64,22 @@ void SimpleSocket::testConnection(int item)
 }
 
 // Getter functions
-sockaddr_in SimpleSocket::getAddress() const
+sockaddr_in Socket::getAddress() const
 {
     return _address;
 }
 
-int SimpleSocket::getSock() const
+int Socket::getSock() const
 {
     return _sock;
 }
 
-int SimpleSocket::getConnection() const
+int Socket::getConnection() const
 {
     return _conection;
 }
 
-int SimpleSocket::getAddressSize() const
+int Socket::getAddressSize() const
 {
     return _addressSize;
 }

@@ -1,7 +1,7 @@
 FILES = main.cpp \
-        Servers/SimpleServer.cpp \
+        Servers/Server.cpp \
         Servers/ServerManager.cpp \
-        Sockets/SimpleSocket.cpp \
+        Sockets/Socket.cpp \
         Requests/HttpRequest.cpp \
         Responses/TextResponse.cpp \
         Responses/SimpleResponse.cpp \

@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-class SimpleSocket
+class Socket
 {
 protected:
 	sockaddr_in _address;
@@ -18,12 +18,12 @@ protected:
 	time_t _last_request_time;
 
 public:
-	SimpleSocket(int domain, int type, int protocol, int port, std::string ip, int backlog);
-	~SimpleSocket();
-	SimpleSocket(const SimpleSocket &other);
+	Socket(int domain, int type, int protocol, int port, std::string ip, int backlog);
+	~Socket();
+	Socket(const Socket &other);
 	const time_t &getLastTime() const;
 	void updateTime();
-	// SimpleSocket &operator=(const SimpleSocket &other);
+	// Socket &operator=(const Socket &other);
 
 	void bindSocket();
 	void testConnection(int item);
