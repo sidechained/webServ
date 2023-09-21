@@ -1,8 +1,9 @@
 #include "SimpleSocket.hpp"
 
 // Default constructor
-SimpleSocket::SimpleSocket(int domain, int type, int protocol, int port, std::string ip)
+SimpleSocket::SimpleSocket(int domain, int type, int protocol, int port, std::string ip, int backlog)
 {
+	(void) backlog;
     // Define address structure
     _address.sin_family = domain;
     _address.sin_port = htons(port);

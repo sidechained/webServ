@@ -5,7 +5,7 @@ SimpleServer::SimpleServer(int domain, int type, int protocol, std::vector<int> 
 {
     for (unsigned long i = 0; i < ports.size(); i++)
     {
-        _sockets.push_back(new ListeningSocket(domain, type, protocol, ports[i], ip, backlog));
+        _sockets.push_back(new SimpleSocket(domain, type, protocol, ports[i], ip, backlog));
     }
 }
 
@@ -16,7 +16,7 @@ SimpleServer::~SimpleServer()
         delete _sockets[i];
 }
 
-std::vector<ListeningSocket *> SimpleServer::getSockets() const
+std::vector<SimpleSocket *> SimpleServer::getSockets() const
 {
     return _sockets;
 }

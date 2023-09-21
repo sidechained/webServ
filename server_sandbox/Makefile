@@ -1,9 +1,7 @@
 FILES = main.cpp \
         Servers/SimpleServer.cpp \
-        Servers/PollingServer.cpp \
         Servers/ServerManager.cpp \
         Sockets/SimpleSocket.cpp \
-        Sockets/ListeningSocket.cpp \
         Requests/HttpRequest.cpp \
         Responses/TextResponse.cpp \
         Responses/SimpleResponse.cpp \

@@ -3,7 +3,6 @@
 #include <iostream>
 #include <netinet/in.h>  // for AF_INET
 #include <sys/socket.h>  // for SOCK_STREAM
-#include "Servers/PollingServer.hpp"
 #include "Servers/ServerManager.hpp"
 
 

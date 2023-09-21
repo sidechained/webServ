@@ -1,7 +1,7 @@
 #pragma once
-#include "../Sockets/ListeningSocket.hpp"
 #include "../Colors.hpp"
 #include <string>
+#include <iostream>
 #include <sstream>
 #include <map>
 #include "../WebServ.hpp"

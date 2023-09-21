@@ -18,7 +18,7 @@ protected:
 	time_t _last_request_time;
 
 public:
-	SimpleSocket(int domain, int type, int protocol, int port, std::string ip);
+	SimpleSocket(int domain, int type, int protocol, int port, std::string ip, int backlog);
 	~SimpleSocket();
 	SimpleSocket(const SimpleSocket &other);
 	const time_t &getLastTime() const;

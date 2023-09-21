@@ -24,7 +24,7 @@ private:
 
 	std::vector<SimpleServer *> _servers;
 	std::map<int, SimpleServer*> _servers_map;
-	std::map<int, ListeningSocket*> _clients_map;
+	std::map<int, SimpleSocket*> _clients_map;
 	fd_set     _recv_fd_pool;
 	fd_set     _write_fd_pool;
 	int        _biggest_fd;
@@ -33,7 +33,7 @@ private:
 	std::map<int, SimpleResponse *> _pendingResponses;
 
 
-	ListeningSocket* findSocket(int fd);
+	SimpleSocket* findSocket(int fd);
 
 public:
 	void setupServers();
@@ -44,8 +44,8 @@ public:
 	void checkTimeout();
 	void closeConnection(const int i);
 	void acceptNewConnection(int fd);
-	void readRequest(const int &i, ListeningSocket* client);
-	void sendResponse(const int &i, ListeningSocket* client);
+	void readRequest(const int &i, SimpleSocket* client);
+	void sendResponse(const int &i, SimpleSocket* client);
 
 
 	ServerManager();

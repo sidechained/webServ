@@ -34,12 +34,12 @@ void ServerManager::setupServers()
 	//_servers.push_back(new SimpleServer(AF_INET, SOCK_STREAM, 0, ports, "127.0.0.3", MAX_CLIENTS));
 }
 
-ListeningSocket *ServerManager::findSocket(int fd)
+SimpleSocket *ServerManager::findSocket(int fd)
 {
 	for (std::vector<SimpleServer *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
 	{
-		std::vector<ListeningSocket *> sockets = (*it)->getSockets();
-		for (std::vector<ListeningSocket *>::iterator it2 = sockets.begin(); it2 != sockets.end(); ++it2)
+		std::vector<SimpleSocket *> sockets = (*it)->getSockets();
+		for (std::vector<SimpleSocket *>::iterator it2 = sockets.begin(); it2 != sockets.end(); ++it2)
 		{
 			int sock = (*it2)->getSock();
 			if (sock == fd)
@@ -57,9 +57,9 @@ void ServerManager::initializeSets()
 	// adds servers sockets to _recv_fd_pool set
 	for (std::vector<SimpleServer *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
 	{
-		std::vector<ListeningSocket *> sockets = (*it)->getSockets();
+		std::vector<SimpleSocket *> sockets = (*it)->getSockets();
 
-		for (std::vector<ListeningSocket *>::iterator it2 = sockets.begin(); it2 != sockets.end(); ++it2)
+		for (std::vector<SimpleSocket *>::iterator it2 = sockets.begin(); it2 != sockets.end(); ++it2)
 		{
 			int sock = (*it2)->getSock();
 			if (listen(sock, MAX_CLIENTS) == -1)
@@ -142,7 +142,7 @@ void ServerManager::runServers()
 }
 void ServerManager::checkTimeout()
 {
-	for (std::map<int, ListeningSocket *>::iterator it = _clients_map.begin(); it != _clients_map.end(); ++it)
+	for (std::map<int, SimpleSocket *>::iterator it = _clients_map.begin(); it != _clients_map.end(); ++it)
 	{
 		//std::cout << "checking timeout" << std::endl;
 
@@ -161,7 +161,7 @@ void ServerManager::acceptNewConnection(int fd)
 	struct sockaddr_in client_address;
 	long client_address_size = sizeof(client_address);
 	int client_sock;
-	// ListeningSocket  new_client(serv);
+	// SimpleSocket  new_client(serv);
 	char buf[INET_ADDRSTRLEN];
 
 	if ((client_sock = accept(fd, (struct sockaddr *)&client_address,
@@ -181,7 +181,7 @@ void ServerManager::acceptNewConnection(int fd)
 		close(client_sock);
 		return;
 	}
-	ListeningSocket *new_client = findSocket(fd);
+	SimpleSocket *new_client = findSocket(fd);
 	std::cout << "socket found" << new_client << std::endl;
 	if (new_client)
 	{
@@ -191,7 +191,7 @@ void ServerManager::acceptNewConnection(int fd)
 	}
 }
 
-void ServerManager::readRequest(const int &i, ListeningSocket *client)
+void ServerManager::readRequest(const int &i, SimpleSocket *client)
 {
 	std::cout << "read request" << std::endl;
 
@@ -210,7 +210,7 @@ void ServerManager::readRequest(const int &i, ListeningSocket *client)
 		HttpRequest parsedRequest(buffer);
 		// std::cout << BG_BOLD_WHITE << buffer << RESET << std::endl;
 		// parsedRequest.printRequest();
-		// ListeningSocket* new_client = findSocket(i);
+		// SimpleSocket* new_client = findSocket(i);
 		// if (client)
 		client->updateTime();
 		// std::cout << BG_RED "socket null" RESET << std::endl;
@@ -221,7 +221,7 @@ void ServerManager::readRequest(const int &i, ListeningSocket *client)
 	}
 }
 
-void ServerManager::sendResponse(const int &i, ListeningSocket *client)
+void ServerManager::sendResponse(const int &i, SimpleSocket *client)
 {
 	std::cout << BG_GREEN "sendResponse call fd: " RESET << i << std::endl;
 
@@ -251,7 +251,7 @@ void ServerManager::sendResponse(const int &i, ListeningSocket *client)
 	}
 	else
 	{
-		// ListeningSocket* client = findSocket(i);
+		// SimpleSocket* client = findSocket(i);
 		//(void)	client;
 		client->updateTime();
 		std::cout << BG_RED "time updated" << client->getLastTime() << RESET << std::endl;
