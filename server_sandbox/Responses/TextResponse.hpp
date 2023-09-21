@@ -1,6 +1,5 @@
 #pragma once
-#include "../WebServ.hpp"
-//#include "SimpleResponse.hpp"
+#include "SimpleResponse.hpp"
 
 class TextResponse : public SimpleResponse
 {

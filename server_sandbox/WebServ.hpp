@@ -1,16 +1,9 @@
-// WEBSERV.hpp
 #pragma once
 #include <string>
 #include <map>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
-#include "Parser/ConfigFileParser.hpp"
-#include "Servers/ServerManager.hpp"
-#include "Servers/Server.hpp"
-#include "Responses/SimpleResponse.hpp"
-#include "Responses/TextResponse.hpp"
 
 extern bool isRunning;
 

@@ -208,6 +208,8 @@ void ServerManager::acceptNewConnection(int fd)
 		return;
 	}
 	Socket *new_client = findSocket(fd);
+
+	
 	std::cout << "socket found" << new_client << std::endl;
 	if (new_client)
 	{
@@ -233,9 +235,14 @@ void ServerManager::readRequest(const int &i, Socket *client)
 	else
 	{
 		std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
+		std::cout << "Before I segfault" << std::endl;
 		Server *server = findserver(i);
 
-		HttpRequest parsedRequest(buffer, server->getConfig());
+		std::cout << "After I segfault" << std::endl;
+		if (!server)
+			return;
+		ServerConfig *config = server->getConfig();
+		HttpRequest parsedRequest(buffer, config);
 		// std::cout << BG_BOLD_WHITE << buffer << RESET << std::endl;
 		// parsedRequest.printRequest();
 		// Socket* new_client = findSocket(i);

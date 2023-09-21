@@ -26,7 +26,7 @@ server:
 			root: /other_location
 
 server:
-	ports: 82
+	ports: 8200
 	hostname: eightytwo.com
 	client_max_body_size_mb: 10
 	error_pages:

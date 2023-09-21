@@ -3,9 +3,9 @@
 #include <string>
 #include <sstream>
 #include <map>
-#include "../WebServ.hpp"
 #include "../Parser/ServerConfig.hpp"
 #include "../Parser/LocationConfig.hpp"
+#include "../WebServ.hpp"
 
 class LocationConfig;
 

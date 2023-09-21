@@ -1,5 +1,4 @@
 #pragma once
-#include "../WebServ.hpp"
 #include "Headers/MovedHeader.hpp"
 #include "Headers/OkHeader.hpp"
 #include "../Requests/HttpRequest.hpp"

@@ -5,7 +5,7 @@
 	"name":"Launch",
 	"type":"cppdbg",
 	"program":"${workspaceFolder}/server",
-	"args":[],
+	"args":["configs/servers.txt"],
 	"cwd":"${workspaceFolder}",
 	"request":"launch",
 	"MIMode":"gdb"

@@ -1,6 +1,7 @@
 #pragma once
 #include "../Requests/HttpRequest.hpp"
 #include "../Responses/TextResponse.hpp"
+#include "Server.hpp"
 #include "unistd.h"
 #include <cstring>
 #include <poll.h>
@@ -9,10 +10,8 @@
 #include <cstdlib>
 #include <fstream>
 #include <csignal>
-#include "../WebServ.hpp"
 #include <cstddef>
-#include "Server.hpp"
-// #include "../Parser/ConfigFileParser.hpp"
+#include "../Parser/ConfigFileParser.hpp"
 
 #define MAX_CLIENTS 10
 #define MESSAGE_BUFFER 20000

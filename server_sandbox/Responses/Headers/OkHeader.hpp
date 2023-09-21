@@ -1,5 +1,7 @@
 #pragma once
 #include "SimpleHeader.hpp"
+#include "../../WebServ.hpp"
+
 
 class OkHeader : public SimpleHeader
 {

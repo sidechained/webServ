@@ -4,6 +4,7 @@
 #include "../Colors.hpp"
 #include <vector>
 
+
 class Server
 {
 private:
@@ -17,7 +18,7 @@ protected:
 	void printClientAddress(sockaddr_in const &address);
 	ServerConfig *_config;
 public:
-	Server(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog);
+	//Server(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog);
 	Server(ServerConfig &config);
 	~Server();
 	void launch();

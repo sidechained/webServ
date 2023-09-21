@@ -1,5 +1,6 @@
 #pragma once
 #include "SimpleHeader.hpp"
+#include "../../WebServ.hpp"
 
 class MovedHeader : public SimpleHeader
 {
