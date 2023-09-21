@@ -2,6 +2,8 @@
 
 ServerManager::ServerManager() {}
 
+//ServerManager::ServerManager(ConfigFileParser *config) : _config(config) {}
+
 ServerManager::~ServerManager()
 {
 	// delete _servers

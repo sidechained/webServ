@@ -39,6 +39,7 @@ private:
 	Socket* findSocket(int fd);
 
 public:
+	//ServerManager(ConfigFileParser *config) : _config(config) {}
 	void setupServers();
 	void initializeSets();
 	void addToSet(const int i, fd_set &set);
