@@ -1,4 +1,6 @@
 <?php
+print_r($_SERVER);
+print_r($_FILES);
 // Check if the form was submitted via POST
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Check if the "fileToUpload" field exists in the form data

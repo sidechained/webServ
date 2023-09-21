@@ -3,6 +3,9 @@
 // TODO:
 // - correctly parse content disposition
 // - handle unexpected amount of semicolons or elements when splitting Content-Type and Content-Disposition
+// - check content length has valid
+// - check content length is present, if not throw error
+// - only content-length bytes should be read from file
 
 PostUploadRequestParser::PostUploadRequestParser(std::string inputFilename, std::string outputFilename) : _outputFilename(outputFilename)
 {
@@ -34,6 +37,15 @@ PostUploadRequestParser::PostUploadRequestParser(std::string inputFilename, std:
 		std::cout << "HTTP version is not HTTP/1.1" << std::endl;
 		exit(EXIT_FAILURE);
 	}
+	std::map<std::string, std::string>::iterator it = postUploadRequest.headers.find("content-length");
+	if (!(it != postUploadRequest.headers.end())) {
+		std::cout << "content-length field must be present in header" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	if(!isValidNonNegativeIntegerString(postUploadRequest.headers["content-length"])) {
+		std::cout << "content-length field is not a valid non-negative integer string" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	checkContentTypes();
 	makeOutputFile();
 }
@@ -41,6 +53,11 @@ PostUploadRequestParser::PostUploadRequestParser(std::string inputFilename, std:
 PostUploadRequestParser::~PostUploadRequestParser()
 {
 	
+}
+
+PostUploadRequest PostUploadRequestParser::getStruct()
+{
+	return postUploadRequest;
 }
 
 void PostUploadRequestParser::initAcceptedFields()
@@ -173,45 +190,42 @@ void PostUploadRequestParser::parseBody(std::fstream &requestFile)
 		Part part;
 		postUploadRequest.parts.push_back(part);
 		parseHeaderBlockFromString(parts[i], line, postUploadRequest.parts[i].headers, partsAcceptedFields);
-		parseContentDisposition(postUploadRequest.parts[i].headers);
+		parseContentDisposition(postUploadRequest.parts[i]);
 		postUploadRequest.parts[i].data = parts[i];
 	}
 }
 
-void PostUploadRequestParser::parseContentDisposition(std::map<std::string, std::string> &partMap)
+void PostUploadRequestParser::parseContentDisposition(Part &part)
 {
-	std::string dispositionType;
-	std::string name;
-	std::string filename;
 	std::vector<std::string> tokens;
-	splitString(partMap["content-disposition"], ";", tokens);
-	dispositionType = tokens[0];
-	if (!(dispositionType == "form-data"))
+	splitString(part.headers["content-disposition"], ";", tokens);
+	part.contentDisposition.type = tokens[0];
+	if (!(part.contentDisposition.type == "form-data"))
 	{
 		std::cout << "syntax error423!" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	// this will need to be adapted to handle more than 2 elements
-	dispositionType = tokens[0];
 	for(size_t i = 0; i < tokens.size(); i++)
 	{
 		trimWhitespace(tokens[i]);
 	}
 	if(startsWith(tokens[1], "name=")) {
-		name = tokens[1];
-		filename = tokens[2];
+		removeFromStringStart(tokens[1], "name=");
+		removeFromStringStart(tokens[2], "filename=");
+		part.contentDisposition.name = stripDoubleQuotes(tokens[1]);
+		part.contentDisposition.filename = stripDoubleQuotes(tokens[2]);
 	} 
-	else if(startsWith(tokens[2], "boundary=")) {
-		name = tokens[2];
-		filename = tokens[1];
+	else if(startsWith(tokens[2], "name=")) {
+		removeFromStringStart(tokens[1], "filename=");
+		removeFromStringStart(tokens[2], "name=");
+		part.contentDisposition.name = stripDoubleQuotes(tokens[2]);
+		part.contentDisposition.filename = stripDoubleQuotes(tokens[1]);
 	}
 	else {
 		std::cout << "syntax error2!" << std::endl;
 		exit(EXIT_FAILURE);
-	}
-	// std::cout << dispositionType << std::endl;
-	// std::cout << name << std::endl;
-	// std::cout << filename << std::endl;		
+	}		
 }
 
 
@@ -276,6 +290,23 @@ bool PostUploadRequestParser::isValidResource(const std::string& resource) {
 	return std::string::npos == resource.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/._-~");
 }
 
+bool PostUploadRequestParser::isValidNonNegativeIntegerString(const std::string& str) {
+    // Check if the string is empty
+    if (str.empty())
+        return false;
+    // Check each character in the string
+    for (size_t i = 0; i < str.length(); ++i) {
+        if (!isdigit(str[i])) {
+            // Character is not a digit
+            return false;
+        }
+    }
+    // Check if the first character is '0' (if the length is greater than 1)
+    if (str.length() > 1 && str[0] == '0')
+        return false;
+    return true;
+}
+
 // Check if the HTTP version follows the format HTTP/x.y
 bool PostUploadRequestParser::isValidHttpVersion(const std::string& httpVersion) {
 	return (httpVersion.length() >= 8 && httpVersion.substr(0, 5) == "HTTP/" && httpVersion[5] == '1' && httpVersion[6] == '.' && httpVersion[7] >= '0' && httpVersion[7] <= '9');
@@ -322,6 +353,15 @@ void PostUploadRequestParser::trimWhitespace(std::string& str) {
 	if (end != std::string::npos) {
 		str.erase(end + 1);
 	}
+}
+
+std::string PostUploadRequestParser::stripDoubleQuotes(const std::string& str) {
+    std::string result = str;
+    // Check if the string has at least two characters and both are quotes
+    if (result.length() >= 2 && result[0] == '"' && result[result.length() - 1] == '"') {
+        result = result.substr(1, result.length() - 2);
+    }
+    return result;
 }
 
 bool PostUploadRequestParser::startsWith(const std::string& fullString, const std::string& start) {

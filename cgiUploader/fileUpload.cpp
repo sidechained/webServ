@@ -1,6 +1,5 @@
 // clear; c++ -Wall -Werror -Wextra -std=c++98 fileUpload.cpp && ./a.out
 
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
