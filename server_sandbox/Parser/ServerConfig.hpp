@@ -1,5 +1,4 @@
-#ifndef SERVERCONFIG_HPP
-# define SERVERCONFIG_HPP
+#pragma once
 
 # include <cstdlib>
 # include <fstream>
@@ -41,5 +40,3 @@ class ServerConfig : public GenericConfig
 		void printLocations() const;
 		void cleanUp();
 };
-
-#endif

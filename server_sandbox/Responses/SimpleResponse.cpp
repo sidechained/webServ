@@ -4,7 +4,7 @@ SimpleResponse::SimpleResponse() : _request(), _headerSent(false), _bodySent(fal
 {
 }
 
-SimpleResponse::SimpleResponse(HttpRequest &request) : _request(request), _headerSent(false), _bodySent(false)
+SimpleResponse::SimpleResponse(HttpRequest &request) : _request(&request), _headerSent(false), _bodySent(false)
 {
     createResponse();
 }
@@ -15,7 +15,7 @@ SimpleResponse::~SimpleResponse()
 
 HttpRequest const &SimpleResponse::getRequest() const
 {
-    return _request;
+    return *_request;
 }
 
 std::string const &SimpleResponse::getHeader() const

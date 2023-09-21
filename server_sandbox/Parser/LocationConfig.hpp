@@ -1,5 +1,4 @@
-#ifndef LOCATIONCONFIG_HPP
-# define LOCATIONCONFIG_HPP
+#pragma once
 
 # include <cstdlib>
 # include <fstream>
@@ -33,5 +32,3 @@ class LocationConfig : public GenericConfig
 		void print() const;
 		void cleanUp();
 };
-
-#endif

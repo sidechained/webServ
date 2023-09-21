@@ -1,5 +1,4 @@
-#ifndef GENERICCONFIG_HPP
-# define GENERICCONFIG_HPP
+#pragma once
 
 # include <cstdlib>
 # include <fstream>
@@ -38,5 +37,3 @@ class GenericConfig
 	public:
 		std::string line; // public because serverConfig needs to revisit the line that the location ended at
 };
-
-#endif

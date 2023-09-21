@@ -1,5 +1,4 @@
 #pragma once
-#include "../Sockets/ListeningSocket.hpp"
 #include "../Colors.hpp"
 #include <string>
 #include <sstream>
@@ -7,6 +6,8 @@
 #include "../WebServ.hpp"
 #include "../Parser/ServerConfig.hpp"
 #include "../Parser/LocationConfig.hpp"
+
+class LocationConfig;
 
 class HttpRequest
 {
