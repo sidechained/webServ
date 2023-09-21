@@ -17,4 +17,7 @@ fclean:			clean
 
 re:				fclean $(NAME)
 
+run:
+				./$(NAME) postRequest.txt tmp/output.txt
+
 .PHONY:			all clean fclean re test

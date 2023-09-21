@@ -1,6 +1,6 @@
 #include "PostUploadRequestParser.hpp"
 
-PostUploadRequestParser::PostUploadRequestParser()
+PostUploadRequestParser::PostUploadRequestParser(std::string inputFilename, std::string outputFilename) : _outputFilename(outputFilename)
 {
 	// init accepted field for header
 	headerAcceptedFields.push_back("host");
@@ -10,7 +10,7 @@ PostUploadRequestParser::PostUploadRequestParser()
 	partsAcceptedFields.push_back("content-disposition");
 	partsAcceptedFields.push_back("content-type");
 	// 
-	std::fstream requestFile("postRequest.txt");
+	std::fstream requestFile(inputFilename.c_str());
 	if(!requestFile.is_open()) {
 		std::cout << "Could not open file" << std::endl;
 		exit(EXIT_FAILURE);
@@ -166,14 +166,58 @@ void PostUploadRequestParser::parseBody(std::fstream &requestFile)
 	boundary = "--" + boundary + '\n';
 	std::vector<std::string> parts;
 	splitString(body, boundary, parts);
+	// open a file, loop over the parts, write to data payload to the file, close the file
+	std::cout << _outputFilename.c_str() << std::endl;
+	std::ofstream outputFile(_outputFilename.c_str());  // Opens a file named "output.txt" for writing
+	if (!outputFile.is_open()) {
+		std::cerr << "Failed to open the file for writing." << std::endl;
+	}
 	std::map<std::string, std::string> partMap;
 	for(size_t i = 0; i < parts.size(); i++)
 	{
 		std::string line;
 		parseHeaderBlockFromString(parts[i], line, partMap, partsAcceptedFields);
-		std::cout << parts[i] << std::endl;
+		parseContentDisposition(partMap);
+		outputFile << parts[i];
 		printMap(partMap);
 	}
+	outputFile.close();
+}
+
+void PostUploadRequestParser::parseContentDisposition(std::map<std::string, std::string> &partMap)
+{
+	std::string dispositionType;
+	std::string name;
+	std::string filename;
+	std::vector<std::string> tokens;
+	splitString(partMap["content-disposition"], ";", tokens);
+	dispositionType = tokens[0];
+	if (!(dispositionType == "form-data"))
+	{
+		std::cout << "syntax error423!" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	// this will need to be adapted to handle more than 2 elements
+	dispositionType = tokens[0];
+	for(size_t i = 0; i < tokens.size(); i++)
+	{
+		trimWhitespace(tokens[i]);
+	}
+	if(startsWith(tokens[1], "name=")) {
+		name = tokens[1];
+		filename = tokens[2];
+	} 
+	else if(startsWith(tokens[2], "boundary=")) {
+		name = tokens[2];
+		filename = tokens[1];
+	}
+	else {
+		std::cout << "syntax error2!" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	std::cout << dispositionType << std::endl;
+	std::cout << name << std::endl;
+	std::cout << filename << std::endl;		
 }
 
 // utility functions

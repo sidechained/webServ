@@ -13,6 +13,13 @@
 class PostUploadRequestParser
 {
 	private:
+		// struct PostUploadRequest {
+		// 	std::string method;
+		// 	std::string resource;
+		// 	std::string httpVersion;
+		// 	std::map<std::string, std::string> headerMap;
+		// 	std::vector<std::map> parts;
+		// };
 		struct HttpRequest {
 			std::string method;
 			std::string resource;
@@ -22,6 +29,7 @@ class PostUploadRequestParser
 			std::string accept;
 			std::string connection;
 		};
+		std::string _outputFilename;
 		std::map<std::string, std::string> headerMap;
 		std::vector<std::string> headerAcceptedFields;
 		std::vector<std::string> partsAcceptedFields;
@@ -37,6 +45,7 @@ class PostUploadRequestParser
 		void parseHeaderBlockFromString(std::string& inputString, std::string& line, std::map<std::string, std::string>& headerMap, std::vector<std::string> acceptedFields);
 		void parseContentTypeValue();
 		void parseBody(std::fstream &requestFile);
+		void parseContentDisposition(std::map<std::string, std::string> &partMap);	
 		void toLowerCase(std::string& str);
 		void splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output);
 		void trimWhitespace(std::string& str);
@@ -45,7 +54,7 @@ class PostUploadRequestParser
 		void printHttpRequest(HttpRequest& httpRequest);
 		void printMap(std::map<std::string, std::string> map);
 	public:
-		PostUploadRequestParser();
+		PostUploadRequestParser(std::string inputFile, std::string outputFile);
 		~PostUploadRequestParser();
 };
 
