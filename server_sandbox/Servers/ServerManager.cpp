@@ -1,6 +1,7 @@
 #include "ServerManager.hpp"
 
 ServerManager::ServerManager() {}
+
 ServerManager::~ServerManager()
 {
 	// delete _servers
@@ -32,6 +33,13 @@ void ServerManager::setupServers()
 	_servers.push_back(new Server(AF_INET, SOCK_STREAM, 0, ports2, "127.0.0.3", MAX_CLIENTS));
 	std::cout << "server 1 created" << std::endl;
 	//_servers.push_back(new Server(AF_INET, SOCK_STREAM, 0, ports, "127.0.0.3", MAX_CLIENTS));
+
+	/*for (std::vector<ServerConfig >::iterator it = _config->serverConfigs.begin(); it != _config->serverConfigs.end(); ++it)
+	{
+		_servers.push_back(new SimpleServer(*it));
+	}
+	
+	std::cout << "servers 1 created" << std::endl;*/
 }
 
 Socket *ServerManager::findSocket(int fd)
