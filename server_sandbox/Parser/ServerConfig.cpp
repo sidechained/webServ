@@ -44,7 +44,7 @@ void ServerConfig::extract(std::fstream &configFile) {
 		}
 		if(countTabIndents(line) != 1)
 		{
-			errorExit(ERR_PARSE, ERR_PARSE_SYNTAX);
+			errorExit(ERR_PARSE, ERR_INDENT_SERVER);
 		}
 		stripTabIndents(line);
 		std::string key;
@@ -100,7 +100,7 @@ void ServerConfig::extractErrorPages(std::fstream &configFile) {
 		}
 		if (countTabIndents(line) != 2)
 		{
-			errorExit(ERR_PARSE, ERR_PARSE_SYNTAX);
+			errorExit(ERR_PARSE, ERR_INDENT_ERROR_PAGES);
 		}
 		// here is the expected correct condition (2 tab indents)
 		firstLine = false;
@@ -123,7 +123,7 @@ void ServerConfig::extractLocations(std::fstream &configFile) {
 		{
 			if (firstLine == true)
 			{ // there must be an entry after first line, otherwise syntax error
-				errorExit(ERR_PARSE, ERR_PARSE_SYNTAX);
+				errorExit(ERR_PARSE, ERR_NO_VALUES);
 			}
 			else
 			{ // this could be the next entry in the server or the end of the server block (carriage return)

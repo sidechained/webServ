@@ -3,7 +3,7 @@
 void GenericConfig::extractKey(std::string &key, std::size_t &colonPos) {
 	colonPos = line.find(':');
 	if (colonPos == std::string::npos)
-		errorExit(ERR_PARSE, ERR_PARSE_NOKEY);
+		errorExit(ERR_PARSE, ERR_PARSE_NOFIELD);
 	key = line.substr(0, colonPos);
 }
 

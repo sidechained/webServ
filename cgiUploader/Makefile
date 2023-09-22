@@ -1,9 +1,9 @@
 NAME			= cgiUploader
 SRCS			= CGIUploader.cpp\
 				../configFileParser/ConfigFileParser.cpp\
-				../configFileParser/ServerConfig.cpp\
-				../configFileParser/LocationConfig.cpp\
-				../configFileParser/GenericConfig.cpp\
+				../configFileParser/ServerParser.cpp\
+				../configFileParser/LocationParser.cpp\
+				../configFileParser/GenericParser.cpp\
 				../postUploadRequestParser/PostUploadRequestParser.cpp\
 				testMain.cpp
 OBJS			= $(SRCS:.cpp=.o)

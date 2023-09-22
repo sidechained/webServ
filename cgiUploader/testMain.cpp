@@ -14,5 +14,6 @@ int main(int argc, char **argv)
 	std::string dataOutputFilename(argv[3]);
     ConfigFileParser configFileParser(serverConfigFilename);
     ServerConfig serverConfig = configFileParser.serverConfigs[0];
-    CGIUploader uploader(serverConfig, postRequestFilename, dataOutputFilename);
+	std::cout << std::endl;
+	CGIUploader uploader(serverConfig, postRequestFilename, dataOutputFilename);
 }

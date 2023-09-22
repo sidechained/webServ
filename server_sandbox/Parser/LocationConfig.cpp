@@ -51,7 +51,7 @@ void LocationConfig::extract(std::fstream &configFile) {
 		if (countTabIndents(line) != 3)
 		{
 			if (firstLine == true)
-				errorExit(ERR_PARSE, ERR_PARSE_SYNTAX);
+				errorExit(ERR_PARSE, ERR_NO_VALUES);
 			else
 			{ // either next entry in locations or carriage return for end of server block
 				skipNextLine = true;

@@ -9,8 +9,7 @@
 class CGIUploader {
 	private:
 		std::string _dataOutputFilename;
-		void prepareEnvironment(PostUploadRequest &postUploadRequest);
-		int executePhpScript(const char *filePath);
+		int executePhpScript(PostUploadRequest &postUploadRequest);
 		unsigned int stringToUnsignedInt(const std::string& str);
 	public:
 		CGIUploader(ServerConfig &serverConfig, std::string postRequestFilename, std::string dataOutputFilename);

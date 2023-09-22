@@ -16,32 +16,41 @@ CGIUploader::CGIUploader(ServerConfig &serverConfig, std::string postRequestFile
 		exit(EXIT_FAILURE);
 	}
 	PostUploadRequest pur = purp.getStruct();
-	prepareEnvironment(pur);
+	executePhpScript(pur);
 }
 
 CGIUploader::~CGIUploader() {
 	
 }
 
-void CGIUploader::prepareEnvironment(PostUploadRequest &postUploadRequest) {
-	setenv("REQUEST_METHOD", postUploadRequest.method.c_str(), 1);
-	setenv("FILES_fileToUpload_name", postUploadRequest.parts[0].contentDisposition.filename.c_str(), 1);
-	setenv("FILES_fileToUpload_type", postUploadRequest.parts[0].headers["content-type"].c_str(), 1);
-	setenv("FILES_fileToUpload_tmp_name", _dataOutputFilename.c_str(), 1);
-	// setenv("FILES_fileToUpload_error", "0", 1); // where to get this from?
-	// setenv("FILES_fileToUpload_size", "12345", 1);
+    //char documentRoot[] = "DOCUMENT_ROOT=/nfs/homes/gbooth/42cursus/5_3_webserv_repo/cgiUploader"; // full path
+    // envp[3] = documentRoot;
+	// ("FILES_fileToUpload_name", , 1);
+	// ("FILES_fileToUpload_type", postUploadRequest.parts[0].headers["content-type"].c_str(), 1);
+	// ("FILES_fileToUpload_tmp_name", _dataOutputFilename.c_str(), 1);
+	// ("FILES_fileToUpload_error", "0", 1); // where to get this from?
+	// ("FILES_fileToUpload_size", "12345", 1);
 	// // CGI_UPLOAD_DIR take from config - if not in dict, upload not allowed
-	executePhpScript(_dataOutputFilename.c_str());
-}
+    // char requestMethod[] = "REQUEST_METHOD=POST";
+    // char contentType[] = "CONTENT_TYPE=multipart/form-data";
 
-int CGIUploader::executePhpScript(const char *filePath)
+int CGIUploader::executePhpScript(PostUploadRequest &postUploadRequest)
 {
 	const char *phpPath = "/usr/bin/php"; // need full path to executable here
 	const char *scriptPath = "upload.php";
+	const char *filePath = _dataOutputFilename.c_str();
+
+    char* envp[4];
+    char contentLength[] = "CONTENT_LENGTH=1234";
+	
+    envp[0] = const_cast<char*>(("REQUEST_METHOD=" + postUploadRequest.method).c_str());
+	envp[1] = const_cast<char*>(postUploadRequest.parts[0].contentDisposition.filename.c_str());
+    envp[2] = contentLength;
+    envp[3] = NULL;
 
 	char *const args[] = {(char *)phpPath, (char *)scriptPath, (char *)filePath, NULL};
 	std::cout << "Executing command: " << phpPath << " " << args[1] << " " << args[2] << "\n";
-	execve(phpPath, args, NULL);
+	execve(phpPath, args, envp);
 
 	perror("execve");
 	return 1;

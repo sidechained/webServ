@@ -12,7 +12,7 @@
 // GenericConfig:
 # define ERR_PARSE "Unable to parse config file"
 # define ERR_PARSE_INDENT "Line not indented by tab"
-# define ERR_PARSE_NOKEY "No key found in line"
+# define ERR_PARSE_NOFIELD "No key found in line"
 # define ERR_PARSE_SPACE "Space doesn't follow key"
 # define ERR_PARSE_SYNTAX "Syntax error"
 

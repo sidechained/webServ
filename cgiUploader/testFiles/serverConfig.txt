@@ -6,7 +6,7 @@ server:
 		404: /404.html
 		500: /50x.html
 		501: /50x.html
-	locations:
+	locationConfigs:
 		/eightyTest:
 			methods: GET
 			redir: /new-url
