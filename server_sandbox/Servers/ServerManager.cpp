@@ -21,13 +21,13 @@ ServerManager::~ServerManager()
 void ServerManager::setupServers()
 {
 	std::cout << std::endl;
-	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "Initializing servers...")
+	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "Initializing servers...")
 
 	for (std::vector<ServerConfig >::iterator it = _config->serverConfigs.begin(); it != _config->serverConfigs.end(); ++it)
 	{
 		_servers.push_back(new Server(*it));
 	}
-	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "Servers initialized!")
+	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "Servers initialized!")
 
 }
 
@@ -77,13 +77,12 @@ void ServerManager::initializeSets()
 			addToSet(sock, _recv_fd_pool);
 			_servers_map.insert(std::make_pair(sock, *it));
 
-			std::cout << BG_BOLD_BLUE "sock n: " << sock << " added to server" RESET << std::endl; // add server name
-
 			if (sock > _biggest_fd)
 				_biggest_fd = sock;
 		}
 	}
-	std::cout << BG_CYAN "server manager initialized" RESET << std::endl;
+	PRINT(SERVERMANAGER, BG_CYAN, "Sockets added to reciving fd set")
+	//std::cout << BG_CYAN "server manager initialized" RESET << std::endl;
 }
 
 void ServerManager::addToSet(const int i, fd_set &set)
@@ -110,6 +109,7 @@ void ServerManager::runServers()
 	_biggest_fd = 0;
 	initializeSets();
 	struct timeval timer;
+	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "Servers are running...	- select()")
 	while (true)
 	{
 		// std::cout << "infinite loop" << std::endl;
@@ -121,7 +121,7 @@ void ServerManager::runServers()
 		if ((select_ret = select(_biggest_fd + 1, &recv_set_cpy, &write_set_cpy, NULL, &timer)) < 0)
 		{
 			// Logger::logMsg(RED, CONSOLE_OUTPUT, "webserv: select error %s   Closing ....", strerror(errno));
-			std::cout << "select error!" << std::endl;
+			//std::cout << "select error!" << std::endl;
 			exit(1);
 			continue;
 		}

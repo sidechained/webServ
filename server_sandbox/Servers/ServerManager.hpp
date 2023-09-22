@@ -15,7 +15,7 @@
 
 #define MAX_CLIENTS 10
 #define MESSAGE_BUFFER 20000
-#define CONNECTION_TIMEOUT 600
+#define CONNECTION_TIMEOUT 60
 
 class Server;
 class SimpleResponse;

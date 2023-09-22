@@ -37,7 +37,7 @@ Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int
 		std::cerr << "fcntl error" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	// std::cout << "Last request time set to " << _last_request_time << std::endl;
+	PRINT(SOCKET, CYAN, "For server: " << ip << " on port: " << port << " Socket created with fd: " << _sock)
 }
 
 const time_t &Socket::getLastTime() const

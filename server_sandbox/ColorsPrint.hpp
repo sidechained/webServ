@@ -9,3 +9,4 @@
 #define HTTPREQUEST		0
 #define TEXTRESPONSE	0
 #define SERVERMANAGER	1
+#define SOCKET			1

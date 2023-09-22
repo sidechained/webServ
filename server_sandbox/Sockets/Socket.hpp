@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <sys/time.h>
 #include <cstdlib>
+#include "../Colors.hpp"
 #define MAX_CLIENTS 10
 
 class Socket
