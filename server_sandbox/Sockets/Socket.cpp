@@ -36,6 +36,7 @@ const time_t &Socket::getLastTime() const
 void Socket::updateTime()
 {
 	_last_request_time = time(NULL);
+	std::cout << "Last request time set to " << _last_request_time << std::endl;
 }
 
 Socket::~Socket()

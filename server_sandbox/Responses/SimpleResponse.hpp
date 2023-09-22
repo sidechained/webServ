@@ -8,7 +8,7 @@ class HttpRequest;
 
 class SimpleResponse
 {
-private:
+protected:
     HttpRequest *_request;
     std::string _header;
     std::string _body;

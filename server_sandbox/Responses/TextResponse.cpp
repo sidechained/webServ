@@ -46,6 +46,8 @@ void TextResponse::createResponse()
     std::string body = oss2.str();
     setBody(body);
 
+	_response = _header + _body;
+
     std::cout << BG_BOLD_MAGENTA << "Header: " << RESET << this->getHeader().substr(0, 1000) << std::endl;
     std::cout << BG_BOLD_MAGENTA << "Body: " << RESET << this->getBody().substr(0, 100) << std::endl;
 

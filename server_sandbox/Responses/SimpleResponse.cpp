@@ -1,6 +1,6 @@
 #include "SimpleResponse.hpp"
 
-SimpleResponse::SimpleResponse() : _request(), _headerSent(false), _bodySent(false)
+SimpleResponse::SimpleResponse() : _request(), _response(""), _headerSent(false), _bodySent(false)
 {
 }
 
@@ -88,9 +88,9 @@ void SimpleResponse::createResponse()
 
 std::string SimpleResponse::getResponse() const
 {
-    std::string response;
-    response = _header + _body;
-    return response;
+    //std::string response;
+    //response = _header + _body;
+    return _response;
 }
 
 int SimpleResponse::fileLength(std::ifstream &file)
@@ -111,5 +111,5 @@ void SimpleResponse::printResponse()
 void SimpleResponse::cutRes(std::string& response, size_t i)
 {
     _response = response.substr(i);
-    std::cout << BG_BOLD_MAGENTA << "RESPONSE UPDATED size: " << response.size() << RESET << std::endl;
+    std::cout << BG_BOLD_MAGENTA << "RESPONSE UPDATED size: " << _response.size() << RESET << std::endl;
 }
