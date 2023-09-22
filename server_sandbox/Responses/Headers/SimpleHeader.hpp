@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <sstream>
-#include "../../WebServ.hpp"
 
 class SimpleHeader
 {

@@ -1,10 +1,12 @@
-#ifndef CONFIGFILEPARSER_HPP
-# define CONFIGFILEPARSER_HPP
+#pragma once
 
 # include <cstdlib>
 # include <vector>
 # include <iostream>
 # include "ServerConfig.hpp"
+# include "GenericConfig.hpp"
+
+class ServerConfig;
 
 class ConfigFileParser : public GenericConfig
 {
@@ -19,5 +21,3 @@ class ConfigFileParser : public GenericConfig
 		int numServers;
 		void print() const;
 };
-
-#endif

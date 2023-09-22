@@ -1,5 +1,4 @@
-#ifndef SERVERCONFIG_HPP
-# define SERVERCONFIG_HPP
+#pragma once
 
 # include <cstdlib>
 # include <fstream>
@@ -8,7 +7,6 @@
 # include <vector>
 # include <map>
 # include "LocationConfig.hpp"
-# include "../WebServ.hpp"
 
 struct Port
 {
@@ -41,5 +39,3 @@ class ServerConfig : public GenericConfig
 		void printLocations() const;
 		void cleanUp();
 };
-
-#endif

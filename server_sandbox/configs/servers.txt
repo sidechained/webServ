@@ -1,6 +1,6 @@
 server:
-	ports: 8080 4545
-	hostname: 127.0.0.1
+	ports: 8002
+	hostname: 127.0.0.3
 	client_max_body_size_mb: 10
 	error_pages:
 		404: /404.html
@@ -26,8 +26,8 @@ server:
 			root: /other_location
 
 server:
-	ports: 82
-	hostname: eightytwo.com
+	ports: 8080 4545
+	hostname: 127.0.0.1
 	client_max_body_size_mb: 10
 	error_pages:
 		404: /404.html

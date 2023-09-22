@@ -1,13 +1,12 @@
-#ifndef LOCATIONCONFIG_HPP
-# define LOCATIONCONFIG_HPP
+#pragma once
 
+#include "../WebServ.hpp"
 # include <cstdlib>
 # include <fstream>
 # include <sstream>
 # include <iostream>
 # include <vector>
 # include <map>
-# include "../WebServ.hpp"
 
 
 # include "GenericConfig.hpp"
@@ -33,5 +32,3 @@ class LocationConfig : public GenericConfig
 		void print() const;
 		void cleanUp();
 };
-
-#endif

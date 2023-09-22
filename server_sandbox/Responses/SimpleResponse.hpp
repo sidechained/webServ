@@ -1,16 +1,18 @@
 #pragma once
-#include "../Requests/HttpRequest.hpp"
 #include "Headers/MovedHeader.hpp"
 #include "Headers/OkHeader.hpp"
+#include "../Requests/HttpRequest.hpp"
 #include <fstream>
 
+class HttpRequest;
 
 class SimpleResponse
 {
 private:
-    HttpRequest _request;
+    HttpRequest *_request;
     std::string _header;
     std::string _body;
+    std::string _response;
     int _bodyLength;
     bool _headerSent;
     bool _bodySent;
@@ -22,7 +24,7 @@ public:
     HttpRequest const &getRequest() const;
     std::string const &getHeader() const;
     std::string const &getBody() const;
-    std::string const &getResponse() const;
+    std::string getResponse() const;
     int const &getBodyLength() const;
     void setHeader(std::string const &header);
     void setBody(std::string const &body);
@@ -35,5 +37,6 @@ public:
     void updateBodyOffset(size_t offset);
     int fileLength(std::ifstream &htmlFile);
     void printResponse();
+    void cutRes(std::string& response, size_t i);
 };
 

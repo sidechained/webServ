@@ -1,25 +1,33 @@
 #pragma once
-#include "../Sockets/ListeningSocket.hpp"
 #include "../Colors.hpp"
 #include <string>
 #include <sstream>
 #include <map>
-#include "../WebServ.hpp"
 #include "../Parser/ServerConfig.hpp"
+#include "../Parser/LocationConfig.hpp"
+#include "../WebServ.hpp"
+
+class LocationConfig;
 
 class HttpRequest
 {
 private:
-    std::string _incomingRequest;
-    std::map<std::string, std::string> _request;
-    bool _noSlash;
+    std::map<std::string, std::string> _incomingRequest;
     ServerConfig *_config;
-    void extractRequestFields();
-    void determineResource();
+
+    bool _noSlash;
+    std::string _path;
+    std::string _contentType;
+    LocationConfig *_locationConfig;
+
+    void fillIncomingRequestMap(std::string const &request);
+    void parseLocationConfig();
+    void parsePath();
     void determineContentType();
     bool hasFileExtension(std::string const &resource);
     bool isDirectory(std::string const &resource);
     bool locationIsSet(std::string const &key);
+    void cleanUpMap(std::map<std::string, std::string> _map);
 
 protected:
 public:
@@ -27,11 +35,10 @@ public:
     HttpRequest(std::string const &request, ServerConfig *config);
     ~HttpRequest();
     void printRequest();
-    std::map<std::string, std::string> &getRequest();
-    std::string const &getResource();
-    std::string const &getMethod();
+    std::string const &getPath();
     std::string const &getContentType() const;
     std::string const &getRedirection() const;
+    std::string const &getHost() const;
     bool isNoSlash() const;
-    void cleanUp();
+
 };

@@ -1,6 +1,4 @@
-// WEBSERV.hpp
-#ifndef WEBSERV_HPP
-#define WEBSERV_HPP
+#pragma once
 #include <string>
 #include <map>
 #include <iostream>
@@ -13,5 +11,3 @@ void loadMapFromFile(const std::string &filename, std::map<std::string, std::str
 std::string findContentType(const std::string &resource);
 std::string findStatusCode(std::string const &code);
 void removeNonPrintableChars(std::string& input);
-
-#endif // WEBSERV_HPP

@@ -4,7 +4,7 @@ SimpleResponse::SimpleResponse() : _request(), _headerSent(false), _bodySent(fal
 {
 }
 
-SimpleResponse::SimpleResponse(HttpRequest &request) : _request(request), _headerSent(false), _bodySent(false)
+SimpleResponse::SimpleResponse(HttpRequest &request) : _request(&request), _headerSent(false), _bodySent(false)
 {
     createResponse();
 }
@@ -15,7 +15,7 @@ SimpleResponse::~SimpleResponse()
 
 HttpRequest const &SimpleResponse::getRequest() const
 {
-    return _request;
+    return *_request;
 }
 
 std::string const &SimpleResponse::getHeader() const
@@ -86,9 +86,9 @@ void SimpleResponse::createResponse()
 {
 }
 
-std::string const &SimpleResponse::getResponse() const
+std::string SimpleResponse::getResponse() const
 {
-    static std::string response;
+    std::string response;
     response = _header + _body;
     return response;
 }
@@ -106,4 +106,10 @@ void SimpleResponse::printResponse()
 {
     std::cout << BG_BOLD_MAGENTA << "Header: " << RESET << getHeader() << std::endl;
     std::cout << BG_BOLD_MAGENTA << "Body: " << RESET << getBody() << std::endl;
+}
+
+void SimpleResponse::cutRes(std::string& response, size_t i)
+{
+    _response = response.substr(i);
+    std::cout << BG_BOLD_MAGENTA << "RESPONSE UPDATED size: " << response.size() << RESET << std::endl;
 }
