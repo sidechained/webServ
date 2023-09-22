@@ -1,18 +1,17 @@
 #include "ConfigFileParser.hpp"
 
 ConfigFileParser::ConfigFileParser(std::string filename) {
-	numServers = 0;
     std::fstream configFile(filename.c_str());
 	if(!configFile.is_open())
-		errorExit(ERR_OPEN, ""); // "" correct way to handle?
+		errorExit(ERR_OPEN, "");
 	while(1)
 	{
 		ServerParser serverParser(configFile);
         serverConfigs.push_back(serverParser.serverConfig);
-		numServers++;
         if (configFile.eof())
 			break;
 	}
+	numServers = serverConfigs.size();
 	configFile.close();
 }
 

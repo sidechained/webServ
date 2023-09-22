@@ -1,5 +1,5 @@
 server:
-	portConfigs: 80 90 100
+	ports: 80 90 100
 	hostname: eighty.com
 	client_max_body_size_mb: 10
 	error_pages:
@@ -8,7 +8,7 @@ server:
 		501: /50x.html
 
 server:
-	portConfigs: 82
+	ports: 82
 	hostname: eightytwo.com
 	client_max_body_size_mb: 10
 	error_pages:

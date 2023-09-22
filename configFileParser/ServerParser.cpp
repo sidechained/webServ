@@ -1,16 +1,30 @@
 #include "ServerParser.hpp"
 #include "GenericParser.hpp"
 
-// modify so that a struct is filled which represents the serverConfigs
-
 ServerParser::ServerParser(std::fstream &configFile) {
-	serverConfig.hostname = "";
-	serverConfig.clientMaxBodySizeMB = 1;
+	setDefaults();
 	extract(configFile);
+}
+
+ServerParser::ServerParser(const ServerParser &o)
+{
+	*this = o;
+}
+
+ServerParser& ServerParser::operator=(const ServerParser &o)
+{
+	serverConfig = o.serverConfig;
+	return *this;
 }
 
 ServerParser::~ServerParser() {
 
+}
+
+void ServerParser::setDefaults()
+{
+	serverConfig.hostname = "";
+	serverConfig.clientMaxBodySizeMB = 1;	
 }
 
 void ServerParser::extract(std::fstream &configFile) {
@@ -32,14 +46,15 @@ void ServerParser::extract(std::fstream &configFile) {
 		}
 		if(countTabIndents(line) != 1)
 		{
-			errorExit(ERR_PARSE, ERR_PARSE_SYNTAX);
+			std::cout << line << std::endl;
+			errorExit(ERR_PARSE, ERR_PARSE_INDENT_SERVER);
 		}
 		stripTabIndents(line);
 		std::string key;
 		std::string value;
 		std::size_t colonPos;
 		extractKey(key, colonPos);
-		if (key == "portConfigs") {
+		if (key == "ports") {
 			extractValue(value, colonPos);
 			extractPorts(value);
 			portFlag = true;
@@ -64,7 +79,7 @@ void ServerParser::extractPorts(std::string portString) {
 	int number;
 	while (iss >> number) {
 		portConfig.number = number;
-		portConfig.dfault = false;
+		portConfig.isDefault = false;
 		serverConfig.portConfigs.push_back(portConfig);
 	}
 }
@@ -88,7 +103,7 @@ void ServerParser::extractErrorPages(std::fstream &configFile) {
 		}
 		if (countTabIndents(line) != 2)
 		{
-			errorExit(ERR_PARSE, ERR_PARSE_SYNTAX);
+			errorExit(ERR_PARSE, "error_pages entries not indented correctly");
 		}
 		// here is the expected correct condition (2 tab indents)
 		firstLine = false;
@@ -111,7 +126,7 @@ void ServerParser::extractLocations(std::fstream &configFile) {
 		{
 			if (firstLine == true)
 			{ // there must be an entry after first line, otherwise syntax error
-				errorExit(ERR_PARSE, ERR_PARSE_SYNTAX);
+				errorExit(ERR_PARSE, ERR_NO_VALUE);
 			}
 			else
 			{ // this could be the next entry in the server or the end of the server block (carriage return)
@@ -136,7 +151,7 @@ void ServerParser::detectKey(std::string keyToMatch) {
 void ServerParser::print(ServerConfig serverConfig){
 	std::cout << "  Ports:";
 	for (std::vector<PortConfig>::const_iterator it = serverConfig.portConfigs.begin(); it != serverConfig.portConfigs.end(); ++it) {
-		std::cout << " " << it->number << "(" << (it->dfault ? "default" : "non-default") << ")";
+		std::cout << " " << it->number << "(" << (it->isDefault ? "default" : "non-default") << ")";
 	}
 	std::cout << std::endl;
 	std::cout << "  Name: \"" << serverConfig.hostname << "\"" << std::endl;

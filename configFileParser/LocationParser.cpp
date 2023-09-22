@@ -8,13 +8,7 @@ LocationParser::LocationParser()
 
 LocationParser::LocationParser(std::fstream &configFile, std::string &inLine) {
 	line = inLine;
-	locationConfig.methods.push_back("GET");
-	locationConfig.methods.push_back("POST");
-	locationConfig.methods.push_back("DELETE");
-	locationConfig.root = "";
-	locationConfig.uploads = "";
-	locationConfig.autoindex = false;
-	locationConfig.index = "";
+	setDefaults();
 	extract(configFile);
 }
 
@@ -25,18 +19,23 @@ LocationParser::LocationParser(const LocationParser &o)
 
 LocationParser& LocationParser::operator=(const LocationParser &o)
 {
-	(void)o;
-	// methods = o.methods;
-	// redirection = o.redirection;
-	// root = o.root;
-	// uploads = o.uploads;
-	// autoindex = o.autoindex;
-	// index = o.index;
+	locationConfig = o.locationConfig;
 	return *this;
 }
 
 LocationParser::~LocationParser() {
 
+}
+
+void LocationParser::setDefaults()
+{
+	locationConfig.methods.push_back("GET");
+	locationConfig.methods.push_back("POST");
+	locationConfig.methods.push_back("DELETE");
+	locationConfig.root = "";
+	locationConfig.uploads = "";
+	locationConfig.autoindex = false;
+	locationConfig.index = "";	
 }
 
 void LocationParser::extract(std::fstream &configFile) {
@@ -51,7 +50,7 @@ void LocationParser::extract(std::fstream &configFile) {
 		if (countTabIndents(line) != 3)
 		{
 			if (firstLine == true)
-				errorExit(ERR_PARSE, ERR_PARSE_SYNTAX);
+				errorExit(ERR_PARSE, ERR_NO_VALUE);
 			else
 			{ // either next entry in locationConfigs or carriage return for end of server block
 				skipNextLine = true;

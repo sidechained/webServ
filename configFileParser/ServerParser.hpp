@@ -12,7 +12,7 @@
 struct PortConfig
 {
 	int number;
-	bool dfault;
+	bool isDefault;
 };
 
 struct ServerConfig
@@ -24,13 +24,13 @@ struct ServerConfig
 	std::map<std::string, LocationConfig> locationConfigs;
 };
 
-
 class ServerParser : public GenericParser
 {
 	private:
 		bool portFlag;
 		bool skipNextLine;
 		ServerParser();
+		void setDefaults();
 		void extract(std::fstream &configFile);
 		void extractPorts(std::string portString);
 		void extractErrorPages(std::fstream &configFile);
@@ -39,8 +39,8 @@ class ServerParser : public GenericParser
 	public:
 		ServerConfig serverConfig;
 		ServerParser(std::fstream &configFile);
-		// ServerParser(const ServerParser &);
-		// ServerParser& operator=(const ServerParser &);
+		ServerParser(const ServerParser &);
+		ServerParser& operator=(const ServerParser &);
 		~ServerParser();
 		static void print(ServerConfig serverConfig);
 		static void printLocations(ServerConfig serverConfig);

@@ -3,15 +3,17 @@
 void GenericParser::extractKey(std::string &key, std::size_t &colonPos) {
 	colonPos = line.find(':');
 	if (colonPos == std::string::npos)
-		errorExit(ERR_PARSE, ERR_PARSE_NOKEY);
+		errorExit(ERR_PARSE, ERR_PARSE_NOFIELD);
 	key = line.substr(0, colonPos);
 }
 
 void GenericParser::extractValue(std::string &value, std::size_t &colonPos) {
 	value = line.substr(colonPos + 1);
-	if (value.empty() || value[0] != ' ')
+	if (value[0] != ' ')
 		errorExit(ERR_PARSE, ERR_PARSE_SPACE);
 	value.erase(0, 1); // strip the space
+	if (value.empty())
+		errorExit(ERR_PARSE, ERR_NO_VALUE);
 }
 
 void GenericParser::errorExit(std::string err1, std::string err2) {

@@ -25,6 +25,7 @@ class LocationParser : public GenericParser
 {
 	private:
 		bool skipNextLine;
+		void setDefaults();
 		void extract(std::fstream &configFile);
 		void extractMethods(std::string methodString);
 	public:
