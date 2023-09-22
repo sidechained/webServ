@@ -46,6 +46,14 @@ PostUploadRequestParser::PostUploadRequestParser(std::string inputFilename, std:
 		std::cout << "content-length field is not a valid non-negative integer string" << std::endl;
 		exit(EXIT_FAILURE);
 	}
+	for(size_t i = 0; i < postUploadRequest.parts.size(); i++)
+	{
+		if (!(postUploadRequest.parts[i].contentDisposition.type == "form-data"))
+		{
+			std::cout << "Content disposition type must be 'form-data'" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}
 	checkContentTypes();
 	makeOutputFile();
 }
@@ -137,34 +145,22 @@ void PostUploadRequestParser::parseContentTypeValue()
 {
 	std::string contentType;
 	std::vector<std::string> tokens;
-
 	// 1. Split the "Content-Type" header value by the semicolon (;)
 	splitString(postUploadRequest.headers["content-type"], ";", tokens);
-	if (tokens.size() != 2)
+	if (tokens.empty())
+		return;
+	postUploadRequest.headers["content-type"] = tokens[0];
+	for(size_t i = 1; i < tokens.size(); i++)
 	{
-		std::cout << "syntax error1!" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	// 2. Trim any leading or trailing whitespace from each part.
-	for(size_t i = 0; i < tokens.size(); i++)
-	{
+		// 2. Trim any leading or trailing whitespace from each part.
 		trimWhitespace(tokens[i]);
+		// 3. Check each part to find the one that starts with "boundary=". This part contains the boundary string.
+		if(startsWith(tokens[i], "boundary=")) {
+			removeFromStringStart(tokens[i], "boundary=");
+			// 4. Extract the boundary string by splitting the part that starts with "boundary=" and retrieves the value after the equal sign (=).	
+			boundary = tokens[i];
+		} 		
 	}
-	// 3. Check each part to find the one that starts with "boundary=". This part contains the boundary string.
-	if(startsWith(tokens[0], "boundary=")) {
-		boundary = tokens[0];
-		postUploadRequest.headers["content-type"] = tokens[1];
-	} 
-	else if(startsWith(tokens[1], "boundary=")) {
-		boundary = tokens[1];
-		postUploadRequest.headers["content-type"] = tokens[0];
-	}
-	else {
-		std::cout << "syntax error2!" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	// 4. Extract the boundary string by splitting the part that starts with "boundary=" and retrieves the value after the equal sign (=).	
-	removeFromStringStart(boundary, "boundary=");
 }
 
 void PostUploadRequestParser::parseBody(std::fstream &requestFile)
@@ -200,34 +196,20 @@ void PostUploadRequestParser::parseContentDisposition(Part &part)
 	std::vector<std::string> tokens;
 	splitString(part.headers["content-disposition"], ";", tokens);
 	part.contentDisposition.type = tokens[0];
-	if (!(part.contentDisposition.type == "form-data"))
-	{
-		std::cout << "syntax error423!" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	// this will need to be adapted to handle more than 2 elements
-	for(size_t i = 0; i < tokens.size(); i++)
+	// loop over remaining tokens and extract any that match 'name' or 'filename'
+	for(size_t i = 1; i < tokens.size(); i++)
 	{
 		trimWhitespace(tokens[i]);
-	}
-	if(startsWith(tokens[1], "name=")) {
-		removeFromStringStart(tokens[1], "name=");
-		removeFromStringStart(tokens[2], "filename=");
-		part.contentDisposition.name = stripDoubleQuotes(tokens[1]);
-		part.contentDisposition.filename = stripDoubleQuotes(tokens[2]);
-	} 
-	else if(startsWith(tokens[2], "name=")) {
-		removeFromStringStart(tokens[1], "filename=");
-		removeFromStringStart(tokens[2], "name=");
-		part.contentDisposition.name = stripDoubleQuotes(tokens[2]);
-		part.contentDisposition.filename = stripDoubleQuotes(tokens[1]);
-	}
-	else {
-		std::cout << "syntax error2!" << std::endl;
-		exit(EXIT_FAILURE);
-	}		
+		if(startsWith(tokens[i], "name=")) {
+			removeFromStringStart(tokens[i], "name=");
+			part.contentDisposition.name = stripDoubleQuotes(tokens[i]);
+		}
+		if(startsWith(tokens[i], "filename=")) {
+			removeFromStringStart(tokens[i], "filename=");
+			part.contentDisposition.filename = stripDoubleQuotes(tokens[i]);
+		}		
+	}	
 }
-
 
 bool PostUploadRequestParser::isContentOfType(std::map<std::string, std::string> headers, std::string typeToMatch)
 {
@@ -253,12 +235,12 @@ void PostUploadRequestParser::checkContentTypes()
 {
 	if (!isContentOfType(postUploadRequest.headers, "multipart/form-data"))
 	{
-		std::cout << "syntax error3!" << std::endl;
+		std::cout << "Header block does not have content-type of 'multipart/form-data'" << std::endl;
 		exit(EXIT_FAILURE);
 	}	
 	if (!arePartContentsOfType("text/plain"))
 	{
-		std::cout << "syntax error3!" << std::endl;
+		std::cout << "All parts do not have content-type of 'text/plain'" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }
