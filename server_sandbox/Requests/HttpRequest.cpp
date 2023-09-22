@@ -93,7 +93,7 @@ void HttpRequest::parseLocationConfig()
         std::cout << BG_RED << "i: " << i << RESET << std::endl;
         i--;
     }
-    std::cout << BG_RED << "got out of the loop" << i << RESET << std::endl;
+    std::cout << BG_RED << "got out of the loop" << i << _path << RESET << std::endl;
 }
 void HttpRequest::parsePath()
 {

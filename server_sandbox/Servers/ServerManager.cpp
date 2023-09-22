@@ -265,7 +265,12 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		if (!server)
 			std::cout << "server null" << std::endl;
 		ServerConfig *config = server->getConfig();
+		if (!config)
+			std::cout << BG_RED "config null" RESET << std::endl;
+
 		HttpRequest parsedRequest(buffer, config);
+		std::cout << BG_GREEN << parsedRequest.getContentType() 
+			<< parsedRequest.getHost() << parsedRequest.getPath() << RESET << std::endl;
 		// std::cout << BG_BOLD_WHITE << buffer << RESET << std::endl;
 		// parsedRequest.printRequest();
 		// Socket* new_client = findSocket(i);

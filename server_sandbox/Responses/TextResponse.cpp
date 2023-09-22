@@ -32,6 +32,7 @@ void TextResponse::createResponse()
     }
 
     std::ifstream htmlFile(request.getPath().c_str(), std::ios::binary);
+	std::cout << BG_YELLOW << request.getPath().c_str() << std::ios::binary << RESET << std::endl;
     if (!htmlFile)
     {
         std::cerr << "Error opening HTML file" << std::endl;
