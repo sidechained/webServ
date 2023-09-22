@@ -1,5 +1,5 @@
 server:
-	ports: 8002
+	ports: 8002 8003
 	hostname: 127.0.0.3
 	client_max_body_size_mb: 10
 	error_pages:
@@ -41,4 +41,4 @@ server:
 			autoindex: true
 			uploads: /uploads
 		/:
-			index: index2.html
+			root: /www
