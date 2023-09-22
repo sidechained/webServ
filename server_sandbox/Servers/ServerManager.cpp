@@ -21,13 +21,13 @@ ServerManager::~ServerManager()
 void ServerManager::setupServers()
 {
 	std::cout << std::endl;
-	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "Initializing servers...")
+	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "Initializing servers..." << RESET << "\n")
 
 	for (std::vector<ServerConfig >::iterator it = _config->serverConfigs.begin(); it != _config->serverConfigs.end(); ++it)
 	{
 		_servers.push_back(new Server(*it));
 	}
-	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "Servers initialized!")
+	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "Servers initialized!" << RESET << "\n")
 
 }
 
@@ -81,7 +81,7 @@ void ServerManager::initializeSets()
 				_biggest_fd = sock;
 		}
 	}
-	PRINT(SERVERMANAGER, BG_CYAN, "Sockets added to reciving fd set")
+	PRINT(SERVERMANAGER, BG_CYAN, "Sockets added to reciving fd set" << RESET << "\n")
 	//std::cout << BG_CYAN "server manager initialized" RESET << std::endl;
 }
 
@@ -109,7 +109,7 @@ void ServerManager::runServers()
 	_biggest_fd = 0;
 	initializeSets();
 	struct timeval timer;
-	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "Servers are running...	- select()")
+	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "Servers are running...  - select()" << RESET << "\n\n")
 	while (true)
 	{
 		// std::cout << "infinite loop" << std::endl;
@@ -135,7 +135,7 @@ void ServerManager::runServers()
 			else if (FD_ISSET(i, &write_set_cpy) && _clients_map.count(i))
 			{
 				sendResponse(i, _clients_map[i]);
-				std::cout << "response sent" << std::endl;
+				//std::cout << "response sent" << std::endl;
 			}
 		}
 		// std::cout << "check timeout" << std::endl;
@@ -164,7 +164,7 @@ void ServerManager::acceptNewConnection(int fd)
 	long client_address_size = sizeof(client_address);
 	int client_sock;
 	// Socket  new_client(serv);
-	char buf[INET_ADDRSTRLEN];
+	//char buf[INET_ADDRSTRLEN];
 
 	if ((client_sock = accept(fd, (struct sockaddr *)&client_address,
 							  (socklen_t *)&client_address_size)) == -1)
@@ -172,7 +172,7 @@ void ServerManager::acceptNewConnection(int fd)
 		std::cout << "accept error" << std::endl;
 		return;
 	}
-	std::cout << BG_BOLD_CYAN << "connection from " << inet_ntop(AF_INET, &client_address, buf, INET_ADDRSTRLEN) << "assigned socket " << client_sock << RESET << std::endl;
+	//std::cout << BG_BOLD_CYAN << "connection from " << inet_ntop(AF_INET, &client_address, buf, INET_ADDRSTRLEN) << "assigned socket " << client_sock << RESET << std::endl;
 
 	addToSet(client_sock, _recv_fd_pool);
 
@@ -185,14 +185,16 @@ void ServerManager::acceptNewConnection(int fd)
 	}
 	Socket *new_client = findSocket(fd);
 	Server *server = findserver(fd);
+	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "CONNECTION accepted from client: " << new_client->getIp() << " : " << new_client->getPort())
+	PRINT(SERVERMANAGER, CYAN, "\tFor server: " << new_client->getIp() << " on port: " << new_client->getPort() << " communication Socket creaed, in read mode waiting for a request. fd: " << client_sock)
 	
-	std::cout << "socket found" << new_client << std::endl;
+	//std::cout << "socket found" << new_client << std::endl;
 	if (new_client)
 	{
 		// std::cout << "adding client to map" << std::endl;
 		_clients_map_server.insert(std::make_pair(client_sock, server));
 		_clients_map.insert(std::make_pair(client_sock, new_client));
-		std::cout << "client added to map, socket: " << client_sock << fd << _biggest_fd << std::endl;
+		//std::cout << "client added to map, socket: " << client_sock << fd << _biggest_fd << std::endl;
 	}
 }
 
@@ -226,7 +228,7 @@ void ServerManager::readRequest(const int &i, Socket *client)
 	bytes_read = read(i, buffer, MESSAGE_BUFFER);
 	if (bytes_read == 0)
 	{
-		std::cout << "connection closed" << std::endl;
+		//std::cout << "connection closed" << std::endl;
 		closeConnection(i);
 		return;
 	}
@@ -238,7 +240,8 @@ void ServerManager::readRequest(const int &i, Socket *client)
 	}
 	else
 	{
-		std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
+		PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tREQUEST from client: " << client->getIp() << " : " << client->getPort() << " has been read")
+		//std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
 		//Server *server = _servers[0];
 		Server *server = findServer(client);
 
@@ -246,8 +249,8 @@ void ServerManager::readRequest(const int &i, Socket *client)
 
 
 		HttpRequest parsedRequest(buffer, config);
-		std::cout << BG_GREEN << parsedRequest.getContentType() 
-			<< parsedRequest.getHost() << parsedRequest.getPath() << RESET << std::endl;
+		//std::cout << BG_GREEN << parsedRequest.getContentType() 
+		//	<< parsedRequest.getHost() << parsedRequest.getPath() << RESET << std::endl;
 		// std::cout << BG_BOLD_WHITE << buffer << RESET << std::endl;
 		// parsedRequest.printRequest();
 		// Socket* new_client = findSocket(i);
@@ -258,12 +261,16 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		_pendingResponses[i] = new TextResponse(parsedRequest);
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
+		PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " communication Socket set to write mode for the response. fd: " << i)
+
 	}
 }
 
 void ServerManager::sendResponse(const int &i, Socket *client)
 {
-	std::cout << BG_GREEN "sendResponse call fd: " RESET << i << std::endl;
+	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tRESPONSE to client: " << client->getIp() << " : " << client->getPort() << " has been written")
+
+	//std::cout << BG_GREEN "sendResponse call fd: " RESET << i << std::endl;
 
 	int bytes_sent;
 
@@ -285,6 +292,7 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 	}
 	else if (bytes_sent == 0 || (size_t)bytes_sent == response.length())
 	{
+		PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " bytes sent: " << bytes_sent << "  fd: " << i)
 		_pendingResponses.erase(i);
 		closeConnection(i);
 		//std::cout << "connection closed" << std::endl;
@@ -295,7 +303,7 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 		//(void)	client;
 		client->updateTime();
 		//std::cout << BG_RED "time updated" << client->getLastTime() << RESET << std::endl;
-		PRINT(SERVERMANAGER, BG_BOLD_RED, "NOT entire data sent, bytes: " << bytes_sent << "  " << responsePtr->getResponse().size())
+		PRINT(SERVERMANAGER, BOLD_BLUE, "\t\tNOT entire data sent, bytes: " << bytes_sent << "  " << responsePtr->getResponse().size())
 		
 		responsePtr->cutRes(response, bytes_sent);
 		//std::cout << BG_BOLD_RED "NOT entire data sent, bytes: " << bytes_sent << "  " << responsePtr->getResponse().size() << RESET << std::endl;
@@ -310,4 +318,5 @@ void ServerManager::closeConnection(const int i)
 		removeFromSet(i, _recv_fd_pool);
 	close(i);
 	_clients_map.erase(i);
+	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "CONNECTION closed" << RESET << "\n\n") 
 }

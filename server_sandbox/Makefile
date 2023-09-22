@@ -15,7 +15,7 @@ FILES = main.cpp \
 		utils/ContentTypeUtils.cpp \
 		utils/LoadMapFromFile.cpp \
 		utils/StatusCodeUtils.cpp \
-		utils/RemoveNonPrintable.cpp \
+		utils/RemoveNonPrintable.cpp 
 
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g
@@ -31,7 +31,8 @@ $(NAME): $(OBJECTS)
 	@$(CC) $(OBJECTS) -o $(NAME)
 	@echo "✅ Build successful!"
 
-$(OBJ_DIR)/%.o: %.cpp
+$(OBJ_DIR)/%.o: %.cpp 
+#$(OBJ_DIR)/%.o: %.cpp %.hpp
 	@echo "🛠️ Compiling $<..."
 	@mkdir -p $(@D)
 	@$(CC) -c $(CFLAGS) $< -o $@

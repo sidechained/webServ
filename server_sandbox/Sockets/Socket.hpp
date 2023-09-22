@@ -20,6 +20,8 @@ protected:
 	int _conection;
 	int _addressSize;
 	time_t _last_request_time;
+	std::string _ip;
+	int _port;
 
 public:
 	Socket(int domain, int type, int protocol, int port, std::string ip, int backlog);
@@ -35,4 +37,6 @@ public:
 	int getSock() const;
 	int getConnection() const;
 	int getAddressSize() const;
+	int getPort() const;
+	std::string getIp() const;
 };

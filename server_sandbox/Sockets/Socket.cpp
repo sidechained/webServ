@@ -1,7 +1,7 @@
 #include "Socket.hpp"
 
 // Default constructor
-Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int backlog)
+Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int backlog) : _ip(ip), _port(port)
 {
 	(void)backlog;
 	// Define address structure
@@ -37,7 +37,7 @@ Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int
 		std::cerr << "fcntl error" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	PRINT(SOCKET, CYAN, "For server: " << ip << " on port: " << port << " Socket created with fd: " << _sock)
+	PRINT(SOCKET, CYAN, "\tFor server: " << ip << " on port: " << port << " Socket created with fd: " << _sock)
 }
 
 const time_t &Socket::getLastTime() const
@@ -47,7 +47,7 @@ const time_t &Socket::getLastTime() const
 void Socket::updateTime()
 {
 	_last_request_time = time(NULL);
-	std::cout << "Last request time set to " << _last_request_time << std::endl;
+	//std::cout << "Last request time set to " << _last_request_time << std::endl;
 }
 
 Socket::~Socket()
@@ -94,4 +94,14 @@ int Socket::getConnection() const
 int Socket::getAddressSize() const
 {
 	return _addressSize;
+}
+
+int Socket::getPort() const
+{
+	return _port;
+}
+
+std::string Socket::getIp() const
+{
+	return _ip;
 }
