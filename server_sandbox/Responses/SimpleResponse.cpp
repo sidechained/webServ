@@ -111,5 +111,5 @@ void SimpleResponse::printResponse()
 void SimpleResponse::cutRes(std::string& response, size_t i)
 {
     _response = response.substr(i);
-    std::cout << BG_BOLD_MAGENTA << "RESPONSE UPDATED size: " << _response.size() << RESET << std::endl;
+    //std::cout << BG_BOLD_MAGENTA << "RESPONSE UPDATED size: " << _response.size() << RESET << std::endl;
 }

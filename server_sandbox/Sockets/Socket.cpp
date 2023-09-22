@@ -26,6 +26,17 @@ Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int
 	testConnection(_conection);
 	// std::cout << "Socket created" << std::endl;
 	_last_request_time = time(NULL);
+
+	if (listen(_sock, MAX_CLIENTS) == -1)
+	{
+		std::cerr << "listen error" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	if (fcntl(_sock, F_SETFL, O_NONBLOCK) < 0)
+	{
+		std::cerr << "fcntl error" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	// std::cout << "Last request time set to " << _last_request_time << std::endl;
 }
 

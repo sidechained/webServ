@@ -7,6 +7,9 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/time.h>
+#include <cstdlib>
+#define MAX_CLIENTS 10
 
 class Socket
 {

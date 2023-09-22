@@ -21,14 +21,14 @@ ServerManager::~ServerManager()
 void ServerManager::setupServers()
 {
 	std::cout << std::endl;
-	std::cout << BG_BOLD_CYAN << "Initializing servers..." << RESET << std::endl;
+	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "Initializing servers...")
 
 	for (std::vector<ServerConfig >::iterator it = _config->serverConfigs.begin(); it != _config->serverConfigs.end(); ++it)
 	{
 		_servers.push_back(new Server(*it));
 	}
+	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "Servers initialized!")
 
-	//std::cout << "servers 1 created" << std::endl;
 }
 
 Socket *ServerManager::findSocket(int fd)
@@ -46,7 +46,6 @@ Socket *ServerManager::findSocket(int fd)
 	return NULL;
 }
 
-// develop a function findServer like findSocket 
 Server *ServerManager::findserver(int fd)
 {
 	for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
@@ -75,16 +74,6 @@ void ServerManager::initializeSets()
 		for (std::vector<Socket *>::iterator it2 = sockets.begin(); it2 != sockets.end(); ++it2)
 		{
 			int sock = (*it2)->getSock();
-			if (listen(sock, MAX_CLIENTS) == -1)
-			{
-				std::cerr << "listen error" << std::endl;
-				exit(EXIT_FAILURE);
-			}
-			if (fcntl(sock, F_SETFL, O_NONBLOCK) < 0)
-			{
-				std::cerr << "fcntl error" << std::endl;
-				exit(EXIT_FAILURE);
-			}
 			addToSet(sock, _recv_fd_pool);
 			_servers_map.insert(std::make_pair(sock, *it));
 
