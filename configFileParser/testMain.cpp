@@ -14,9 +14,8 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 	ConfigFileParser cfp(argv[1]);
-	// cfp.print(); // convenience method to print everything as a diagnostic:
+	cfp.print(); // convenience method to print everything as a diagnostic:
 
-	std::cout << cfp.numServers << std::endl;
 	// NOTE: Presume below that we're using "servers.txt" as the config file...
 
 	// // print whatever we feel like from the vector of serverConfigs:

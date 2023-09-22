@@ -18,6 +18,6 @@ fclean:			clean
 re:				fclean $(NAME)
 
 run:		
-				./$(NAME) testFiles/server1s.txt
+				./$(NAME) testFiles/servers.txt
 
 .PHONY:			all clean fclean re test

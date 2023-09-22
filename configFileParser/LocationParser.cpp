@@ -29,13 +29,14 @@ LocationParser::~LocationParser() {
 
 void LocationParser::setDefaults()
 {
-	locationConfig.methods.push_back("GET");
-	locationConfig.methods.push_back("POST");
-	locationConfig.methods.push_back("DELETE");
-	locationConfig.root = "";
-	locationConfig.uploads = "";
-	locationConfig.autoindex = false;
-	locationConfig.index = "";	
+	std::vector<std::string> methods;
+	splitString(DEFAULT_LOCATION_METHODS, " ", methods);
+	for(size_t i = 0; i < methods.size(); i++)
+		locationConfig.methods.push_back(methods[i]);
+	locationConfig.root = DEFAULT_LOCATION_ROOT;
+	locationConfig.uploads = DEFAULT_LOCATION_UPLOADS;
+	locationConfig.autoindex = DEFAULT_LOCATION_AUTOINDEX;
+	locationConfig.index = DEFAULT_LOCATION_INDEX;
 }
 
 void LocationParser::extract(std::fstream &configFile) {

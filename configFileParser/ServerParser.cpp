@@ -23,8 +23,8 @@ ServerParser::~ServerParser() {
 
 void ServerParser::setDefaults()
 {
-	serverConfig.hostname = "";
-	serverConfig.clientMaxBodySizeMB = 1;	
+	serverConfig.hostname = DEFAULT_SERVER_HOSTNAME;
+	serverConfig.clientMaxBodySizeMB = DEFAULT_SERVER_CLIENTMAXBODYSIZEMB;	
 }
 
 void ServerParser::extract(std::fstream &configFile) {

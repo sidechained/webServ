@@ -33,3 +33,24 @@ int GenericParser::countTabIndents(const std::string line) {
 void GenericParser::stripTabIndents(std::string &line) {
 	line.erase(0, countTabIndents(line));
 }
+
+void GenericParser::splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output) {
+	std::string::size_type start = 0;
+	std::string::size_type end = input.find(delimiter);
+
+	while (end != std::string::npos) {
+		// Only add non-empty substrings to the output
+		if (start != end)
+			output.push_back(input.substr(start, end - start));
+
+		start = end + delimiter.length();  // Move start to the beginning of the next substring
+		end = input.find(delimiter, start);
+	}
+
+	// Add the last token if it's non-empty
+	if (start < input.length()) {
+		std::string lastToken = input.substr(start);
+		if (!lastToken.empty())
+			output.push_back(lastToken);
+	}
+}
