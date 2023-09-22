@@ -10,24 +10,24 @@
 
 // all error messages are here at the moment for convenience
 
-// GenericConfig:
+// GenericParser:
 # define ERR_PARSE "Unable to parse config file"
 # define ERR_PARSE_INDENT "Line not indented by tab"
 # define ERR_PARSE_NOKEY "No key found in line"
 # define ERR_PARSE_SPACE "Space doesn't follow key"
 # define ERR_PARSE_SYNTAX "Syntax error"
 
-// LocationConfig:
+// LocationParser:
 # define ERR_PARSE_REDIR "Redirections should only contain two elements"
 
-// ServerConfig:
+// ServerParser:
 # define ERR_PARSE_KEY "First line of server block not "
 # define ERR_PARSE_PORTS "Server cannot be created without specifying at least one port to listen on"
 
 // ConfigFileParser
 # define ERR_OPEN "Unable to open config file"
 
-class GenericConfig
+class GenericParser
 {
 	protected:
 		void extractKey(std::string &key, std::size_t &colonPos);

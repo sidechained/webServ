@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 	ConfigFileParser cfp(argv[1]);
 	
 	// convenience method to print everything as a diagnostic:
-	// cfp.print();
+	cfp.print();
 
 	// NOTE: Presume below that we're using "servers.txt" as the config file...
 
@@ -27,13 +27,13 @@ int main(int argc, char **argv)
 	std::cout << std::endl;
 	std::cout << cfp.serverConfigs[0].hostname << std::endl;
 	std::cout << cfp.serverConfigs[1].hostname << std::endl;
-	std::cout << "size:" << cfp.serverConfigs[0].locations.size() << std::endl;
-	std::cout << cfp.serverConfigs[0].locations["/eightyTest"].root << std::endl;
+	std::cout << "size:" << cfp.serverConfigs[0].locationConfigs.size() << std::endl;
+	std::cout << cfp.serverConfigs[0].locationConfigs["/eightyTest"].root << std::endl;
 
 	// lookup a location by path in server 0 (don't forget the preceding slash!)
 	std::cout << std::endl;
-	std::map<std::string, LocationConfig>::iterator itLook = cfp.serverConfigs[0].locations.find("/eightyTest");
-	if (itLook != cfp.serverConfigs[0].locations.end()) {
+	std::map<std::string, LocationConfig>::iterator itLook = cfp.serverConfigs[0].locationConfigs.find("/eightyTest");
+	if (itLook != cfp.serverConfigs[0].locationConfigs.end()) {
 		std::cout << "autoindex: " << (itLook->second.autoindex ? "true" : "false")  << std::endl;
 	} else {
 		std::cout << "Key 'eightyTest' not found in the map." << std::endl;
@@ -41,12 +41,13 @@ int main(int argc, char **argv)
 
 	// loop over the servers, looking up and printing some elements
 	std::cout << std::endl;
-	std::vector<ServerConfig>::iterator it;
+	std::vector<ServerParser>::iterator it;
+	std::cout << cfp.serverConfigs.size() << std::endl;
 	for (size_t i = 0; i < cfp.serverConfigs.size(); ++i) {
 		std::cout << "Server " << i + 1 << ":\n";
 		std::cout << " Name: " << cfp.serverConfigs[i].hostname << ", ";
-		if (!cfp.serverConfigs[i].ports.empty())
-			std::cout << "First port num: " << cfp.serverConfigs[i].ports[0].number << "\n";
-		cfp.serverConfigs[i].printLocations(); // convenience method
+		if (!cfp.serverConfigs[i].portConfigs.empty())
+			std::cout << "First port num: " << cfp.serverConfigs[i].portConfigs[0].number << "\n";
+		ServerParser::printLocations(cfp.serverConfigs[i]); // convenience method
 	}
 }

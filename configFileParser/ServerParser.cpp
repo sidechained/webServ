@@ -1,19 +1,19 @@
-#include "ServerConfig.hpp"
-#include "GenericConfig.hpp"
+#include "ServerParser.hpp"
+#include "GenericParser.hpp"
 
 // modify so that a struct is filled which represents the serverConfigs
 
-ServerConfig::ServerConfig(std::fstream &configFile) {
-	hostname = "";
-	clientMaxBodySizeMB = 1;
+ServerParser::ServerParser(std::fstream &configFile) {
+	serverConfig.hostname = "";
+	serverConfig.clientMaxBodySizeMB = 1;
 	extract(configFile);
 }
 
-ServerConfig::~ServerConfig() {
+ServerParser::~ServerParser() {
 
 }
 
-void ServerConfig::extract(std::fstream &configFile) {
+void ServerParser::extract(std::fstream &configFile) {
 	skipNextLine = false;
 	portFlag = false;
 	std::getline(configFile, line);
@@ -39,37 +39,37 @@ void ServerConfig::extract(std::fstream &configFile) {
 		std::string value;
 		std::size_t colonPos;
 		extractKey(key, colonPos);
-		if (key == "ports") {
+		if (key == "portConfigs") {
 			extractValue(value, colonPos);
 			extractPorts(value);
 			portFlag = true;
 		} else if (key == "hostname") {
 			extractValue(value, colonPos);
-			hostname = value;
+			serverConfig.hostname = value;
 		} else if (key == "client_max_body_size_mb") {
 			extractValue(value, colonPos);
 			std::istringstream iss(value);
-			iss >> clientMaxBodySizeMB;
+			iss >> serverConfig.clientMaxBodySizeMB;
 		} else if (key == "error_pages") {
 			extractErrorPages(configFile);
-		} else if (key == "locations") {
+		} else if (key == "locationConfigs") {
 			extractLocations(configFile);
 		}
 	}
 }
 
-void ServerConfig::extractPorts(std::string portString) {
-	Port port;
+void ServerParser::extractPorts(std::string portString) {
+	PortConfig portConfig;
 	std::istringstream iss(portString);
 	int number;
 	while (iss >> number) {
-		port.number = number;
-		port.dfault = false;
-		ports.push_back(port);
+		portConfig.number = number;
+		portConfig.dfault = false;
+		serverConfig.portConfigs.push_back(portConfig);
 	}
 }
 
-void ServerConfig::extractErrorPages(std::fstream &configFile) {
+void ServerParser::extractErrorPages(std::fstream &configFile) {
 	bool firstLine = true;
 	while(1)
 	{
@@ -98,12 +98,12 @@ void ServerConfig::extractErrorPages(std::fstream &configFile) {
 		stripTabIndents(line);
 		extractKey(errorKey, errorColonPos);
 		extractValue(errorValue, errorColonPos);
-		error_pages[errorKey] = errorValue;
+		serverConfig.error_pages[errorKey] = errorValue;
 	}
 }
 
-void ServerConfig::extractLocations(std::fstream &configFile) {
-	std::getline(configFile, line); // skip 'locations:' line
+void ServerParser::extractLocations(std::fstream &configFile) {
+	std::getline(configFile, line); // skip 'locationConfigs:' line
 	bool firstLine = true;
 	while(1)
 	{
@@ -121,37 +121,37 @@ void ServerConfig::extractLocations(std::fstream &configFile) {
 		}
 		// matching condition
 		firstLine = false;
-		LocationConfig location(configFile, line);
-		line = location.line; // pick up from where locationConfig left off
-		locations[location.key] = location;
+		LocationParser locationParser(configFile, line);
+		line = locationParser.line; // pick up from where left off
+		serverConfig.locationConfigs[locationParser.locationConfig.key] = locationParser.locationConfig;
 	}
 }
 
-void ServerConfig::detectKey(std::string keyToMatch) {
+void ServerParser::detectKey(std::string keyToMatch) {
 	std::string err_str = std::string(ERR_PARSE_KEY) + "'" + keyToMatch + ":'";
 	if(line != keyToMatch + ":")
 		errorExit(ERR_PARSE, err_str);
 }
 
-void ServerConfig::print() const {
+void ServerParser::print(ServerConfig serverConfig){
 	std::cout << "  Ports:";
-	for (std::vector<Port>::const_iterator it = ports.begin(); it != ports.end(); ++it) {
+	for (std::vector<PortConfig>::const_iterator it = serverConfig.portConfigs.begin(); it != serverConfig.portConfigs.end(); ++it) {
 		std::cout << " " << it->number << "(" << (it->dfault ? "default" : "non-default") << ")";
 	}
 	std::cout << std::endl;
-	std::cout << "  Name: \"" << hostname << "\"" << std::endl;
-	std::cout << "  Client Max Body Size (MB): " << clientMaxBodySizeMB << std::endl;
+	std::cout << "  Name: \"" << serverConfig.hostname << "\"" << std::endl;
+	std::cout << "  Client Max Body Size (MB): " << serverConfig.clientMaxBodySizeMB << std::endl;
 	std::cout << "  Error Pages:" << std::endl;
-	for (std::map<std::string, std::string>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
+	for (std::map<std::string, std::string>::const_iterator it = serverConfig.error_pages.begin(); it != serverConfig.error_pages.end(); ++it) {
 		std::cout << "    \"" << it->first << "\": \"" << it->second << "\"" << std::endl;
 	}
-	printLocations();
+	printLocations(serverConfig);
 }
 
-void ServerConfig::printLocations() const {
+void ServerParser::printLocations(ServerConfig serverConfig) {
 	std::cout << "  Locations:" << std::endl;
-	for (std::map<std::string, LocationConfig>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
+	for (std::map<std::string, LocationConfig>::const_iterator it = serverConfig.locationConfigs.begin(); it != serverConfig.locationConfigs.end(); ++it) {
 		std::cout << "    \"" << it->first << "\":" << std::endl;
-		it->second.print();
+		LocationParser::print(it->second);
 	}
 }

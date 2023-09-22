@@ -7,8 +7,8 @@ ConfigFileParser::ConfigFileParser(std::string filename) {
 		errorExit(ERR_OPEN, ""); // "" correct way to handle?
 	while(1)
 	{
-		ServerConfig serverConfig(configFile);
-        serverConfigs.push_back(serverConfig);
+		ServerParser serverParser(configFile);
+        serverConfigs.push_back(serverParser.serverConfig);
 		numServers++;
         if (configFile.eof())
 			break;
@@ -37,7 +37,7 @@ void ConfigFileParser::print() const {
 	int serverNum = 0;
 	for (std::vector<ServerConfig>::const_iterator it = serverConfigs.begin(); it != serverConfigs.end(); ++it) {
 		std::cout << "Server " << serverNum << ":" << std::endl;
-		it->print();
+		ServerParser::print(*it);
 		serverNum++;
 	}
 }

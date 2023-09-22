@@ -4,9 +4,9 @@
 # include <cstdlib>
 # include <vector>
 # include <iostream>
-# include "ServerConfig.hpp"
+# include "ServerParser.hpp"
 
-class ConfigFileParser : public GenericConfig
+class ConfigFileParser : public GenericParser
 {
 	private:
 		ConfigFileParser();
