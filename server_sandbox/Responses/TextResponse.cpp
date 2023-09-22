@@ -16,7 +16,8 @@ void TextResponse::createResponse()
 {
     HttpRequest request = this->getRequest();
 
-    std::cout << BG_BOLD_MAGENTA << "Creating HTML response for resource" << RESET << std::endl;
+	PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Creating HTML response for resource");
+    //std::cout << BG_BOLD_MAGENTA << "Creating HTML response for resource" << RESET << std::endl;
 
     if (request.isNoSlash())
     {
@@ -32,7 +33,7 @@ void TextResponse::createResponse()
     }
 
     std::ifstream htmlFile(request.getPath().c_str(), std::ios::binary);
-	std::cout << BG_YELLOW << request.getPath().c_str() << std::ios::binary << RESET << std::endl;
+
     if (!htmlFile)
     {
         std::cerr << "Error opening HTML file" << std::endl;
@@ -49,8 +50,10 @@ void TextResponse::createResponse()
 
 	_response = _header + _body;
 
-    std::cout << BG_BOLD_MAGENTA << "Header: " << RESET << this->getHeader().substr(0, 1000) << std::endl;
-    std::cout << BG_BOLD_MAGENTA << "Body: " << RESET << this->getBody().substr(0, 100) << std::endl;
+	PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Header: " << this->getHeader().substr(0, 1000))
+    //std::cout << BG_BOLD_MAGENTA << "Header: " << RESET << this->getHeader().substr(0, 1000) << std::endl;
+	PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Body: " << this->getBody().substr(0, 100))
+    //std::cout << BG_BOLD_MAGENTA << "Body: " << RESET << this->getBody().substr(0, 100) << std::endl;
 
     // clear and reset htmlFile
     htmlFile.clear();

@@ -23,25 +23,12 @@ void ServerManager::setupServers()
 	std::cout << std::endl;
 	std::cout << BG_BOLD_CYAN << "Initializing servers..." << RESET << std::endl;
 
-	// std::vector<int> ports;
-	// ports.push_back(8002);
-	// ports.push_back(8003);
-	// std::vector<int> ports2;
-	// ports2.push_back(8004);
-	// Server* server1 = new Server(AF_INET, SOCK_STREAM, 0, ports, "127.0.0.2", MAX_CLIENTS);
-	//_servers.push_back(server1);
-	// std::cout << "server 1 not created" << std::endl;
-	// _servers.push_back(new Server(AF_INET, SOCK_STREAM, 0, ports, "127.0.0.1", MAX_CLIENTS));
-	// _servers.push_back(new Server(AF_INET, SOCK_STREAM, 0, ports2, "127.0.0.3", MAX_CLIENTS));
-	// std::cout << "server 1 created" << std::endl;
-	//_servers.push_back(new Server(AF_INET, SOCK_STREAM, 0, ports, "127.0.0.3", MAX_CLIENTS));
-
 	for (std::vector<ServerConfig >::iterator it = _config->serverConfigs.begin(); it != _config->serverConfigs.end(); ++it)
 	{
 		_servers.push_back(new Server(*it));
 	}
 
-	std::cout << "servers 1 created" << std::endl;
+	//std::cout << "servers 1 created" << std::endl;
 }
 
 Socket *ServerManager::findSocket(int fd)
@@ -183,7 +170,7 @@ void ServerManager::checkTimeout()
 
 void ServerManager::acceptNewConnection(int fd)
 {
-	std::cout << "accept new connection function" << std::endl;
+	//std::cout << "accept new connection function" << std::endl;
 	struct sockaddr_in client_address;
 	long client_address_size = sizeof(client_address);
 	int client_sock;
@@ -231,8 +218,8 @@ Server* ServerManager::findServer(Socket* client)
 			int sock = (*it2)->getSock();
 			if (sock == client->getSock())
 			{
-				std::cout << "server found" << std::endl;
-				std::cout << "index is " << it - _servers.begin() << std::endl;
+				//std::cout << "server found" << std::endl;
+				//std::cout << "index is " << it - _servers.begin() << std::endl;
 				return *it;
 			}
 		}
@@ -243,30 +230,31 @@ Server* ServerManager::findServer(Socket* client)
 
 void ServerManager::readRequest(const int &i, Socket *client)
 {
-	std::cout << "read request" << std::endl;
+	//std::cout << "read request" << std::endl;
 
 	char buffer[MESSAGE_BUFFER];
 	int bytes_read = 0;
 	bytes_read = read(i, buffer, MESSAGE_BUFFER);
-	if (bytes_read <= 0)
+	if (bytes_read == 0)
 	{
-		std::cout << "bytes read <= 0" << std::endl;
+		std::cout << "connection closed" << std::endl;
+		closeConnection(i);
+		return;
+	}
+	else if (bytes_read < 0)
+	{
+		std::cout << "read error" << std::endl;
 		closeConnection(i);
 		return;
 	}
 	else
 	{
 		std::cout << BG_GREEN << "Client " << i << " sent a request" << RESET << std::endl;
-		std::cout << "Before I segfault" << std::endl;
 		//Server *server = _servers[0];
 		Server *server = findServer(client);
 
-		std::cout << "After I segfault" << std::endl;
-		if (!server)
-			std::cout << "server null" << std::endl;
 		ServerConfig *config = server->getConfig();
-		if (!config)
-			std::cout << BG_RED "config null" RESET << std::endl;
+
 
 		HttpRequest parsedRequest(buffer, config);
 		std::cout << BG_GREEN << parsedRequest.getContentType() 
@@ -294,8 +282,8 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 	std::string response = responsePtr->getResponse();
 
 	// std::cout << BG_BOLD_MAGENTA << response << RESET << std::endl;
-	std::cout << "pointer is " << &responsePtr << std::endl;
-	std::cout << BG_BOLD_YELLOW "size response" << response.size() << "fd is " << i << RESET << std::endl;
+	//std::cout << "pointer is " << &responsePtr << std::endl;
+	//std::cout << BG_BOLD_YELLOW "size response" << response.size() << "fd is " << i << RESET << std::endl;
 	if (response.length() >= MESSAGE_BUFFER)
 		bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);
 	else
@@ -303,24 +291,25 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 
 	if (bytes_sent < 0)
 	{
-		std::cout << BG_BOLD_YELLOW "Problem sending" RESET << std::endl;
+		std::cout <<  "Problem sending" << std::endl;
 		closeConnection(i);
 	}
 	else if (bytes_sent == 0 || (size_t)bytes_sent == response.length())
 	{
 		_pendingResponses.erase(i);
 		closeConnection(i);
-		std::cout << "connection closed" << std::endl;
+		//std::cout << "connection closed" << std::endl;
 	}
 	else
 	{
 		// Socket* client = findSocket(i);
 		//(void)	client;
 		client->updateTime();
-		std::cout << BG_RED "time updated" << client->getLastTime() << RESET << std::endl;
-		std::cout << BG_BOLD_RED "NOT entire data sent, bytes: " << bytes_sent << "  " << responsePtr->getResponse().size() << RESET << std::endl;
+		//std::cout << BG_RED "time updated" << client->getLastTime() << RESET << std::endl;
+		PRINT(SERVERMANAGER, BG_BOLD_RED, "NOT entire data sent, bytes: " << bytes_sent << "  " << responsePtr->getResponse().size())
+		
 		responsePtr->cutRes(response, bytes_sent);
-		std::cout << BG_BOLD_RED "NOT entire data sent, bytes: " << bytes_sent << "  " << responsePtr->getResponse().size() << RESET << std::endl;
+		//std::cout << BG_BOLD_RED "NOT entire data sent, bytes: " << bytes_sent << "  " << responsePtr->getResponse().size() << RESET << std::endl;
 	}
 }
 

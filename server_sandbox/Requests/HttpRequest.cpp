@@ -72,13 +72,16 @@ void HttpRequest::parseLocationConfig()
     long i = _path.size();
     while (i > 0)
     {
-        std::cout << BG_RED << "i: " << i << RESET << std::endl;
+		PRINT(HTTPREQUEST, BG_RED, "i: " << i )
+        //std::cout << BG_RED << "i: " << i << RESET << std::endl;
         std::string key = _path.substr(0, i);
-        std::cout << BG_RED << "key: " << key << RESET << std::endl;
+		PRINT(HTTPREQUEST, BG_RED, "key: " << key )
+        //std::cout << BG_RED << "key: " << key << RESET << std::endl;
         if (locationIsSet(key))
         {
             _locationConfig = &_config->locations[key];
-            std::cout << BG_RED << "location is set" << RESET << std::endl;
+			PRINT(HTTPREQUEST, BG_RED, "location is set" )
+            //std::cout << BG_RED << "location is set" << RESET << std::endl;
             if (_locationConfig->root != "")
             {
                 if (key == "/")
@@ -90,10 +93,12 @@ void HttpRequest::parseLocationConfig()
             }
             break;
         }
-        std::cout << BG_RED << "i: " << i << RESET << std::endl;
+		PRINT(HTTPREQUEST, BG_RED, "i--" << i )
+        //std::cout << BG_RED << "i: " << i << RESET << std::endl;
         i--;
     }
-    std::cout << BG_RED << "got out of the loop" << i << _path << RESET << std::endl;
+	PRINT(HTTPREQUEST, BG_RED, "got out of the loop" << i << _path )
+    //std::cout << BG_RED << "got out of the loop" << i << _path << RESET << std::endl;
 }
 void HttpRequest::parsePath()
 {
@@ -137,7 +142,8 @@ void HttpRequest::printRequest()
 {
     for (std::map<std::string, std::string>::iterator it = _incomingRequest.begin(); it != _incomingRequest.end(); ++it)
     {
-        std::cout << BG_BOLD_MAGENTA << it->first << ": " << RESET << it->second << std::endl;
+		PRINT(HTTPREQUEST, BG_BOLD_MAGENTA, it->first << ": " << RESET << it->second )
+        //std::cout << BG_BOLD_MAGENTA << it->first << ": " << RESET << it->second << std::endl;
     }
 }
 
