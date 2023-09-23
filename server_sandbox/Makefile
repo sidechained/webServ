@@ -4,7 +4,9 @@ FILES = main.cpp \
         Servers/Server.cpp \
         Sockets/Socket.cpp \
 		Servers/ServerManager.cpp \
+		Responses/ResponseFactory.cpp \
         Responses/TextResponse.cpp \
+		Responses/RedirResponse.cpp \
         Responses/SimpleResponse.cpp \
 		Responses/Headers/SimpleHeader.cpp \
 		Responses/Headers/MovedHeader.cpp \

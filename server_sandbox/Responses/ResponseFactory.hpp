@@ -2,6 +2,7 @@
 #include "../Requests/HttpRequest.hpp"
 #include "SimpleResponse.hpp"
 #include "TextResponse.hpp"
+#include "RedirResponse.hpp"
 
 class ResponseFactory
 {

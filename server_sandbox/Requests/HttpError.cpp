@@ -40,3 +40,10 @@ bool HttpError::getError(std::string const &error)
         return _errors[error];
 }
 
+void HttpError::clearErrors()
+{
+    for (std::map<std::string, bool>::iterator it = _errors.begin(); it != _errors.end(); it++)
+    {
+        it->second = false;
+    }
+}

@@ -11,21 +11,24 @@ TextResponse::~TextResponse()
 
 void TextResponse::createResponse()
 {
-    HttpRequest request = this->getRequest();
+    HttpRequest request = getRequest();
+    request.printRequest();
 
 	PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Creating HTML response for resource");
-    //std::cout << BG_BOLD_MAGENTA << "Creating HTML response for resource" << RESET << std::endl;
 
-    if (request.isNoSlash())
+    if (request.getError("noSlash"))
     {
+        std::cout << BG_BOLD_MAGENTA << "No slash in resource" << RESET << std::endl;
         setHeader(MovedHeader(request.getHost(), request.getPath()).getHeader());
         setBodySent(true);
         return;
     }
     if (request.getRedirection() != "")
     {
+        std::cout << BG_BOLD_MAGENTA << "Redirection in resource" << RESET << std::endl;
         setHeader(MovedHeader(request.getHost(), request.getRedirection()).getHeader());
         setBodySent(true);
+        printResponse();
         return;
     }
 

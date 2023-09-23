@@ -10,13 +10,14 @@ HttpRequest::~HttpRequest()
 
 HttpRequest::HttpRequest(std::string const &request, ServerConfig *config) : _config(config)
 {
-    _noSlash = false;
+    this->clearErrors();
+     _incomingRequest["Redirection"] = "";
     fillIncomingRequestMap(request);
-    if (getRedirection() != "")
-    {
-        this->addError("redirection");
-        return;
-    }
+    // if (getRedirection() != "")
+    // {
+    //     this->addError("redirection");
+    //     return;
+    // }
     parseLocationConfig();
     parsePath();
     parseMethod();
@@ -70,7 +71,6 @@ void HttpRequest::parseLocationConfig()
     if (!isDirectory(_path) && !hasFileExtension(_path))
     {
         this->addError("noSlash");
-        _noSlash = true;
         return;
     }
     _locationConfig = NULL;
@@ -165,8 +165,8 @@ void HttpRequest::printRequest()
 {
     for (std::map<std::string, std::string>::iterator it = _incomingRequest.begin(); it != _incomingRequest.end(); ++it)
     {
-        PRINT(HTTPREQUEST, BG_BOLD_MAGENTA, it->first << ": " << RESET << it->second)
-        // std::cout << BG_BOLD_MAGENTA << it->first << ": " << RESET << it->second << std::endl;
+        //PRINT(HTTPREQUEST, BG_BOLD_MAGENTA, it->first << ": " << RESET << it->second)
+        std::cout << BG_BOLD_MAGENTA << it->first << ": " << RESET << it->second << std::endl;
     }
 }
 
@@ -195,9 +195,4 @@ std::string const &HttpRequest::getHost() const
     static std::string host = _incomingRequest.at("Host");
     removeNonPrintableChars(host);
     return host;
-}
-
-bool HttpRequest::isNoSlash()
-{
-    return _noSlash;
 }

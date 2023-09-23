@@ -17,7 +17,6 @@ private:
     std::map<std::string, std::string> _incomingRequest;
     ServerConfig *_config;
 
-    bool _noSlash;
     std::string _path;
     std::string _contentType;
     LocationConfig *_locationConfig;
@@ -42,5 +41,4 @@ public:
     std::string const &getContentType() const;
     std::string const &getRedirection() const;
     std::string const &getHost() const;
-    bool isNoSlash();
 };

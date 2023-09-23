@@ -13,6 +13,7 @@ public:
     void addError(std::string const &error);
     void removeError(std::string const &error);
     bool getError(std::string const &error);
+    void clearErrors();
 };
 
 

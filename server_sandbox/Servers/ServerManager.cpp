@@ -258,6 +258,7 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		client->updateTime();
 		// std::cout << BG_RED "socket null" RESET << std::endl;
 		//(void)	client;
+		//_pendingResponses[i] = ResponseFactory::createResponse(parsedRequest);
 		_pendingResponses[i] = new TextResponse(parsedRequest);
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
