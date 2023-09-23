@@ -21,10 +21,10 @@ ServerManager::~ServerManager()
 void ServerManager::setupServers()
 {
 	std::cout << std::endl;
-	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "Initializing servers..." << RESET << "\n")
 
 	for (std::vector<ServerConfig >::iterator it = _config->serverConfigs.begin(); it != _config->serverConfigs.end(); ++it)
 	{
+		PRINT(SERVERMANAGER, BG_BOLD_BLUE, "Initializing server " << it - _config->serverConfigs.begin() + 1 << " of " << _config->serverConfigs.size() << RESET << "\n")
 		_servers.push_back(new Server(*it));
 	}
 	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "Servers initialized!" << RESET << "\n")

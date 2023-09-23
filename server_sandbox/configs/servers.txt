@@ -1,6 +1,6 @@
 server:
-	ports: 8002 8003
-	hostname: 127.0.0.3
+	ports: 8080
+	hostname: localhost
 	client_max_body_size_mb: 10
 	error_pages:
 		404: /404.html
@@ -27,7 +27,7 @@ server:
 
 server:
 	ports: 8080 4545
-	hostname: 127.0.0.1
+	hostname: 127.0.0.3
 	client_max_body_size_mb: 10
 	error_pages:
 		404: /404.html
