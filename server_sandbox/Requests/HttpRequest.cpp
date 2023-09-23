@@ -12,11 +12,16 @@ HttpRequest::HttpRequest(std::string const &request, ServerConfig *config) : _co
 {
     _noSlash = false;
     fillIncomingRequestMap(request);
+    if (getRedirection() != "")
+    {
+        this->addError("redirection");
+        return;
+    }
     parseLocationConfig();
     parsePath();
+    parseMethod();
     determineContentType();
     cleanUpMap(_incomingRequest);
-
 }
 
 void HttpRequest::fillIncomingRequestMap(std::string const &request)
@@ -53,7 +58,6 @@ void HttpRequest::fillIncomingRequestMap(std::string const &request)
     _incomingRequest["Redirection"] = "";
 }
 
-
 void HttpRequest::cleanUpMap(std::map<std::string, std::string> _map)
 {
     for (std::map<std::string, std::string>::iterator it = _map.begin(); it != _map.end(); ++it)
@@ -65,6 +69,7 @@ void HttpRequest::parseLocationConfig()
     _path = _incomingRequest["Resource"];
     if (!isDirectory(_path) && !hasFileExtension(_path))
     {
+        this->addError("noSlash");
         _noSlash = true;
         return;
     }
@@ -72,16 +77,16 @@ void HttpRequest::parseLocationConfig()
     long i = _path.size();
     while (i > 0)
     {
-		PRINT(HTTPREQUEST, BG_RED, "i: " << i )
-        //std::cout << BG_RED << "i: " << i << RESET << std::endl;
+        PRINT(HTTPREQUEST, BG_RED, "i: " << i)
+        // std::cout << BG_RED << "i: " << i << RESET << std::endl;
         std::string key = _path.substr(0, i);
-		PRINT(HTTPREQUEST, BG_RED, "key: " << key )
-        //std::cout << BG_RED << "key: " << key << RESET << std::endl;
+        PRINT(HTTPREQUEST, BG_RED, "key: " << key)
+        // std::cout << BG_RED << "key: " << key << RESET << std::endl;
         if (locationIsSet(key))
         {
             _locationConfig = &_config->locations[key];
-			PRINT(HTTPREQUEST, BG_RED, "location is set" )
-            //std::cout << BG_RED << "location is set" << RESET << std::endl;
+            PRINT(HTTPREQUEST, BG_RED, "location is set")
+            // std::cout << BG_RED << "location is set" << RESET << std::endl;
             if (_locationConfig->root != "")
             {
                 if (key == "/")
@@ -93,13 +98,14 @@ void HttpRequest::parseLocationConfig()
             }
             break;
         }
-		PRINT(HTTPREQUEST, BG_RED, "i--" << i )
-        //std::cout << BG_RED << "i: " << i << RESET << std::endl;
+        PRINT(HTTPREQUEST, BG_RED, "i--" << i)
+        // std::cout << BG_RED << "i: " << i << RESET << std::endl;
         i--;
     }
-	PRINT(HTTPREQUEST, BG_RED, "got out of the loop" << i << _path )
-    //std::cout << BG_RED << "got out of the loop" << i << _path << RESET << std::endl;
+    PRINT(HTTPREQUEST, BG_RED, "got out of the loop" << i << _path)
+    // std::cout << BG_RED << "got out of the loop" << i << _path << RESET << std::endl;
 }
+
 void HttpRequest::parsePath()
 {
     if (isDirectory(_path))
@@ -107,6 +113,23 @@ void HttpRequest::parsePath()
         if (_locationConfig && _locationConfig->index != "")
             _path = _path + _locationConfig->index;
     }
+}
+
+void HttpRequest::parseMethod()
+{
+    std::string requestMethod = _incomingRequest["Method"];
+
+    if (requestMethod == "GET" || requestMethod == "POST" || requestMethod == "DELETE")
+    {
+        if (!_locationConfig)
+            return;
+        std::vector<std::string> locationMethods;
+        locationMethods = _locationConfig->methods;
+        if (std::find(locationMethods.begin(), locationMethods.end(), requestMethod) == locationMethods.end())
+            this->addError("methodNotAllowed");
+    }
+    else
+        this->addError("methodNotAllowed");
 }
 
 void HttpRequest::determineContentType()
@@ -142,11 +165,10 @@ void HttpRequest::printRequest()
 {
     for (std::map<std::string, std::string>::iterator it = _incomingRequest.begin(); it != _incomingRequest.end(); ++it)
     {
-		PRINT(HTTPREQUEST, BG_BOLD_MAGENTA, it->first << ": " << RESET << it->second )
-        //std::cout << BG_BOLD_MAGENTA << it->first << ": " << RESET << it->second << std::endl;
+        PRINT(HTTPREQUEST, BG_BOLD_MAGENTA, it->first << ": " << RESET << it->second)
+        // std::cout << BG_BOLD_MAGENTA << it->first << ": " << RESET << it->second << std::endl;
     }
 }
-
 
 std::string const &HttpRequest::getPath()
 {
@@ -161,10 +183,10 @@ std::string const &HttpRequest::getContentType() const
 std::string const &HttpRequest::getRedirection() const
 {
     static const std::string emptyString = "";
-    
+
     if (_locationConfig && !_locationConfig->redirection.empty())
         return _locationConfig->redirection;
-    
+
     return emptyString;
 }
 
@@ -175,7 +197,7 @@ std::string const &HttpRequest::getHost() const
     return host;
 }
 
-bool HttpRequest::isNoSlash() const
+bool HttpRequest::isNoSlash()
 {
     return _noSlash;
 }

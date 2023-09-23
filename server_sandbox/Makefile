@@ -1,5 +1,6 @@
 FILES = main.cpp \
         Requests/HttpRequest.cpp \
+		Requests/HttpError.cpp \
         Servers/Server.cpp \
         Sockets/Socket.cpp \
 		Servers/ServerManager.cpp \

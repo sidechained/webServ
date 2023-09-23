@@ -9,9 +9,6 @@ TextResponse::~TextResponse()
 {
 }
 
-
-
-
 void TextResponse::createResponse()
 {
     HttpRequest request = this->getRequest();
