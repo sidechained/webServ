@@ -1,10 +1,10 @@
 #include "SimpleResponse.hpp"
 
-SimpleResponse::SimpleResponse() : _request(), _response(""), _headerSent(false), _bodySent(false)
+SimpleResponse::SimpleResponse() : _request(), _header(""), _body(""), _response(""), _bodyLength(0), _headerSent(false), _bodySent(false)
 {
 }
 
-SimpleResponse::SimpleResponse(HttpRequest &request) : _request(&request), _headerSent(false), _bodySent(false)
+SimpleResponse::SimpleResponse(HttpRequest &request) : _request(&request), _header(""), _body(""), _response(""), _bodyLength(0), _headerSent(false), _bodySent(false)
 {
     createResponse();
 }
@@ -86,10 +86,9 @@ void SimpleResponse::createResponse()
 {
 }
 
-std::string SimpleResponse::getResponse() const
+std::string const &SimpleResponse::getResponse() 
 {
-    //std::string response;
-    //response = _header + _body;
+    _response = _header + _body;
     return _response;
 }
 

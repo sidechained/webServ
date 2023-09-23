@@ -1,6 +1,6 @@
 server:
 	ports: 8080
-	hostname: localhost
+	hostname: 127.0.0.1
 	client_max_body_size_mb: 10
 	error_pages:
 		404: /404.html

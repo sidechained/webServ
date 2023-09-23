@@ -24,7 +24,7 @@ public:
     HttpRequest const &getRequest() const;
     std::string const &getHeader() const;
     std::string const &getBody() const;
-    std::string getResponse() const;
+    std::string const &getResponse();
     int const &getBodyLength() const;
     void setHeader(std::string const &header);
     void setBody(std::string const &body);

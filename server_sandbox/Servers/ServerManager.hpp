@@ -14,8 +14,8 @@
 #include "../Parser/ConfigFileParser.hpp"
 
 #define MAX_CLIENTS 10
-#define MESSAGE_BUFFER 20000
-#define CONNECTION_TIMEOUT 60
+#define MESSAGE_BUFFER 200000
+#define CONNECTION_TIMEOUT 500
 
 class Server;
 class SimpleResponse;
