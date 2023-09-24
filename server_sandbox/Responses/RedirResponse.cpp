@@ -3,17 +3,15 @@
 RedirResponse::RedirResponse(HttpRequest &request) : SimpleResponse(request)
 {
     if (request.hasError())
-        createResponse();
+        createResponse(request);
 }
 
 RedirResponse::~RedirResponse()
 {
 }
 
-void RedirResponse::createResponse()
+void RedirResponse::createResponse(HttpRequest &request)
 {
-    HttpRequest request = this->getRequest();
-
     if (request.getError("noSlash"))
     {
         std::cout << BG_BOLD_MAGENTA << "No slash in resource" << RESET << std::endl;

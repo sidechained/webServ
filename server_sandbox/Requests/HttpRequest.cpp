@@ -13,15 +13,11 @@ HttpRequest::HttpRequest(std::string const &request, ServerConfig *config) : _co
     this->clearErrors();
      _incomingRequest["Redirection"] = "";
     fillIncomingRequestMap(request);
-    // if (getRedirection() != "")
-    // {
-    //     this->addError("redirection");
-    //     return;
-    // }
     parseLocationConfig();
     parsePath();
     parseMethod();
     determineContentType();
+    _errorPages = _config->error_pages;
     cleanUpMap(_incomingRequest);
 }
 
@@ -175,6 +171,11 @@ std::string const &HttpRequest::getPath()
     return _path;
 }
 
+void HttpRequest::setPath(std::string const &path)
+{
+    _path = path;
+}
+
 std::string const &HttpRequest::getContentType() const
 {
     return _contentType;
@@ -195,4 +196,9 @@ std::string const &HttpRequest::getHost() const
     static std::string host = _incomingRequest.at("Host");
     removeNonPrintableChars(host);
     return host;
+}
+
+ServerConfig *HttpRequest::getConfig() const
+{
+    return _config;
 }

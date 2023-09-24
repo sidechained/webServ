@@ -4,6 +4,15 @@
 ServerConfig::ServerConfig(std::fstream &configFile) {
 	hostname = "";
 	client_max_body_size_mb = 1;
+	error_pages["400"] = "./config/error_pages/400.html";
+	error_pages["401"] = "./config/error_pages/401.html";
+	error_pages["403"] = "./config/error_pages/403.html";
+	error_pages["404"] = "./config/error_pages/404.html";
+	error_pages["405"] = "./config/error_pages/405.html";
+	error_pages["413"] = "./config/error_pages/413.html";
+	error_pages["500"] = "./config/error_pages/500.html";
+	error_pages["501"] = "./config/error_pages/501.html";
+	error_pages["505"] = "./config/error_pages/505.html";
 	extract(configFile);
 	print();
 	cleanUp();

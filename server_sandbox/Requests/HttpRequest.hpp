@@ -19,6 +19,7 @@ private:
 
     std::string _path;
     std::string _contentType;
+    std::map<std::string, std::string> _errorPages;
     LocationConfig *_locationConfig;
 
     void fillIncomingRequestMap(std::string const &request);
@@ -38,7 +39,9 @@ public:
     ~HttpRequest();
     void printRequest();
     std::string const &getPath();
+    void setPath(std::string const &path);
     std::string const &getContentType() const;
     std::string const &getRedirection() const;
     std::string const &getHost() const;
+    ServerConfig *getConfig() const;
 };

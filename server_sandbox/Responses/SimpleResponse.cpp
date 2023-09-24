@@ -6,7 +6,6 @@ SimpleResponse::SimpleResponse() : _request(), _header(""), _body(""), _response
 
 SimpleResponse::SimpleResponse(HttpRequest &request) : _request(&request), _header(""), _body(""), _response(""), _bodyLength(0), _headerSent(false), _bodySent(false)
 {
-    createResponse();
 }
 
 SimpleResponse::~SimpleResponse()
@@ -80,10 +79,6 @@ void SimpleResponse::updateBodyOffset(size_t offset)
     _body = _body.substr(offset);
     if (_body.empty())
         _bodySent = true;
-}
-
-void SimpleResponse::createResponse()
-{
 }
 
 std::string const &SimpleResponse::getResponse() 

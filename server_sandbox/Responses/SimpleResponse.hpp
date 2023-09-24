@@ -20,7 +20,7 @@ public:
     SimpleResponse();
     SimpleResponse(HttpRequest &request);
     virtual ~SimpleResponse();
-    virtual void createResponse();
+    virtual void createResponse(HttpRequest &request) = 0;
     HttpRequest const &getRequest() const;
     std::string const &getHeader() const;
     std::string const &getBody() const;

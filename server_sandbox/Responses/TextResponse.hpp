@@ -7,7 +7,7 @@ private:
 public:
     TextResponse(HttpRequest &request);
     ~TextResponse();
-    void createResponse();
+    void createResponse(HttpRequest &request);
 };
 
 

@@ -7,6 +7,6 @@ private:
 public:
     RedirResponse(HttpRequest &request);
     ~RedirResponse();
-    void createResponse();
+    void createResponse(HttpRequest &request);
 };
 
