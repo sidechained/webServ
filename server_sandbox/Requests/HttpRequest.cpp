@@ -16,7 +16,9 @@ HttpRequest::HttpRequest(std::string const &request, ServerConfig *config) : _co
     parseLocationConfig();
     parsePath();
     parseMethod();
-    determineContentType();
+    parseAutoIndex();
+    parseRedirection();
+    parseContentType();
     _errorPages = _config->error_pages;
     cleanUpMap(_incomingRequest);
 }
@@ -82,7 +84,6 @@ void HttpRequest::parseLocationConfig()
         {
             _locationConfig = &_config->locations[key];
             PRINT(HTTPREQUEST, BG_RED, "location is set")
-            // std::cout << BG_RED << "location is set" << RESET << std::endl;
             if (_locationConfig->root != "")
             {
                 if (key == "/")
@@ -94,12 +95,8 @@ void HttpRequest::parseLocationConfig()
             }
             break;
         }
-        PRINT(HTTPREQUEST, BG_RED, "i--" << i)
-        // std::cout << BG_RED << "i: " << i << RESET << std::endl;
-        i--;
+        i = key.find_last_of("/");
     }
-    PRINT(HTTPREQUEST, BG_RED, "got out of the loop" << i << _path)
-    // std::cout << BG_RED << "got out of the loop" << i << _path << RESET << std::endl;
 }
 
 void HttpRequest::parsePath()
@@ -128,7 +125,23 @@ void HttpRequest::parseMethod()
         this->addError("methodNotAllowed");
 }
 
-void HttpRequest::determineContentType()
+void HttpRequest::parseAutoIndex()
+{
+    if (_locationConfig && _locationConfig->autoindex)
+        _autoIndex = true;
+    else
+        _autoIndex = false;
+}
+
+void HttpRequest::parseRedirection()
+{
+    if (_locationConfig && !_locationConfig->redirection.empty())
+        _redirection = _locationConfig->redirection;
+    else
+        _redirection = "";
+}
+
+void HttpRequest::parseContentType()
 {
     _contentType = findContentType(_path);
 }
@@ -183,12 +196,7 @@ std::string const &HttpRequest::getContentType() const
 
 std::string const &HttpRequest::getRedirection() const
 {
-    static const std::string emptyString = "";
-
-    if (_locationConfig && !_locationConfig->redirection.empty())
-        return _locationConfig->redirection;
-
-    return emptyString;
+    return _redirection;
 }
 
 std::string const &HttpRequest::getHost() const
@@ -201,4 +209,9 @@ std::string const &HttpRequest::getHost() const
 ServerConfig *HttpRequest::getConfig() const
 {
     return _config;
+}
+
+bool HttpRequest::getAutoIndex() const
+{
+    return _autoIndex;
 }

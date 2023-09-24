@@ -14,8 +14,6 @@ protected:
     std::string _body;
     std::string _response;
     int _bodyLength;
-    bool _headerSent;
-    bool _bodySent;
 public:
     SimpleResponse();
     SimpleResponse(HttpRequest &request);
@@ -28,15 +26,10 @@ public:
     int const &getBodyLength() const;
     void setHeader(std::string const &header);
     void setBody(std::string const &body);
-    void setHeaderSent(bool headerSent);
-    void setBodyLength(int length);
-    bool isHeaderSent() const;
-    void setBodySent(bool bodySent);
-    bool isBodySent() const;
+    void setBody(std::ifstream &file);
     void updateHeaderOffset(size_t offset);
     void updateBodyOffset(size_t offset);
     int fileLength(std::ifstream &htmlFile);
-    void printResponse();
     void cutRes(std::string& response, size_t i);
 };
 

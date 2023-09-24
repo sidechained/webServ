@@ -19,6 +19,8 @@ private:
 
     std::string _path;
     std::string _contentType;
+    std::string _redirection;
+    bool _autoIndex;
     std::map<std::string, std::string> _errorPages;
     LocationConfig *_locationConfig;
 
@@ -26,7 +28,10 @@ private:
     void parseLocationConfig();
     void parsePath();
     void parseMethod();
-    void determineContentType();
+    void parseAutoIndex();
+    void parseRedirection();
+    void parseContentType();
+
     bool hasFileExtension(std::string const &resource);
     bool isDirectory(std::string const &resource);
     bool locationIsSet(std::string const &key);
@@ -43,5 +48,6 @@ public:
     std::string const &getContentType() const;
     std::string const &getRedirection() const;
     std::string const &getHost() const;
+    bool getAutoIndex() const;
     ServerConfig *getConfig() const;
 };

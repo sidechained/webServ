@@ -7,6 +7,7 @@ FILES = main.cpp \
 		Responses/ResponseFactory.cpp \
         Responses/TextResponse.cpp \
 		Responses/RedirResponse.cpp \
+		Responses/ErrResponse.cpp \
         Responses/SimpleResponse.cpp \
 		Responses/Headers/SimpleHeader.cpp \
 		Responses/Headers/MovedHeader.cpp \

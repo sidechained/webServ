@@ -3,8 +3,7 @@ server:
 	hostname: 127.0.0.1
 	client_max_body_size_mb: 10
 	error_pages:
-		500: /50x.html
-		501: /50x.html
+		404: ./www/custom_404.html
 	locations:
 		/tictactoe:
 			index: index.html
@@ -15,6 +14,7 @@ server:
 			autoindex: true
 			uploads: /uploads
 		/new-url:
+			methods: GET
 			index: test.html
 			root: /tmp
 		/:

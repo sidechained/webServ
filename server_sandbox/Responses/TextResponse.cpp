@@ -1,6 +1,6 @@
 #include "TextResponse.hpp"
 
-TextResponse::TextResponse(HttpRequest &request) : SimpleResponse(request)
+TextResponse::TextResponse(HttpRequest &request) : ErrResponse(request)
 {
     createResponse(request);
 }
@@ -11,73 +11,103 @@ TextResponse::~TextResponse()
 
 void TextResponse::createResponse(HttpRequest &request)
 {
+    PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Creating HTML response for resource");
     request.printRequest();
-
-	PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Creating HTML response for resource");
-
-
     if (request.getRedirection() != "")
     {
         std::cout << BG_BOLD_MAGENTA << "Redirection in resource" << RESET << std::endl;
         setHeader(MovedHeader(request.getHost(), request.getRedirection()).getHeader());
-        setBodySent(true);
-        printResponse();
         return;
     }
 
-    std::cout << BG_BLUE << "Path: " << RESET << request.getPath() << std::endl;
+    if (request.getError("methodNotAllowed"))
+    {
+        std::cout << BG_BOLD_MAGENTA << "Method not allowed" << RESET << std::endl;
+        std::string error = "405";
+        this->createErrResponse(error);
+        return;
+    }
     std::ifstream htmlFile(request.getPath().c_str(), std::ios::binary);
-
     if (!htmlFile)
     {
-        std::cerr << "Error opening HTML file" << std::endl;
-        ServerConfig *config = request.getConfig();
-        std::string errorPage = config->error_pages["404"];
-        std::cout << "Error page: " << errorPage << std::endl;
-        request.setPath(errorPage);
-        std::cout << "New path: " << request.getPath() << std::endl;
-        htmlFile.open(request.getPath().c_str(), std::ios::binary);
-        if (!htmlFile)
-        {
-            std::cerr << "Error opening error page" << std::endl;
-            return;
-        }
-        setBodyLength(this->fileLength(htmlFile));
-        std::ostringstream oss1;
-        //create header
-        oss1 << "HTTP/1.1 404 Not Found\r\n";
-        oss1 << "Content-Type: text/html\r\n";
-        oss1 << "Content-Length: " << this->getBodyLength() << "\r\n";
-        oss1 << "\r\n";
-        std::string header = oss1.str();
-        setHeader(header);
-
-        std::ostringstream oss2;
-        oss2 << htmlFile.rdbuf();
-        std::string body = oss2.str();
-        setBody(body);
-
-        _response = _header + _body;
+        std::string error = "404";
+        this->createErrResponse(error);
         return;
     }
-    setBodyLength(this->fileLength(htmlFile));
+    if (request.getAutoIndex())
+    {
+        std::cout << BG_BOLD_MAGENTA << "Autoindexing" << RESET << std::endl;
+        createAutoIndexResponse(request.getPath().c_str());
+        setHeader(OkHeader(request.getContentType(), this->getBodyLength()).getHeader());
+        std::cout << "header: " << this->getHeader() << std::endl;
+        std::cout << "body: " << this->getBody() << std::endl;
+        return;
+    }
+
+    setBody(htmlFile);
     setHeader(OkHeader(this->getRequest().getContentType(), this->getBodyLength()).getHeader());
 
-    // Set body
-    std::ostringstream oss2;
-    oss2 << htmlFile.rdbuf();
-    std::string body = oss2.str();
-    setBody(body);
+    // PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Header: " << this->getHeader().substr(0, 1000))
+    // PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Body: " << this->getBody().substr(0, 100))
 
-
-	PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Header: " << this->getHeader().substr(0, 1000))
-    // std::cout << BG_BOLD_MAGENTA << "Header: " << RESET << this->getHeader().substr(0, 1000) << std::endl;
-	PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Body: " << this->getBody().substr(0, 100))
-    // std::cout << BG_BOLD_MAGENTA << "Body: " << RESET << this->getBody().substr(0, 100) << std::endl;
-
-    // clear and reset htmlFile
     htmlFile.clear();
     htmlFile.seekg(0, std::ios::beg);
     htmlFile.close();
 }
 
+void TextResponse::createAutoIndexResponse(const char *dirName)
+{
+
+    _body =
+        "<!DOCTYPE html>\n\
+	<html>\n\
+	<head>\n\
+			<title>" +
+        std::string(dirName) + "</title>\n\
+	</head>\n\
+	<body>\n\
+	<h1>INDEX</h1>\n\
+	<p>\n";
+
+    genDir(dirName);
+
+    _body += "\
+	</p>\n\
+	</body>\n\
+	</html>\n";
+    setBody(_body);
+}
+
+void TextResponse::genDir(const char *dirName)
+{
+    // add ./ to dirName
+    std::string dirNameStr = std::string(dirName);
+    if (dirNameStr[0] != '.')
+        dirNameStr = "./" + dirNameStr;
+    //remove file name from dirNameStr
+    size_t lastSlash = dirNameStr.find_last_of("/");
+    dirNameStr = dirNameStr.substr(0, lastSlash);
+    std::cout << "dirName: " << dirNameStr << std::endl;
+    DIR *dir = opendir(dirNameStr.c_str());
+    if (!dir)
+    {
+        perror("opendir");
+        exit(EXIT_FAILURE);
+    }
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL)
+    {
+        genLink(std::string(entry->d_name), std::string(dirNameStr));
+    }
+    closedir(dir);
+}
+
+void TextResponse::genLink(std::string entryName, std::string dirName)
+{
+    std::string host = _request->getHost();
+    std::cout << "host: " << host << std::endl;
+    int port = 8080;
+    std::stringstream ss;
+    ss << port;
+    _body += "\t\t<p><a href=\"http://" + host + ":" + ss.str() + dirName + "/" + entryName + "\">" + entryName + "</a></p>\n";
+}
