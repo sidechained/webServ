@@ -73,17 +73,18 @@ void HttpRequest::parseLocationConfig()
     }
     _locationConfig = NULL;
     long i = _path.size();
-    while (i > 0)
+    while (i >= 0)
     {
-        PRINT(HTTPREQUEST, BG_RED, "i: " << i)
-        // std::cout << BG_RED << "i: " << i << RESET << std::endl;
+        PRINT(HTTPREQUEST, BG_RED, "i: " << i)    
         std::string key = _path.substr(0, i);
+        if (key == "")
+            key = "/";
         PRINT(HTTPREQUEST, BG_RED, "key: " << key)
-        // std::cout << BG_RED << "key: " << key << RESET << std::endl;
         if (locationIsSet(key))
         {
             _locationConfig = &_config->locations[key];
-            PRINT(HTTPREQUEST, BG_RED, "location is set")
+            PRINT(HTTPREQUEST, BG_RED, "location is set");
+            PRINT(HTTPREQUEST, BG_RED, "root: " << _locationConfig->root);
             if (_locationConfig->root != "")
             {
                 if (key == "/")
@@ -96,6 +97,7 @@ void HttpRequest::parseLocationConfig()
             break;
         }
         i = key.find_last_of("/");
+
     }
 }
 

@@ -6,7 +6,7 @@
         std::cout << color << statement << RESET << std::endl; \
     }
 
-#define HTTPREQUEST		0
-#define TEXTRESPONSE	0
+#define HTTPREQUEST		1
+#define TEXTRESPONSE	1
 #define SERVERMANAGER	1
 #define SOCKET			1

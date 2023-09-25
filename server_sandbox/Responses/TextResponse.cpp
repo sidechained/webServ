@@ -13,6 +13,7 @@ void TextResponse::createResponse(HttpRequest &request)
 {
     PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Creating HTML response for resource");
     request.printRequest();
+    PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Path: " << request.getPath());
     if (request.getRedirection() != "")
     {
         std::cout << BG_BOLD_MAGENTA << "Redirection in resource" << RESET << std::endl;
