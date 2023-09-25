@@ -19,15 +19,14 @@ Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int
 	int reuse = 1;
 	testConnection(setsockopt(_sock, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)));
 
-	// Set socket to be nonblocking?
-
 	// Bind socket and IP
 	_conection = bind(_sock, (struct sockaddr *)&_address, sizeof(_address));
 	testConnection(_conection);
-	// std::cout << "Socket created" << std::endl;
+
+	// initialize last request time
 	_last_request_time = time(NULL);
 
-	if (listen(_sock, MAX_CLIENTS) == -1)
+	if (listen(_sock, backlog) == -1)
 	{
 		std::cerr << "listen error" << std::endl;
 		exit(EXIT_FAILURE);
@@ -47,23 +46,12 @@ const time_t &Socket::getLastTime() const
 void Socket::updateTime()
 {
 	_last_request_time = time(NULL);
-	//std::cout << "Last request time set to " << _last_request_time << std::endl;
+	// std::cout << "Last request time set to " << _last_request_time << std::endl;
 }
 
 Socket::~Socket()
 {
 	close(_sock);
-}
-
-Socket::Socket(const Socket &other)
-{
-	if (this != &other)
-	{
-		_address = other._address;
-		_sock = other._sock;
-		_conection = other._conection;
-		_addressSize = other._addressSize;
-	}
 }
 
 void Socket::testConnection(int item)
@@ -76,6 +64,7 @@ void Socket::testConnection(int item)
 }
 
 // Getter functions
+
 sockaddr_in Socket::getAddress() const
 {
 	return _address;

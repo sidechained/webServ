@@ -12,7 +12,7 @@ Server::Server(ServerConfig &config) : _config(&config), _ports(config.ports), _
 {
     for (unsigned long i = 0; i < config.ports.size(); i++)
     {
-        _sockets.push_back(new Socket(AF_INET, SOCK_STREAM, 0, _ports[i].number, _ip, 10));
+        _sockets.push_back(new Socket(AF_INET, SOCK_STREAM, 0, _ports[i].number, _ip, MAX_CLIENTS));
     }
 }
 

@@ -4,6 +4,8 @@
 #include "../Colors.hpp"
 #include <vector>
 
+#define MAX_CLIENTS 10
+
 
 class Server
 {
