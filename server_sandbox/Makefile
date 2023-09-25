@@ -12,9 +12,9 @@ FILES = main.cpp \
 		Responses/Headers/SimpleHeader.cpp \
 		Responses/Headers/MovedHeader.cpp \
 		Responses/Headers/OkHeader.cpp \
-		Parser/GenericConfig.cpp \
-		Parser/LocationConfig.cpp \
-		Parser/ServerConfig.cpp \
+		Parser/GenericParser.cpp \
+		Parser/LocationParser.cpp \
+		Parser/ServerParser.cpp \
 		Parser/ConfigFileParser.cpp \
 		utils/ContentTypeUtils.cpp \
 		utils/LoadMapFromFile.cpp \

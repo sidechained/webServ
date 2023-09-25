@@ -1,0 +1,32 @@
+server:
+	ports: 80 90 100
+	hostname: eighty.com
+	client_max_body_size_mb: 10
+	error_pages:
+	locationConfigs:
+		/eightyTest:
+			methods: GET
+			redir: /new-url
+			root: /tmp
+			autoindex: true
+			uploads: /uploads
+		/:
+			index: index1.html
+
+server:
+	ports: 82
+	hostname: eightytwo.com
+	client_max_body_size_mb: 10
+	error_pages:
+		404: /404.html
+		500: /50x.html
+		501: /50x.html
+	locationConfigs:
+		/eightyTwoTest:
+			methods: POST DELETE
+			redir: /new-url
+			root: /tmp
+			autoindex: true
+			uploads: /uploads
+		/:
+			index: index2.html

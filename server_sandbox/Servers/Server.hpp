@@ -1,6 +1,6 @@
 #pragma once
 #include "../Sockets/Socket.hpp"
-#include "../Parser/ServerConfig.hpp"
+#include "../Parser/ServerParser.hpp"
 #include "../Colors.hpp"
 #include <vector>
 
@@ -19,7 +19,7 @@ protected:
 	void log(std::string const &message);
 	void printClientAddress(sockaddr_in const &address);
 	ServerConfig *_config;
-	std::vector<Port> _ports;
+	std::vector<PortConfig> _ports;
 	std::string _ip;
 public:
 	//Server(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog);

@@ -5,8 +5,8 @@
 #include <sstream>
 #include <map>
 #include <algorithm>
-#include "../Parser/ServerConfig.hpp"
-#include "../Parser/LocationConfig.hpp"
+#include "../Parser/ServerParser.hpp"
+#include "../Parser/LocationParser.hpp"
 #include "../WebServ.hpp"
 
 class LocationConfig;
@@ -22,7 +22,7 @@ private:
     std::string _redirection;
     bool _autoIndex;
     std::map<std::string, std::string> _errorPages;
-    LocationConfig *_locationConfig;
+    LocationParser *_locationConfig;
 
     void fillIncomingRequestMap(std::string const &request);
     void parseLocationConfig();

@@ -1,0 +1,17 @@
+server:
+	error_pages:
+		404: /404.html
+		500: /50x.html
+		501: /50x.html
+	ports: 80 90 100
+	client_max_body_size_mb: 10
+	hostname: eighty.com
+
+server:
+	error_pages:
+		404: /404.html
+		500: /50x.html
+		501: /50x.html
+	hostname: eightytwo.com
+	ports: 82
+	client_max_body_size_mb: 10
