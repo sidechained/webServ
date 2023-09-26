@@ -11,26 +11,32 @@ Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int
 	_addressSize = sizeof(_address);
 
 	// Establish connection
+	// print establish connection
+	PRINT(SOCKET, CYAN, "\tFor server: " << ip << " on port: " << port << " Establishing connection...")
 	_sock = socket(domain, type, protocol);
 	testConnection(_sock);
 
 	// Allow socket descriptor to be reuseable
 	// Should allow to rerun ./server multiple times
 	int reuse = 1;
+	PRINT(SOCKET, CYAN, "\tFor server: " << ip << " on port: " << port << " Setting socket options...")
 	testConnection(setsockopt(_sock, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)));
 
 	// Bind socket and IP
+	PRINT(SOCKET, CYAN, "\tFor server: " << ip << " on port: " << port << " Binding socket...")
 	_conection = bind(_sock, (struct sockaddr *)&_address, sizeof(_address));
 	testConnection(_conection);
 
 	// initialize last request time
 	_last_request_time = time(NULL);
 
+	PRINT(SOCKET, CYAN, "\tFor server: " << ip << " on port: " << port << " Listening on socket...")
 	if (listen(_sock, backlog) == -1)
 	{
 		std::cerr << "listen error" << std::endl;
 		exit(EXIT_FAILURE);
 	}
+	PRINT(SOCKET, CYAN, "\tFor server: " << ip << " on port: " << port << " Socket listening on fd: " << _sock)
 	if (fcntl(_sock, F_SETFL, O_NONBLOCK) < 0)
 	{
 		std::cerr << "fcntl error" << std::endl;
