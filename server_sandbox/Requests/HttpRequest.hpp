@@ -9,7 +9,7 @@
 #include "../Parser/LocationParser.hpp"
 #include "../WebServ.hpp"
 
-class LocationConfig;
+// class LocationConfig;
 
 class HttpRequest : public HttpError
 {
@@ -22,7 +22,7 @@ private:
     std::string _redirection;
     bool _autoIndex;
     std::map<std::string, std::string> _errorPages;
-    LocationParser *_locationConfig;
+    LocationConfig *_locationConfig;
 
     void fillIncomingRequestMap(std::string const &request);
     void parseLocationConfig();

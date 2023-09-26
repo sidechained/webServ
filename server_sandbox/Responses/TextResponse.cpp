@@ -107,8 +107,9 @@ void TextResponse::genLink(std::string entryName, std::string dirName)
 {
     std::string host = _request->getHost();
     std::cout << "host: " << host << std::endl;
-    int port = 8080;
-    std::stringstream ss;
-    ss << port;
-    _body += "\t\t<p><a href=\"http://" + host + ":" + ss.str() + dirName + "/" + entryName + "\">" + entryName + "</a></p>\n";
+    if (dirName[0] == '.')
+        dirName = dirName.substr(1);
+    // std::stringstream ss;
+    // ss << port;
+    _body += "\t\t<p><a href=\"http://" + host  + dirName + "/" + entryName + "\">" + entryName + "</a></p>\n";
 }

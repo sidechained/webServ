@@ -3,7 +3,10 @@ server:
 	hostname: eighty.com
 	client_max_body_size_mb: 10
 	error_pages:
-	locationConfigs:
+		404: /404.html
+		500: /50x.html
+		501: /50x.html
+	locations:
 		/eightyTest:
 			methods: GET
 			redir: /new-url
@@ -21,10 +24,10 @@ server:
 		404: /404.html
 		500: /50x.html
 		501: /50x.html
-	locationConfigs:
+	locations:
 		/eightyTwoTest:
 			methods: POST DELETE
-			redir: /new-url
+			redir: /old-url /new-url
 			root: /tmp
 			autoindex: true
 			uploads: /uploads

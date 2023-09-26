@@ -11,7 +11,7 @@ HttpRequest::~HttpRequest()
 HttpRequest::HttpRequest(std::string const &request, ServerConfig *config) : _config(config)
 {
     this->clearErrors();
-     _incomingRequest["Redirection"] = "";
+    _incomingRequest["Redirection"] = "";
     fillIncomingRequestMap(request);
     parseLocationConfig();
     parsePath();
@@ -75,14 +75,14 @@ void HttpRequest::parseLocationConfig()
     long i = _path.size();
     while (i >= 0)
     {
-        PRINT(HTTPREQUEST, BG_RED, "i: " << i)    
+        PRINT(HTTPREQUEST, BG_RED, "i: " << i)
         std::string key = _path.substr(0, i);
         if (key == "")
             key = "/";
         PRINT(HTTPREQUEST, BG_RED, "key: " << key)
         if (locationIsSet(key))
         {
-            _locationConfig = &_config->locations[key];
+            _locationConfig = &_config->locationConfigs[key];
             PRINT(HTTPREQUEST, BG_RED, "location is set");
             PRINT(HTTPREQUEST, BG_RED, "root: " << _locationConfig->root);
             if (_locationConfig->root != "")
@@ -91,13 +91,13 @@ void HttpRequest::parseLocationConfig()
                     _path = _locationConfig->root + _path;
                 else
                     _path = _locationConfig->root + _path.substr(i);
-                if (_path[0] == '/')
-                    _path = _path.substr(1);
             }
+            if (_path[0] == '/')
+                _path = _path.substr(1);
+            std::cout << BG_YELLOW << "path: " << _path << RESET << std::endl;
             break;
         }
         i = key.find_last_of("/");
-
     }
 }
 
@@ -167,7 +167,8 @@ bool HttpRequest::isDirectory(std::string const &resource)
 
 bool HttpRequest::locationIsSet(std::string const &key)
 {
-    if (_config->locations.find(key) != _config->locations.end())
+    // if (_config->locations.find(key) != _config->locations.end())
+    if (_config->locationConfigs.find(key) != _config->locationConfigs.end())
         return true;
     return false;
 }
@@ -176,7 +177,7 @@ void HttpRequest::printRequest()
 {
     for (std::map<std::string, std::string>::iterator it = _incomingRequest.begin(); it != _incomingRequest.end(); ++it)
     {
-        //PRINT(HTTPREQUEST, BG_BOLD_MAGENTA, it->first << ": " << RESET << it->second)
+        // PRINT(HTTPREQUEST, BG_BOLD_MAGENTA, it->first << ": " << RESET << it->second)
         std::cout << BG_BOLD_MAGENTA << it->first << ": " << RESET << it->second << std::endl;
     }
 }

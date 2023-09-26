@@ -5,8 +5,6 @@ server:
 	error_pages:
 		404: ./www/custom_404.html
 	locations:
-		/tictactoe:
-			index: index.html
 		/test:
 			methods: GET
 			redir: /new-url
@@ -20,6 +18,7 @@ server:
 		/:
 			root: /www
 		/my_game:
+			autoindex: true
 			root: /tictactoe
 		/my_game/hello:
 			root: /other_location
@@ -29,15 +28,16 @@ server:
 	hostname: 127.0.0.3
 	client_max_body_size_mb: 10
 	error_pages:
-		404: /404.html
 		500: /50x.html
 		501: /50x.html
 	locations:
-		/eightyTwoTest:
-			methods: POST DELETE
-			redir: /old-url /new-url
+		/test:
+			methods: GET
+			redir: /new-url
 			root: /tmp
 			autoindex: true
 			uploads: /uploads
+		/new-url:
+			methods: GET
 		/:
 			root: /www
