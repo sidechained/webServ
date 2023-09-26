@@ -37,6 +37,7 @@ void LocationParser::setDefaults()
 	locationConfig.uploads = DEFAULT_LOCATION_UPLOADS;
 	locationConfig.autoindex = DEFAULT_LOCATION_AUTOINDEX;
 	locationConfig.index = DEFAULT_LOCATION_INDEX;
+	locationConfig.redirection = DEFAULT_LOCATION_REDIRECT;
 }
 
 void LocationParser::extract(std::fstream &configFile) {

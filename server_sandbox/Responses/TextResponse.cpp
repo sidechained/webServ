@@ -12,9 +12,8 @@ TextResponse::~TextResponse()
 void TextResponse::createResponse(HttpRequest &request)
 {
     PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Creating HTML response for resource");
-    request.printRequest();
     PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Path: " << request.getPath());
-    if (request.getRedirection() != "")
+    if (request.getLocationConfig()->redirection != "")
     {
         std::cout << BG_BOLD_MAGENTA << "Redirection in resource" << RESET << std::endl;
         setHeader(MovedHeader(request.getHost(), request.getRedirection()).getHeader());
@@ -35,7 +34,7 @@ void TextResponse::createResponse(HttpRequest &request)
         this->createErrResponse(error);
         return;
     }
-    if (request.getAutoIndex())
+    if (request.getLocationConfig()->autoindex)
     {
         std::cout << BG_BOLD_MAGENTA << "Autoindexing" << RESET << std::endl;
         createAutoIndexResponse(request.getPath().c_str());

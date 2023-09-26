@@ -11,15 +11,12 @@ HttpRequest::~HttpRequest()
 HttpRequest::HttpRequest(std::string const &request, ServerConfig *config) : _config(config)
 {
     this->clearErrors();
-    _incomingRequest["Redirection"] = "";
+    _errorPages = _config->error_pages;
     fillIncomingRequestMap(request);
     parseLocationConfig();
-    parsePath();
+    parseIndex();
     parseMethod();
-    parseAutoIndex();
-    parseRedirection();
     parseContentType();
-    _errorPages = _config->error_pages;
     cleanUpMap(_incomingRequest);
 }
 
@@ -75,44 +72,48 @@ void HttpRequest::parseLocationConfig()
     long i = _path.size();
     while (i >= 0)
     {
-        PRINT(HTTPREQUEST, BG_RED, "i: " << i)
         std::string key = _path.substr(0, i);
         if (key == "")
             key = "/";
-        PRINT(HTTPREQUEST, BG_RED, "key: " << key)
         if (locationIsSet(key))
         {
             _locationConfig = &_config->locationConfigs[key];
-            PRINT(HTTPREQUEST, BG_RED, "location is set");
-            PRINT(HTTPREQUEST, BG_RED, "root: " << _locationConfig->root);
-            if (_locationConfig->root != "")
-            {
-                if (key == "/")
-                    _path = _locationConfig->root + _path;
-                else
-                    _path = _locationConfig->root + _path.substr(i);
-            }
-            if (_path[0] == '/')
-                _path = _path.substr(1);
-            std::cout << BG_YELLOW << "path: " << _path << RESET << std::endl;
+            PRINT(HTTPREQUEST, BG_BLUE, "location is set");
+            parsePath(key, i);
             break;
         }
         i = key.find_last_of("/");
     }
 }
 
-void HttpRequest::parsePath()
+void HttpRequest::parsePath(std::string &key, long i)
+{
+    if (_locationConfig->root != "")
+    {
+        if (key == "/")
+            _path = _locationConfig->root + _path;
+        else
+            _path = _locationConfig->root + _path.substr(i);
+    }
+    if (_path[0] == '/')
+        _path = _path.substr(1);
+    PRINT(HTTPREQUEST, BG_BLUE, "path: " << _path)
+}
+
+void HttpRequest::parseIndex()
 {
     if (isDirectory(_path))
     {
         if (_locationConfig && _locationConfig->index != "")
             _path = _path + _locationConfig->index;
     }
+    PRINT(HTTPREQUEST, BG_BLUE, "path: " << _path)
 }
 
 void HttpRequest::parseMethod()
 {
     std::string requestMethod = _incomingRequest["Method"];
+    std::cout << "Parsing method: " << requestMethod << std::endl;
 
     if (requestMethod == "GET" || requestMethod == "POST" || requestMethod == "DELETE")
     {
@@ -125,22 +126,6 @@ void HttpRequest::parseMethod()
     }
     else
         this->addError("methodNotAllowed");
-}
-
-void HttpRequest::parseAutoIndex()
-{
-    if (_locationConfig && _locationConfig->autoindex)
-        _autoIndex = true;
-    else
-        _autoIndex = false;
-}
-
-void HttpRequest::parseRedirection()
-{
-    if (_locationConfig && !_locationConfig->redirection.empty())
-        _redirection = _locationConfig->redirection;
-    else
-        _redirection = "";
 }
 
 void HttpRequest::parseContentType()
@@ -167,7 +152,6 @@ bool HttpRequest::isDirectory(std::string const &resource)
 
 bool HttpRequest::locationIsSet(std::string const &key)
 {
-    // if (_config->locations.find(key) != _config->locations.end())
     if (_config->locationConfigs.find(key) != _config->locationConfigs.end())
         return true;
     return false;
@@ -199,7 +183,7 @@ std::string const &HttpRequest::getContentType() const
 
 std::string const &HttpRequest::getRedirection() const
 {
-    return _redirection;
+    return _locationConfig->redirection;
 }
 
 std::string const &HttpRequest::getHost() const
@@ -214,7 +198,15 @@ ServerConfig *HttpRequest::getConfig() const
     return _config;
 }
 
-bool HttpRequest::getAutoIndex() const
+LocationConfig *HttpRequest::getLocationConfig() const
 {
-    return _autoIndex;
+    return _locationConfig;
+}
+
+std::string const &HttpRequest::getMethod() const
+{
+    static std::string methods = _incomingRequest.at("Method");
+    std::cout << "Method in request: " << methods << std::endl;
+    removeNonPrintableChars(methods);
+    return methods;
 }

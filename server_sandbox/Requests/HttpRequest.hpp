@@ -19,16 +19,15 @@ private:
 
     std::string _path;
     std::string _contentType;
-    std::string _redirection;
-    bool _autoIndex;
+    std::string _meth
     std::map<std::string, std::string> _errorPages;
     LocationConfig *_locationConfig;
 
     void fillIncomingRequestMap(std::string const &request);
     void parseLocationConfig();
-    void parsePath();
+    void parsePath(std::string &key, long i);
+    void parseIndex();
     void parseMethod();
-    void parseAutoIndex();
     void parseRedirection();
     void parseContentType();
 
@@ -43,11 +42,12 @@ public:
     HttpRequest(std::string const &request, ServerConfig *config);
     ~HttpRequest();
     void printRequest();
+    LocationConfig *getLocationConfig() const;
     std::string const &getPath();
     void setPath(std::string const &path);
     std::string const &getContentType() const;
     std::string const &getRedirection() const;
     std::string const &getHost() const;
-    bool getAutoIndex() const;
+    std::string const &getMethod() const;
     ServerConfig *getConfig() const;
 };
