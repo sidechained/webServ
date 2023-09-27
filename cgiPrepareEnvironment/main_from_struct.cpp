@@ -15,10 +15,8 @@
 int main() {
 
     std::string tmpName = "resources/postRequestData.txt";
-    PostUploadRequestParser purp("resources/postRequest.txt", tmpName);
+    PostUploadRequestParser purp("resources/postRequest.txt");
     // note: postRequestData will be three 'parts' chunked together, but this should be changed to be three separate files
-
-    std::cout << purp.getStruct().method << std::endl;
 
     char* argv[] = {
         (char*)"/usr/bin/php",
@@ -44,7 +42,7 @@ int main() {
         NULL
     };
 
-    std::cout << envp[0] << std::endl;
+    // std::cout << envp[0] << std::endl;
 
     // open request body
     std::string data = "This is the request body data\n";

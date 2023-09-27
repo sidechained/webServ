@@ -1,4 +1,4 @@
-POST /cgi/upload.php HTTP/1.1
+POST /upload.php HTTP/1.1
 Host: myHost
 Content-Type: multipart/form-data; boundary=----MyBoundary123
 Content-Length: 1234
