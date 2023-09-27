@@ -1,6 +1,6 @@
 #pragma once
 #include "../Requests/HttpRequest.hpp"
-#include "../Responses/TextResponse.hpp"
+#include "../Responses/SimpleResponse.hpp"
 #include "Server.hpp"
 #include "unistd.h"
 #include <cstring>
@@ -12,10 +12,11 @@
 #include <csignal>
 #include <cstddef>
 #include "../Parser/ConfigFileParser.hpp"
+#include "../Responses/ResponseFactory.hpp"
 
-#define MAX_CLIENTS 10
-#define MESSAGE_BUFFER 20000
-#define CONNECTION_TIMEOUT 60
+//#define MAX_CLIENTS 10
+#define MESSAGE_BUFFER 200000
+#define CONNECTION_TIMEOUT 500
 
 class Server;
 class SimpleResponse;

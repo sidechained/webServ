@@ -1,7 +1,7 @@
 #include "Socket.hpp"
 
 // Default constructor
-Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int backlog)
+Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int backlog) : _ip(ip), _port(port)
 {
 	(void)backlog;
 	// Define address structure
@@ -11,22 +11,38 @@ Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int
 	_addressSize = sizeof(_address);
 
 	// Establish connection
+	// print establish connection
+	PRINT(SOCKET, CYAN, "\tFor server: " << ip << " on port: " << port << " Establishing connection...")
 	_sock = socket(domain, type, protocol);
 	testConnection(_sock);
 
 	// Allow socket descriptor to be reuseable
 	// Should allow to rerun ./server multiple times
 	int reuse = 1;
+	PRINT(SOCKET, CYAN, "\tFor server: " << ip << " on port: " << port << " Setting socket options...")
 	testConnection(setsockopt(_sock, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)));
 
-	// Set socket to be nonblocking?
-
 	// Bind socket and IP
+	PRINT(SOCKET, CYAN, "\tFor server: " << ip << " on port: " << port << " Binding socket...")
 	_conection = bind(_sock, (struct sockaddr *)&_address, sizeof(_address));
 	testConnection(_conection);
-	// std::cout << "Socket created" << std::endl;
+
+	// initialize last request time
 	_last_request_time = time(NULL);
-	// std::cout << "Last request time set to " << _last_request_time << std::endl;
+
+	PRINT(SOCKET, CYAN, "\tFor server: " << ip << " on port: " << port << " Listening on socket...")
+	if (listen(_sock, backlog) == -1)
+	{
+		std::cerr << "listen error" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	PRINT(SOCKET, CYAN, "\tFor server: " << ip << " on port: " << port << " Socket listening on fd: " << _sock)
+	if (fcntl(_sock, F_SETFL, O_NONBLOCK) < 0)
+	{
+		std::cerr << "fcntl error" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	PRINT(SOCKET, CYAN, "\tFor server: " << ip << " on port: " << port << " Socket created with fd: " << _sock)
 }
 
 const time_t &Socket::getLastTime() const
@@ -36,22 +52,12 @@ const time_t &Socket::getLastTime() const
 void Socket::updateTime()
 {
 	_last_request_time = time(NULL);
+	// std::cout << "Last request time set to " << _last_request_time << std::endl;
 }
 
 Socket::~Socket()
 {
 	close(_sock);
-}
-
-Socket::Socket(const Socket &other)
-{
-	if (this != &other)
-	{
-		_address = other._address;
-		_sock = other._sock;
-		_conection = other._conection;
-		_addressSize = other._addressSize;
-	}
 }
 
 void Socket::testConnection(int item)
@@ -64,6 +70,7 @@ void Socket::testConnection(int item)
 }
 
 // Getter functions
+
 sockaddr_in Socket::getAddress() const
 {
 	return _address;
@@ -82,4 +89,14 @@ int Socket::getConnection() const
 int Socket::getAddressSize() const
 {
 	return _addressSize;
+}
+
+int Socket::getPort() const
+{
+	return _port;
+}
+
+std::string Socket::getIp() const
+{
+	return _ip;
 }

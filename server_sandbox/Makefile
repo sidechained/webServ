@@ -1,21 +1,25 @@
 FILES = main.cpp \
         Requests/HttpRequest.cpp \
+		Requests/HttpError.cpp \
         Servers/Server.cpp \
         Sockets/Socket.cpp \
 		Servers/ServerManager.cpp \
+		Responses/ResponseFactory.cpp \
         Responses/TextResponse.cpp \
+		Responses/RedirResponse.cpp \
+		Responses/ErrResponse.cpp \
         Responses/SimpleResponse.cpp \
 		Responses/Headers/SimpleHeader.cpp \
 		Responses/Headers/MovedHeader.cpp \
 		Responses/Headers/OkHeader.cpp \
-		Parser/GenericConfig.cpp \
-		Parser/LocationConfig.cpp \
-		Parser/ServerConfig.cpp \
+		Parser/GenericParser.cpp \
+		Parser/LocationParser.cpp \
+		Parser/ServerParser.cpp \
 		Parser/ConfigFileParser.cpp \
 		utils/ContentTypeUtils.cpp \
 		utils/LoadMapFromFile.cpp \
 		utils/StatusCodeUtils.cpp \
-		utils/RemoveNonPrintable.cpp \
+		utils/RemoveNonPrintable.cpp 
 
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g
@@ -31,7 +35,8 @@ $(NAME): $(OBJECTS)
 	@$(CC) $(OBJECTS) -o $(NAME)
 	@echo "✅ Build successful!"
 
-$(OBJ_DIR)/%.o: %.cpp
+$(OBJ_DIR)/%.o: %.cpp 
+#$(OBJ_DIR)/%.o: %.cpp %.hpp
 	@echo "🛠️ Compiling $<..."
 	@mkdir -p $(@D)
 	@$(CC) -c $(CFLAGS) $< -o $@

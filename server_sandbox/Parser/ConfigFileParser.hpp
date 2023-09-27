@@ -1,19 +1,17 @@
-#pragma once
+#ifndef CONFIGFILEPARSER_HPP
+# define CONFIGFILEPARSER_HPP
 
 # include <cstdlib>
 # include <vector>
 # include <iostream>
-# include "ServerConfig.hpp"
-# include "GenericConfig.hpp"
+# include "ServerParser.hpp"
 
-class ServerConfig;
-
-class ConfigFileParser : public GenericConfig
+class ConfigFileParser : public GenericParser
 {
 	private:
 		ConfigFileParser();
 	public:
-		ConfigFileParser(std::string filehostname);
+		ConfigFileParser(std::string filename);
 		ConfigFileParser(const ConfigFileParser &);
 		ConfigFileParser& operator=(const ConfigFileParser &);
 		~ConfigFileParser();
@@ -21,3 +19,5 @@ class ConfigFileParser : public GenericConfig
 		int numServers;
 		void print() const;
 };
+
+#endif

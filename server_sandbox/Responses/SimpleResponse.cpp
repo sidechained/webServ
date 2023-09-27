@@ -1,12 +1,11 @@
 #include "SimpleResponse.hpp"
 
-SimpleResponse::SimpleResponse() : _request(), _headerSent(false), _bodySent(false)
+SimpleResponse::SimpleResponse() : _request(), _header(""), _body(""), _response(""), _bodyLength(0)
 {
 }
 
-SimpleResponse::SimpleResponse(HttpRequest &request) : _request(&request), _headerSent(false), _bodySent(false)
+SimpleResponse::SimpleResponse(HttpRequest &request) : _request(&request), _header(""), _body(""), _response(""), _bodyLength(0)
 {
-    createResponse();
 }
 
 SimpleResponse::~SimpleResponse()
@@ -41,56 +40,33 @@ void SimpleResponse::setHeader(std::string const &header)
 void SimpleResponse::setBody(std::string const &body)
 {
     _body = body;
+   _bodyLength = _body.size();
 }
 
-void SimpleResponse::setHeaderSent(bool headerSent)
+void SimpleResponse::setBody(std::ifstream &file)
 {
-    _headerSent = headerSent;
+    std::ostringstream oss2;
+    oss2 << file.rdbuf();
+    std::string body = oss2.str();
+    setBody(body);
 }
 
-void SimpleResponse::setBodyLength(int length)
-{
-    _bodyLength = length;
-}
-
-bool SimpleResponse::isHeaderSent() const
-{
-    return _headerSent;
-}
-
-void SimpleResponse::setBodySent(bool bodySent)
-{
-    _bodySent = bodySent;
-}
-
-bool SimpleResponse::isBodySent() const
-{
-    return _bodySent;
-}
 
 void SimpleResponse::updateHeaderOffset(size_t offset)
 {
     _header = _header.substr(offset);
-    if (_header.empty())
-        _headerSent = true;
 }
 
 void SimpleResponse::updateBodyOffset(size_t offset)
 {
     _body = _body.substr(offset);
-    if (_body.empty())
-        _bodySent = true;
+
 }
 
-void SimpleResponse::createResponse()
+std::string const &SimpleResponse::getResponse() 
 {
-}
-
-std::string SimpleResponse::getResponse() const
-{
-    std::string response;
-    response = _header + _body;
-    return response;
+    _response = _header + _body;
+    return _response;
 }
 
 int SimpleResponse::fileLength(std::ifstream &file)
@@ -102,14 +78,7 @@ int SimpleResponse::fileLength(std::ifstream &file)
     return fileLength;
 }
 
-void SimpleResponse::printResponse()
-{
-    std::cout << BG_BOLD_MAGENTA << "Header: " << RESET << getHeader() << std::endl;
-    std::cout << BG_BOLD_MAGENTA << "Body: " << RESET << getBody() << std::endl;
-}
-
 void SimpleResponse::cutRes(std::string& response, size_t i)
 {
     _response = response.substr(i);
-    std::cout << BG_BOLD_MAGENTA << "RESPONSE UPDATED size: " << response.size() << RESET << std::endl;
 }
