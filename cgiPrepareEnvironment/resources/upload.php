@@ -21,16 +21,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // Move the uploaded file to the destination directory
             if (move_uploaded_file($file["tmp_name"], $destination)) {
                 echo "File uploaded successfully.";
+                exit(0);  
             } else {
                 echo "Error moving the uploaded file.";
+                exit(1);
             }
         } else {
             echo "Error uploading file. Error code: " . $file["error"];
+            exit(1);
         }
     } else {
         echo "File field not found in the form.";
+        exit(1);
     }
 } else {
     echo "Invalid request method.";
+    exit(1);
 }
 ?>

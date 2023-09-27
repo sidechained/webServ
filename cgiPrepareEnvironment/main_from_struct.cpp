@@ -54,16 +54,30 @@ int main() {
     pipe(stdin_pipe);
 
     pid_t pid = fork();
+    if (pid < 0)
+    {
+        perror("fork");
+        return(EXIT_FAILURE);
+    }
     if (pid == 0) {  // Child process
         execve("usr/bin/php", argv, envp);
         perror("execve");
         exit(EXIT_FAILURE);
-    } else if (pid > 0) {  // Parent process
-        int status;
-        waitpid(pid, &status, 0);
-    } else {
-        perror("fork");
-        exit(EXIT_FAILURE);
     }
-    return EXIT_SUCCESS;
+    // parent process > 0
+    int status;
+    waitpid(pid, &status, 0);
+    if (WIFEXITED(status) == false) {
+        std::cerr << "PHP script did not exit normally." << std::endl;
+        return(EXIT_FAILURE);
+    }
+    int exitStatus = WEXITSTATUS(status);
+    if (exitStatus == 0) {
+        std::cout << "PHP script exited with success." << std::endl;
+        return(EXIT_SUCCESS);
+    }
+    std::cout << "PHP script exited with failure." << std::endl;
+    return(EXIT_FAILURE);
 }
+
+
