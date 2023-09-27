@@ -9,12 +9,11 @@ if ($fileName && file_exists($fileName)) {
     // Generate the new file name with "_copy"
     $copyFileName = pathinfo($fileName, PATHINFO_FILENAME) . "_copy." . pathinfo($fileName, PATHINFO_EXTENSION);
 
-    // Make a copy of the file
-    if (copy($fileName, $copyFileName)) {
-        echo "Copied file to: $copyFileName\n";
-    } else {
-        echo "Failed to copy file.\n";
-    }
+    // Read data from stdin and write it to the copy file
+    $inputData = file_get_contents('php://stdin');
+    file_put_contents($copyFileName, $inputData);
+
+    echo "Copied file to: $copyFileName\n";
 } else {
     echo "FILENAME is not set or the file does not exist.\n";
 }
@@ -26,4 +25,3 @@ echo "FILENAME: $fileName\n";
 
 echo "Hello, World!\n";
 ?>
-

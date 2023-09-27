@@ -64,15 +64,13 @@ int main() {
         // Close the write end of the pipe (parent reads from child)
         close(pipe_fd[1]);
 
-        // Read data from the pipe (output of the child process)
-        char buffer[4096];
-        ssize_t bytes_read;
-
-        while ((bytes_read = read(pipe_fd[0], buffer, sizeof(buffer))) > 0) {
-            // Process the data read from the child process
-            // For example, you can write it to a file or display it
-            write(STDOUT_FILENO, buffer, bytes_read);
-        }
+        // Write your string to the pipe (child's stdin)
+        const char* message = "This is the string you want to send to PHP\n";
+       ssize_t bytes_written = write(pipe_fd[1], message, strlen(message));
+		if (bytes_written == -1) {
+			perror("write");
+			return 1;
+		}
 
         // Close the read end of the pipe
         close(pipe_fd[0]);
