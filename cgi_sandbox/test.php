@@ -1,16 +1,29 @@
 <?php
 // Access the custom environmental variables set in C++ using $_SERVER
 
+// Get the value of FILENAME
+$fileName = getenv('FILENAME');
 
-// thsi works as well the same!!
-//$customVar1 = $_SERVER['CUSTOM_VAR1'];
-//$customVar2 = $_SERVER['CUSTOM_VAR2'];
+// Check if FILENAME is set and the file exists
+if ($fileName && file_exists($fileName)) {
+    // Generate the new file name with "_copy"
+    $copyFileName = pathinfo($fileName, PATHINFO_FILENAME) . "_copy." . pathinfo($fileName, PATHINFO_EXTENSION);
 
-$customVar1 = getenv('CUSTOM_VAR1');
-$customVar2 = getenv('CUSTOM_VAR2');
+    // Make a copy of the file
+    if (copy($fileName, $copyFileName)) {
+        echo "Copied file to: $copyFileName\n";
+    } else {
+        echo "Failed to copy file.\n";
+    }
+} else {
+    echo "FILENAME is not set or the file does not exist.\n";
+}
 
-echo "CUSTOM_VAR1: $customVar1\n";
-echo "CUSTOM_VAR2: $customVar2\n";
+//$customVar2 = getenv('CUSTOM_VAR2');
 
-echo "hello World!\n"
+echo "FILENAME: $fileName\n";
+//echo "CUSTOM_VAR2: $customVar2\n";
+
+echo "Hello, World!\n";
 ?>
+
