@@ -17,7 +17,13 @@ fclean:			clean
 
 re:				fclean $(NAME)
 
-run:
-				./$(NAME) postRequest.txt tmp/output.txt
+testSingle:
+				./$(NAME) postRequestSingle.txt
+
+testMulti:
+				./$(NAME) postRequestMulti.txt				
+
+testFirefox:
+				./$(NAME) postRequestFirefox.txt
 
 .PHONY:			all clean fclean re test

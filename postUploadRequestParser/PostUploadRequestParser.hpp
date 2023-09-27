@@ -32,7 +32,6 @@ class PostUploadRequestParser
 {
 	private:
 		PostUploadRequest postUploadRequest;
-		std::string _outputFilename;
 		std::vector<std::string> headerAcceptedFields;
 		std::vector<std::string> partsAcceptedFields;
 		std::string boundary;
@@ -48,7 +47,7 @@ class PostUploadRequestParser
 		void parseContentDisposition(Part &part);
 		bool isContentOfType(std::map<std::string, std::string> headers, std::string typeToMatch);
 		bool arePartContentsOfType(std::string typeToMatch);
-		void checkContentTypes();
+		void validate();
 		void makeOutputFile();
 		// utility functions:
 		bool isValidMethod(const std::string& method);
@@ -65,7 +64,7 @@ class PostUploadRequestParser
 		void printPartHeaders();
 		void printHeaders(std::map<std::string, std::string> map);
 	public:
-		PostUploadRequestParser(std::string inputFile, std::string outputFile);
+		PostUploadRequestParser(std::string inputFile);
 		~PostUploadRequestParser();
 		PostUploadRequest getStruct();
 };

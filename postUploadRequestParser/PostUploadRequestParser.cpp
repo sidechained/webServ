@@ -7,7 +7,7 @@
 // - check content length is present, if not throw error
 // - only content-length bytes should be read from file
 
-PostUploadRequestParser::PostUploadRequestParser(std::string inputFilename, std::string outputFilename) : _outputFilename(outputFilename)
+PostUploadRequestParser::PostUploadRequestParser(std::string inputFilename)
 {
 	initAcceptedFields();
 	std::fstream requestFile(inputFilename.c_str());
@@ -24,37 +24,7 @@ PostUploadRequestParser::PostUploadRequestParser(std::string inputFilename, std:
 	parseBody(requestFile);
 	requestFile.close();
 	printPartHeaders();
-	//
-	if(postUploadRequest.method != "POST") {
-		std::cout << "Request is not a post request" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	if(postUploadRequest.resource != "/cgi/upload.php") { // hardcoded for now
-		std::cout << "Resource requested does not match server-side resource" << std::endl;
-		exit(EXIT_FAILURE);
-	}		
-	if(postUploadRequest.httpVersion != "HTTP/1.1") {
-		std::cout << "HTTP version is not HTTP/1.1" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	std::map<std::string, std::string>::iterator it = postUploadRequest.headers.find("content-length");
-	if (!(it != postUploadRequest.headers.end())) {
-		std::cout << "content-length field must be present in header" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	if(!isValidNonNegativeIntegerString(postUploadRequest.headers["content-length"])) {
-		std::cout << "content-length field is not a valid non-negative integer string" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	for(size_t i = 0; i < postUploadRequest.parts.size(); i++)
-	{
-		if (!(postUploadRequest.parts[i].contentDisposition.type == "form-data"))
-		{
-			std::cout << "Content disposition type must be 'form-data'" << std::endl;
-			exit(EXIT_FAILURE);
-		}
-	}
-	checkContentTypes();
+	validate();
 	makeOutputFile();
 }
 
@@ -230,34 +200,63 @@ bool PostUploadRequestParser::arePartContentsOfType(std::string typeToMatch)
 	return true;
 }
 
-// check file type are as expected in header and parts
-void PostUploadRequestParser::checkContentTypes()
+void PostUploadRequestParser::validate()
 {
+	if(postUploadRequest.method != "POST") {
+		std::cout << "Request is not a post request" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	if(postUploadRequest.resource != "/upload.php") { // hardcoded for now
+		std::cout << "Resource requested does not match server-side resource" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	if(postUploadRequest.httpVersion != "HTTP/1.1") {
+		std::cout << "HTTP version is not HTTP/1.1" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	std::map<std::string, std::string>::iterator it = postUploadRequest.headers.find("content-length");
+	if (!(it != postUploadRequest.headers.end())) {
+		std::cout << "content-length field must be present in header" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	if(!isValidNonNegativeIntegerString(postUploadRequest.headers["content-length"])) {
+		std::cout << "content-length field is not a valid non-negative integer string" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	if (!isContentOfType(postUploadRequest.headers, "multipart/form-data"))
 	{
 		std::cout << "Header block does not have content-type of 'multipart/form-data'" << std::endl;
 		exit(EXIT_FAILURE);
 	}	
-	if (!arePartContentsOfType("text/plain"))
-	{
-		std::cout << "All parts do not have content-type of 'text/plain'" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-}
-
-// open a file, loop over the parts, write to data payload to the file, close the file
-void PostUploadRequestParser::makeOutputFile()
-{
-	std::ofstream outputFile(_outputFilename.c_str());
-	if (!outputFile.is_open()) {
-		std::cerr << "Failed to open the file for writing." << std::endl;
-	}	
 	for(size_t i = 0; i < postUploadRequest.parts.size(); i++)
 	{
-		outputFile << postUploadRequest.parts[i].data;
+		if (!(postUploadRequest.parts[i].contentDisposition.type == "form-data"))
+		{
+			std::cout << "Content disposition type must be 'form-data'" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}	
+}
+
+// loop over the parts & if filename exists for the part, open a file with that name, write data payload to it and close
+void PostUploadRequestParser::makeOutputFile()
+{
+	std::string outputDirName = "tmp/";
+	for(size_t i = 0; i < postUploadRequest.parts.size(); i++)
+	{
+		std::string filename = outputDirName + postUploadRequest.parts[i].contentDisposition.filename;
+		if (!filename.empty())
+		{
+			std::ofstream outputFile(filename.c_str());
+			if (!outputFile.is_open()) {
+				std::cerr << "Failed to open the file for writing." << std::endl;
+				break ;
+			}
+			outputFile << postUploadRequest.parts[i].data;
+			outputFile.close();
+			std::cout << "Output file written to: " << filename << std::endl;
+		}
 	}
-	outputFile.close();
-	std::cout << "Output file written to: " << _outputFilename << std::endl;
 }
 
 // utility functions
