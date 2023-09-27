@@ -36,7 +36,7 @@ And extracts the data from each parts into a single file and puts them in a temp
 
 3. We now perform some basic validity checks based on the struct and our config
 
-a. Does our config file allows POST requests for this route/location (config.location("key").methods)?
+a. Does our config file allow POST requests for this route/location (config.location("key").methods)?
 - if not then return "405 Method Not Allowed"
 
 b. Does our request meet the following conditions?
