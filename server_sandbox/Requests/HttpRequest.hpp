@@ -33,8 +33,11 @@ private:
     std::string _contentType;
     // std::string _meth;
     std::string _body;
-    std::vector<Part> parts;
-    std::string boundary;
+    std::vector<Part> _parts;
+    std::string _boundary;
+	std::vector<std::string> headerAcceptedFields;
+	std::vector<std::string> partsAcceptedFields;
+    std::vector<std::string> acceptedFields;
     std::map<std::string, std::string> _errorPages;
     LocationConfig *_locationConfig;
 
@@ -45,15 +48,32 @@ private:
     void parseMethod();
     void parseRedirection();
     void parseContentType();
+    bool isAcceptedField(std::string field, std::vector<std::string> acceptedFields);
+    void parseHeaderLine(const std::string& header, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields);
+    void parseHeaderBlock(std::fstream &requestFile, std::string &line, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields);
+	void parseHeaderBlockFromString(std::string& inputString, std::string& line, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields);    
     void parseContentTypeValue();
     void parseVectorParts();
-
+    void parseBody();
+    void parseContentDisposition(Part &part);
+    bool isContentOfType(std::map<std::string, std::string> headers, std::string typeToMatch);
+    bool arePartContentsOfType(std::string typeToMatch);
+    void validate();
+    void makeOutputFile();
+    // utility functions:
+    bool isValidMethod(const std::string& method);
+    bool isValidResource(const std::string& resource);
+    bool isValidHttpVersion(const std::string& httpVersion);
+    bool isValidNonNegativeIntegerString(const std::string& str);
+    void toLowerCase(std::string& str);
     void splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output);
     void trimWhitespace(std::string& str);
     std::string stripDoubleQuotes(const std::string& str);
     bool startsWith(const std::string& fullString, const std::string& start);
     void removeFromStringStart(std::string& fullString, const std::string& prefix);
-
+    void printPostUploadRequest();
+    void printPartHeaders();
+    void printHeaders(std::map<std::string, std::string> map);
     bool hasFileExtension(std::string const &resource);
     bool isDirectory(std::string const &resource);
     bool locationIsSet(std::string const &key);
@@ -72,6 +92,8 @@ public:
     std::string const &getRedirection() const;
     std::string const getHost();
     std::string const getMethod();
+    std::string const getResource();
+    std::string const getHttpVersion();
     std::string const &getBody() const;
     ServerConfig *getConfig() const;
 };
