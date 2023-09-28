@@ -17,8 +17,21 @@ HttpRequest::HttpRequest(std::string const &request, ServerConfig *config) : _co
     parseIndex();
     parseMethod();
     parseContentType();
+    parseContentTypeValue();
+    parseVectorParts();
     cleanUpMap(_incomingRequest);
 }
+
+void HttpRequest::parseVectorParts()
+{
+    if (getMethod() == "POST" && _incomingRequest["Content-Type"] == "multipart/form-data")
+    {
+        std::cout << "we are multipart!!" << std::endl;
+        std::istringstream bodyStream(_body);
+        
+    }
+}
+
 
 void HttpRequest::fillIncomingRequestMap(std::string const &request)
 {
@@ -44,6 +57,7 @@ void HttpRequest::fillIncomingRequestMap(std::string const &request)
         if (line == "\r")
             break;
         std::string::size_type pos = line.find(": ");
+        std::cout << line << std::endl;
         if (pos != std::string::npos)
         {
             std::string key = line.substr(0, pos);
@@ -51,6 +65,7 @@ void HttpRequest::fillIncomingRequestMap(std::string const &request)
             _incomingRequest[key] = value;
         }
     }
+    _body.assign(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
     _incomingRequest["Redirection"] = "";
 }
 
@@ -133,6 +148,88 @@ void HttpRequest::parseContentType()
     _contentType = findContentType(_path);
 }
 
+// what if there are more than two elements given here?
+void HttpRequest::parseContentTypeValue()
+{
+	std::vector<std::string> tokens;
+	// 1. Split the "Content-Type" header value by the semicolon (;)
+	splitString(_incomingRequest["Content-Type"], ";", tokens);
+	if (tokens.empty())
+		return;
+	_incomingRequest["Content-Type"] = tokens[0];
+	for(size_t i = 1; i < tokens.size(); i++)
+	{
+		// 2. Trim any leading or trailing whitespace from each part.
+		trimWhitespace(tokens[i]);
+		// 3. Check each part to find the one that starts with "boundary=". This part contains the boundary string.
+		if(startsWith(tokens[i], "boundary=")) {
+			removeFromStringStart(tokens[i], "boundary=");
+			// 4. Extract the boundary string by splitting the part that starts with "boundary=" and retrieves the value after the equal sign (=).	
+			boundary = tokens[i];
+		}
+	}
+    std::cout << "bnd:" << boundary << std::endl;
+}
+
+void HttpRequest::splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output) {
+	std::string::size_type start = 0;
+	std::string::size_type end = input.find(delimiter);
+
+	while (end != std::string::npos) {
+		// Only add non-empty substrings to the output
+		if (start != end)
+			output.push_back(input.substr(start, end - start));
+
+		start = end + delimiter.length();  // Move start to the beginning of the next substring
+		end = input.find(delimiter, start);
+	}
+
+	// Add the last token if it's non-empty
+	if (start < input.length()) {
+		std::string lastToken = input.substr(start);
+		if (!lastToken.empty())
+			output.push_back(lastToken);
+	}
+}
+
+void HttpRequest::trimWhitespace(std::string& str) {
+	// Trim leading whitespace
+	std::string::size_type start = str.find_first_not_of(" \t\n\r");
+	if (start != std::string::npos) {
+		str.erase(0, start);
+	} else {
+		str.clear();  // String contains only whitespace
+		return;
+	}
+	// Trim trailing whitespace
+	std::string::size_type end = str.find_last_not_of(" \t\n\r");
+	if (end != std::string::npos) {
+		str.erase(end + 1);
+	}
+}
+
+bool HttpRequest::startsWith(const std::string& fullString, const std::string& start) {
+	if (fullString.length() < start.length())
+		return false;
+	for (std::string::size_type i = 0; i < start.length(); ++i) {
+		if (fullString[i] != start[i])
+			return false;
+	}
+	return true;
+}
+
+void HttpRequest::removeFromStringStart(std::string& fullString, const std::string& line) {
+	std::string::size_type foundPos = fullString.find(line);
+
+	if (foundPos == 0) {
+		// Line found at the start, erase it
+		fullString.erase(0, line.length());
+		// Additionally, remove any leading whitespace or newline
+		while (!fullString.empty() && (fullString[0] == ' ' || fullString[0] == '\t' || fullString[0] == '\n' || fullString[0] == '\r'))
+			fullString.erase(0, 1);
+	}
+}
+
 bool HttpRequest::hasFileExtension(std::string const &resource)
 {
     std::string::size_type pos = resource.find(".");
@@ -186,9 +283,9 @@ std::string const &HttpRequest::getRedirection() const
     return _locationConfig->redirection;
 }
 
-std::string const &HttpRequest::getHost() const
+std::string const HttpRequest::getHost()
 {
-    static std::string host = _incomingRequest.at("Host");
+    std::string host = _incomingRequest["Host"];
     removeNonPrintableChars(host);
     return host;
 }
@@ -203,10 +300,15 @@ LocationConfig *HttpRequest::getLocationConfig() const
     return _locationConfig;
 }
 
-std::string const &HttpRequest::getMethod() const
+std::string const HttpRequest::getMethod()
 {
-    static std::string methods = _incomingRequest.at("Method");
-    std::cout << "Method in request: " << methods << std::endl;
-    removeNonPrintableChars(methods);
-    return methods;
+    std::string method = _incomingRequest["Method"];
+    std::cout << "Method in request: " << method << std::endl;
+    removeNonPrintableChars(method);
+    return method;
+}
+
+std::string const &HttpRequest::getBody() const
+{
+    return _body;
 }

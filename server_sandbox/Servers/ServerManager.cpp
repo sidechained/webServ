@@ -233,7 +233,9 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		ServerConfig *config = server->getConfig();
 		//std::cout << "REQUEST:" << std::endl << buffer << std::endl;
 		HttpRequest parsedRequest(buffer, config);
-
+		std::cout << "Printing request" << std::endl;
+  	  parsedRequest.printRequest();
+		std::cout << BG_GREEN << parsedRequest.getMethod() << std::endl;
 		client->updateTime();
 		_pendingResponses[i] = ResponseFactory::createResponse(parsedRequest);
 		removeFromSet(i, _recv_fd_pool);

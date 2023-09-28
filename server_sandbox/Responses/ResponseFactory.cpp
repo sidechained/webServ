@@ -30,8 +30,7 @@ SimpleResponse *ResponseFactory::POSTresponse(HttpRequest &request)
 SimpleResponse *ResponseFactory::createResponse(HttpRequest &request)
 {
     SimpleResponse *response = NULL;
-    std::cout << "Printing request" << std::endl;
-    request.printRequest();
+    
     std::string method = request.getMethod();
     std::cout << "Method: " << method << std::endl;
     if (method == "GET")
