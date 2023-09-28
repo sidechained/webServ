@@ -9,9 +9,17 @@ if ($fileName && file_exists($fileName)) {
     // Generate the new file name with "_copy"
     $copyFileName = pathinfo($fileName, PATHINFO_FILENAME) . "_copy." . pathinfo($fileName, PATHINFO_EXTENSION);
 
-    // Read data from stdin and write it to the copy file
+    // Read data from the original file
+    $originalData = file_get_contents($fileName);
+
+    // Read data from stdin
     $inputData = file_get_contents('php://stdin');
-    file_put_contents($copyFileName, $inputData);
+
+    // Combine the original content and input data
+    $combinedData = $originalData . $inputData;
+
+    // Write the combined content to the copy file
+    file_put_contents($copyFileName, $combinedData);
 
     echo "Copied file to: $copyFileName\n";
 } else {
