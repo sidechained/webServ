@@ -1,8 +1,10 @@
 <?php
 // Access the custom environmental variables set in C++ using $_SERVER
+$fileName = $_SERVER['FILENAME'];
+//$fileName = $_FILES['FILENAME'];
 
 // Get the value of FILENAME
-$fileName = getenv('FILENAME');
+//$fileName = getenv('FILENAME');
 
 // Check if FILENAME is set and the file exists
 if ($fileName && file_exists($fileName)) {
