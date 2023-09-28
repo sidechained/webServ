@@ -87,12 +87,12 @@ void FormResponse::createResponse(HttpRequest &request)
         close(input_pipefd[1]);
 
         		// Create a file for writing the HTML output
-		std::ofstream htmlFile("output.html");
+		/*std::ofstream htmlFile("output.html");
 
 		if (!htmlFile) {
 			std::cerr << "Failed to open HTML output file." << std::endl;
 			return ;
-		}
+		}*/
 
 		std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
 
@@ -104,12 +104,23 @@ void FormResponse::createResponse(HttpRequest &request)
 		}
 		close(output_pipefd[0]);
 
-		// Write the HTML output to the file
+
+		// Convert the vector to a string
+		std::string htmlString(htmlOutputBuffer.begin(), htmlOutputBuffer.end());
+		setBody(htmlString);
+		//_body = htmlString;
+
+		setHeader(OkHeader(this->getRequest().getContentType(), this->getBodyLength()).getHeader());
+
+		std::cout << BG_BLUE << _response << RESET << std::endl;
+
+
+		/*// Write the HTML output to the file
 		htmlFile.write(htmlOutputBuffer.data(), htmlOutputBuffer.size());
 
 		// Close the HTML file
-		htmlFile.close();
-        //save htmlOutputBuffer to body
+		htmlFile.close();*/
+
          // Wait for the child process to finish
         int status;
         waitpid(child_pid, &status, 0);

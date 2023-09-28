@@ -251,7 +251,14 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 	int bytes_sent;
 
 	SimpleResponse *responsePtr = _pendingResponses[i];
+	if (!responsePtr)
+	{
+		std::cout << "responsePtr is NULL" << std::endl;
+		closeConnection(i);
+		return;
+	}
 	std::string response = responsePtr->getResponse();
+	PRINT(SERVERMANAGER, CYAN, "response is: " << response << "response")
 
 	if (response.length() >= MESSAGE_BUFFER)
 		bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);
