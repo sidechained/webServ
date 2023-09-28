@@ -9,7 +9,7 @@ FILES = main.cpp \
 		Responses/RedirResponse.cpp \
 		Responses/ErrResponse.cpp \
         Responses/SimpleResponse.cpp \
-		Responses/UploadResponse.cpp \
+		Responses/FormResponse.cpp \
 		Responses/Headers/SimpleHeader.cpp \
 		Responses/Headers/MovedHeader.cpp \
 		Responses/Headers/OkHeader.cpp \

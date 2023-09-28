@@ -23,7 +23,7 @@ SimpleResponse *ResponseFactory::GETresponse(HttpRequest &request)
 SimpleResponse *ResponseFactory::POSTresponse(HttpRequest &request)
 {
     SimpleResponse *response = NULL;
-    response = new UploadResponse(request);
+    response = new FormResponse(request);
     return response;
 }
 

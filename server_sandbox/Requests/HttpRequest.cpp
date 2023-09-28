@@ -53,17 +53,22 @@ void HttpRequest::fillIncomingRequestMap(std::string const &request)
             _incomingRequest[key] = value;
         }
     }
-    std::cout << "getting next few lines:" << std::endl;
-    std::cout << line << std::endl;
-    std::getline(requestStream, line);
-    std::cout << line << std::endl;
-    std::getline(requestStream, line);
-    std::cout << line << std::endl;
-    std::getline(requestStream, line);
-    std::cout << line << std::endl;
-    std::cout << "assigning body" << std::endl;
-    _body.assign(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
-    std::cout << _body << std::endl;
+	std::cout << "Getting body" << std::endl;
+	//from this point add everything in requestStream to _body
+	_body.assign(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
+	std::cout << BG_GREEN << _body << RESET << std::endl;
+
+    // std::cout << "getting next few lines:" << std::endl;
+    // std::cout << line << std::endl;
+    // std::getline(requestStream, line);
+    // std::cout << line << std::endl;
+    // std::getline(requestStream, line);
+    // std::cout << line << std::endl;
+    // std::getline(requestStream, line);
+    // std::cout << line << std::endl;
+    // std::cout << "assigning body" << std::endl;
+    // _body.assign(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
+    // std::cout << _body << std::endl;
     _incomingRequest["Redirection"] = "";
 }
 
@@ -249,8 +254,11 @@ void HttpRequest::parseBody()
 void HttpRequest::parseContentDisposition(Part &part)
 {
 	std::vector<std::string> tokens;
-	splitString(part.headers["content-disposition"], ";", tokens);
+	splitString(part.headers["Content-Disposition"], ";", tokens);
+	if (tokens.empty())
+		return;
 	part.contentDisposition.type = tokens[0];
+
 	// loop over remaining tokens and extract any that match 'name' or 'filename'
 	for(size_t i = 1; i < tokens.size(); i++)
 	{
