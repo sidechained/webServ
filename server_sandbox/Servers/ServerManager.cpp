@@ -128,6 +128,11 @@ void ServerManager::runServers()
 				readRequest(i, _clients_map[i]);
 			else if (FD_ISSET(i, &write_set_cpy) && _clients_map.count(i))
 			{
+				//int cgi_state = _clients_map[i].response.getCgiState();
+                //if (cgi_state == 1 && FD_ISSET(_clients_map[i].response._cgi_obj.pipe_in[1], &write_set_cpy))
+                //    sendCgiBody(_clients_map[i], _clients_map[i].response._cgi_obj);
+                //else if (cgi_state == 1 && FD_ISSET(_clients_map[i].response._cgi_obj.pipe_out[0], &recv_set_cpy))
+                //    readCgiResponse(_clients_map[i], _clients_map[i].response._cgi_obj);
 				sendResponse(i, _clients_map[i]);
 			}
 		}
