@@ -8,27 +8,9 @@
 
 int main() {
 
-	/*// Step 1: Create an instance of ofstream to work with files.
-    std::ofstream outputFile;
-
-    // Step 2: Open the file. This will create the file if it doesn't exist.
-    outputFile.open("output.txt");
-
-    // Step 3: Check if the file is successfully opened.
-    if (!outputFile.is_open()) {
-        std::cerr << "Failed to open the file." << std::endl;
-        return 1; // Exit with an error code.
-    }
-
-    // Step 4: Write "Hello, world!" to the file.
-    outputFile << "Hello, world!" << std::endl;
-
-    // Step 5: Close the file when you're done with it.
-    outputFile.close();*/
-
     // Specify the path to the PHP interpreter and the PHP script
     const char* phpInterpreter = "/usr/bin/php"; // Replace with the actual path to php if needed
-    const char* phpScript = "./test.php"; // Replace with the path to your PHP script
+    const char* phpScript = "./test_upload.php"; // Replace with the path to your PHP script
 
     // Build the argument vector
     const char* args[] = {
@@ -37,11 +19,12 @@ int main() {
         nullptr
     };
 
-    // Define your custom environmental variables
-    char fileNameVar[] = "FILENAME=output.txt";
+	// Define your custom environmental variables
+	char fileNameVar[] = "REQUEST_METHOD=POST";
+	char contentTypeVar[] = "CONTENT_TYPE=multipart/form-data; boundary=---------------------------24175356543300846871480001031";
 
-    // Execute the PHP script with custom environmental variables set in C++
-    char* const envVars[] = { fileNameVar, nullptr };
+	// Execute the PHP script with custom environmental variables set in C++
+	char* const envVars[] = { fileNameVar, contentTypeVar, nullptr };
 
     // Create a pipe for communication
     int input_pipefd[2];  // Pipe for sending input to child
@@ -102,10 +85,25 @@ int main() {
         close(input_pipefd[0]);  // Close the read end of the input pipe in the parent
         close(output_pipefd[1]); // Close the write end of the output pipe in the parent
         
-        // Send a string to the child process
+        /*// Send a string to the child process
         const char* message = "Hello, child process!\n";
         write(input_pipefd[1], message, strlen(message));
-        close(input_pipefd[1]);
+        close(input_pipefd[1]);*/
+
+			// Open and read the content of the file 'input.txt' in the parent process
+		std::ifstream inputFile("input.txt");
+		if (!inputFile) {
+			perror("input.txt");
+			return 1;
+		}
+
+		std::string fileContent((std::istreambuf_iterator<char>(inputFile)),
+								std::istreambuf_iterator<char>());
+		inputFile.close();
+
+		// Send the content of the file to the child process
+		write(input_pipefd[1], fileContent.c_str(), fileContent.length());
+		close(input_pipefd[1]);
 
 		std::cout << BOLD_GREEN << "Output from PHP script:" << RESET << std::endl;
         // Read the output from the child process and print it
