@@ -1,25 +1,20 @@
 <?php
 
-// // Read the HTTP request from stdin
-// $request = '';
-// while ($line = fgets(STDIN)) {
-//     $request .= $line;
-// }
+ // Read the HTTP request from stdin
+ $request = '';
+ while ($line = fgets(STDIN)) {
+     $request .= $line;
+	 //echo $line;
+	 //echo "ciao";
+ }
 
-// // Split the request into headers and body
-// list($headers, $body) = explode("\r\n\r\n", $request, 2);
-
-// Extract the POST data from the body
-// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-//     parse_str($body, $postParams);
-// } else {
-//     // No POST data found
-//     exit("No POST data found in the request.");
-// }
+ // Parse the input string to extract variables
+parse_str($request, $requestData);
 
 // Extract the "name" and "color" variables
-$name = isset($postParams['name']) ? $postParams['name'] : '';
-$color = isset($postParams['color']) ? $postParams['color'] : '';
+$name = $requestData['name'] ?? '';
+$color = $requestData['color'] ?? '';
+
 
 // Check if the name is "marco"
 // if ($name !== 'marco') {
@@ -41,8 +36,8 @@ $htmlResponse = "<html>
 </html>";
 
 // Send the HTTP response headers
-header("Content-Type: text/html");
-header("Content-Length: " . strlen($htmlResponse));
+//header("Content-Type: text/html");
+//header("Content-Length: " . strlen($htmlResponse));
 
 // Output the HTML response to stdout
 echo $htmlResponse;
