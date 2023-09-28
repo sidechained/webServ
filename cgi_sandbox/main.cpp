@@ -8,7 +8,7 @@
 
 int main() {
 
-	/*// Step 1: Create an instance of ofstream to work with files.
+	// Step 1: Create an instance of ofstream to work with files.
     std::ofstream outputFile;
 
     // Step 2: Open the file. This will create the file if it doesn't exist.
@@ -24,7 +24,7 @@ int main() {
     outputFile << "Hello, world!" << std::endl;
 
     // Step 5: Close the file when you're done with it.
-    outputFile.close();*/
+    outputFile.close();
 
     // Specify the path to the PHP interpreter and the PHP script
     const char* phpInterpreter = "/usr/bin/php"; // Replace with the actual path to php if needed
