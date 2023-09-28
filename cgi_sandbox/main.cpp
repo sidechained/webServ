@@ -23,8 +23,8 @@ int main() {
     char* const envVars[] = { fileNameVar, nullptr };
 
     // Create a pipe for communication
-    int pipe_fd[2];
-    if (pipe(pipe_fd) == -1) {
+    int pipefd[2];
+    if (pipe(pipefd) == -1) {
         perror("pipe");
         return 1;
     }
@@ -38,16 +38,19 @@ int main() {
     }
 
     if (child_pid == 0) {
-        // This code is executed by the child process
-
-        // Close the read end of the pipe (child doesn't read from parent)
-        close(pipe_fd[0]);
-
-        // Duplicate the write end of the pipe to stdin (file descriptor 0)
-        dup2(pipe_fd[1], 0);
-
-        // Close the write end of the pipe (no longer needed)
-        close(pipe_fd[1]);
+		        // This is the child process
+        close(pipefd[1]); // Close the write end of the pipe in the child
+        
+        // Redirect stdin to the read end of the pipe
+        dup2(pipefd[0], 0);
+        close(pipefd[0]);
+        
+        // Read from stdin and print to console
+        /*char buffer[256];
+        ssize_t bytes_read;
+        while ((bytes_read = read(0, buffer, sizeof(buffer))) > 0) {
+            write(1, buffer, bytes_read); // Print to stdout
+        }*/
 
         // Execute the PHP script within the child process
         if (execve(phpInterpreter, const_cast<char* const*>(args), envVars) == -1) {
@@ -55,21 +58,13 @@ int main() {
             exit(EXIT_FAILURE);
         }
     } else {
-        // This code is executed by the parent process
-
-        // Close the write end of the pipe (parent writes to child)
-        close(pipe_fd[1]);
-
-        // Write your string to the pipe (child's stdin)
-        const char* message = "This is the string you want to send to PHP\n";
-        ssize_t bytes_written = write(pipe_fd[0], message, strlen(message));
-        if (bytes_written == -1) {
-            perror("write");
-            return 1;
-        }
-
-        // Close the read end of the pipe
-        close(pipe_fd[0]);
+		// This is the parent process
+        close(pipefd[0]); // Close the read end of the pipe in the parent
+        
+        // Send a string to the child process
+        const char* message = "Hello, child process!\n";
+        write(pipefd[1], message, strlen(message));
+        close(pipefd[1]);
 
         // Wait for the child process to finish
         int status;
