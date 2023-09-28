@@ -1,4 +1,5 @@
 <?php
+//phpinfo();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($_FILES['fileInput']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = 'uploads/';

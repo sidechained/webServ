@@ -20,11 +20,46 @@ int main() {
     };
 
 	// Define your custom environmental variables
-	char fileNameVar[] = "REQUEST_METHOD=POST";
-	char contentTypeVar[] = "CONTENT_TYPE=multipart/form-data; boundary=---------------------------24175356543300846871480001031";
+	//char fileNameVar[] = "REQUEST_METHOD=POST";
+	//char contentTypeVar[] = "CONTENT_TYPE=multipart/form-data; boundary=---------------------------24175356543300846871480001031";
 
 	// Execute the PHP script with custom environmental variables set in C++
-	char* const envVars[] = { fileNameVar, contentTypeVar, nullptr };
+	//char* const envVars[] = { fileNameVar, contentTypeVar, nullptr };
+
+	char* envVars[] = {
+    (char*)"REQUEST_METHOD=POST",
+    (char*)"QUERY_STRING=",
+    (char*)"CONTENT_LENGTH=239",
+    (char*)"CONTENT_TYPE=multipart/form-data; boundary=---------------------------24175356543300846871480001031",
+    (char*)"SCRIPT_FILENAME=./test_upload.php",  // Replace with the actual path
+    (char*)"SCRIPT_NAME=./test_upload.php",
+	(char*)"HTTP_CONTENT_TYPE=multipart/form-data; boundary=---------------------------24175356543300846871480001031",
+
+    //(char*)"DOCUMENT_ROOT=/path/to/your/document/root",  // Replace with the actual path
+    (char*)"GATEWAY_INTERFACE=CGI/1.1",
+    (char*)"REMOTE_ADDR=127.0.0.1",  // Replace with the client's IP address
+    (char*)"REMOTE_PORT=8080",  // Replace with the client's port number
+    (char*)"SERVER_ADDR=localhost",
+    (char*)"SERVER_PORT=8080",
+    (char*)"SERVER_NAME=localhost",
+    (char*)"SERVER_PROTOCOL=HTTP/1.1",
+    (char*)"HTTP_HOST=localhost:8080",
+    (char*)"HTTP_USER_AGENT=Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/118.0",
+    (char*)"HTTP_ACCEPT=text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    (char*)"HTTP_ACCEPT_LANGUAGE=en-US,en;q=0.5",
+    (char*)"HTTP_ACCEPT_ENCODING=gzip, deflate, br",
+    (char*)"HTTP_ORIGIN=http://localhost:8080",
+    (char*)"HTTP_CONNECTION=keep-alive",
+    (char*)"HTTP_REFERER=http://localhost:8080/Form.html",
+    (char*)"HTTP_UPGRADE_INSECURE_REQUESTS=1",
+    (char*)"HTTP_SEC_FETCH_DEST=document",
+    (char*)"HTTP_SEC_FETCH_MODE=navigate",
+    (char*)"HTTP_SEC_FETCH_SITE=same-origin",
+    (char*)"HTTP_SEC_FETCH_USER=?1",
+    (char*)"HTTP_COOKIE=",  // Set the actual cookies if available
+    nullptr
+};
+
 
     // Create a pipe for communication
     int input_pipefd[2];  // Pipe for sending input to child

@@ -224,7 +224,7 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		std::cout << "REQUEST:" << std::endl << buffer << std::endl;
 
 
-/*	JUST TO PRINT OUT
+	//JUST TO PRINT OUT
 	// Create a new file stream
     std::ofstream outputFile("output.txt");
 
@@ -239,7 +239,7 @@ void ServerManager::readRequest(const int &i, Socket *client)
     std::cout.rdbuf(originalCoutBuffer);
 
     // Close the output file
-    outputFile.close();*/
+    outputFile.close();
 
 		HttpRequest parsedRequest(buffer, config);
 

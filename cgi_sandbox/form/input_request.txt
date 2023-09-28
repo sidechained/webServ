@@ -16,4 +16,4 @@ Sec-Fetch-Mode: navigate
 Sec-Fetch-Site: same-origin
 Sec-Fetch-User: ?1
 
-name=marco&color=red
+name=marr&color=red
