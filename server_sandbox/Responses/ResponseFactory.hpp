@@ -3,7 +3,7 @@
 #include "SimpleResponse.hpp"
 #include "TextResponse.hpp"
 #include "RedirResponse.hpp"
-#include "UploadResponse.hpp"
+#include "FormResponse.hpp"
 #include <map>
 #include <functional>
 
