@@ -1,27 +1,57 @@
 <?php
 
+$uploadPath = $_SERVER['UPLOAD_PATH'];
+$boundary = $_SERVER['BOUNDARY'];
+
+//echo "path = $uploadPath";
+//echo "path = $boundary";
+
  // Read the HTTP request from stdin
  $request = '';
  while ($line = fgets(STDIN)) {
      $request .= $line;
-	 //echo $line;
-	 //echo "ciao";
  }
 
- // Parse the input string to extract variables
-parse_str($request, $requestData);
+// Split the request into parts using the boundary
+$parts = explode("--$boundary", $request);
 
-// Extract the "name" and "color" variables
-$name = $requestData['name'] ?? '';
-$color = $requestData['color'] ?? '';
+//// Loop through each part to process the file uploads
+//foreach ($parts as $part) {
+//    // Skip empty parts
+//    if (trim($part) == '') continue;
 
+//    // Extract content disposition and file name
+//    if (preg_match('/Content-Disposition: form-data; name="fileToUpload"; filename="(.+)"(.+)/s', $part, $matches)) {
+//        $fileName = trim($matches[1]);
+//		echo $fileName;
+//        $content = trim($matches[2]);
+//		echo "\n\n content is: $content\n" ;
 
-// Check if the name is "marco"
-// if ($name !== 'marco') {
-//     // Name is not "marco," set an error code and exit
-//     //http_response_code(400); // Set a 400 Bad Request status code
-//     exit(5);
-// }
+//        // Save the content to a file in the upload folder
+//        file_put_contents("$uploadPath/$fileName", $content);
+//    }
+//}
+
+// Initialize variables to store Content-Type and content
+$contentType = '';
+$fileContent = '';
+
+// Loop through each part to process the file uploads
+foreach ($parts as $part) {
+    // Skip empty parts
+    if (trim($part) == '') continue;
+
+    // Check if the part contains Content-Type
+    if (strpos($part, 'Content-Type:') !== false) {
+        // Extract Content-Type
+        $contentType = trim(preg_replace('/Content-Type: (.+)/', '$1', $part));
+		echo "\n\n content is: $contentType\n" ;
+    } else {
+        // This part contains file content
+        $fileContent .= trim($part);
+		echo "\n\n content is: $fileContent\n" ;
+    }
+}
 
 // Generate a custom HTML response
 $htmlResponse = "<html>
@@ -30,8 +60,9 @@ $htmlResponse = "<html>
 </head>
 <body>
     <h1>Form Submission Result</h1>
-    <p>Name: $name</p>
-    <p>Color: $color</p>
+    <p>Upload folder: $uploadPath</p>
+    <p>boundary: $boundary</p>
+    <p>Request: $request</p>
 </body>
 </html>";
 
