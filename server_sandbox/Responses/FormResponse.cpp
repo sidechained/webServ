@@ -27,7 +27,7 @@ void FormResponse::createResponse(HttpRequest &request)
     // Define your custom environmental variables
     char fileNameVar[] = "REQUEST_METHOD=POST";
 	// Get the boundary string from request
-	std::string strBoundary = request.getBoundary();
+	std::string strBoundary = "BOUNDARY=" + request.getBoundary();
 	removeNonPrintableChars(strBoundary);
 	std::cout << BG_RED << strBoundary << RESET << std::endl;
 
@@ -35,8 +35,16 @@ void FormResponse::createResponse(HttpRequest &request)
 	char boundary[strBoundary.size() + 1]; // +1 for null terminator
 	strcpy(boundary, strBoundary.c_str());
 
+	std::string strUploadPath = "UPLOAD_PATH=." + request.getLocationConfig()->uploads;
+	removeNonPrintableChars(strUploadPath);
+	std::cout << BG_RED << strUploadPath << RESET << std::endl;
+
+	// Convert the boundary string to a mutable character array
+	char uploadPath[strUploadPath.size() + 1]; // +1 for null terminator
+	strcpy(uploadPath, strUploadPath.c_str());
+
     // Execute the PHP script with custom environmental variables set in C++
-    char *const envVars[] = {fileNameVar, boundary, NULL};
+    char *const envVars[] = {fileNameVar, boundary, uploadPath,  NULL};
 
     // Create the input pipe
     if (pipe(input_pipefd) == -1)
