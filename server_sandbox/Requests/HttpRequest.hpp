@@ -31,13 +31,9 @@ private:
 
     std::string _path;
     std::string _contentType;
-    // std::string _meth;
     std::string _body;
     std::vector<Part> _parts;
     std::string _boundary;
-	std::vector<std::string> headerAcceptedFields;
-	std::vector<std::string> partsAcceptedFields;
-    std::vector<std::string> acceptedFields;
     std::map<std::string, std::string> _errorPages;
     LocationConfig *_locationConfig;
 
@@ -48,10 +44,8 @@ private:
     void parseMethod();
     void parseRedirection();
     void parseContentType();
-    bool isAcceptedField(std::string field, std::vector<std::string> acceptedFields);
-    void parseHeaderLine(const std::string& header, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields);
-    void parseHeaderBlock(std::fstream &requestFile, std::string &line, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields);
-	void parseHeaderBlockFromString(std::string& inputString, std::string& line, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields);    
+    void parseHeaderLine(const std::string& header, std::map<std::string, std::string> &headers);
+	void parseHeaderBlockFromString(std::string& inputString, std::string& line, std::map<std::string, std::string> &headers);    
     void parseContentTypeValue();
     void parseVectorParts();
     void parseBody();
@@ -65,7 +59,6 @@ private:
     bool isValidResource(const std::string& resource);
     bool isValidHttpVersion(const std::string& httpVersion);
     bool isValidNonNegativeIntegerString(const std::string& str);
-    void toLowerCase(std::string& str);
     void splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output);
     void trimWhitespace(std::string& str);
     std::string stripDoubleQuotes(const std::string& str);
