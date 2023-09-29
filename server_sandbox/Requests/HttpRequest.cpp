@@ -1,5 +1,10 @@
 #include "HttpRequest.hpp"
 
+// TODO
+// - exit in Luca-style :)
+// - consider adding extra first-line/header validations from G's code
+// - separate out extra processing of configs/location to later stage?
+
 HttpRequest::HttpRequest()
 {
 }
@@ -19,6 +24,7 @@ HttpRequest::HttpRequest(std::string const &request, ServerConfig *config) : _co
     parseContentType();
     parseContentTypeValue();
     parseVectorParts();
+	printPartHeaders();
     cleanUpMap(_incomingRequest);
 }
 
@@ -53,22 +59,7 @@ void HttpRequest::fillIncomingRequestMap(std::string const &request)
             _incomingRequest[key] = value;
         }
     }
-	std::cout << "Getting body" << std::endl;
-	//from this point add everything in requestStream to _body
-	_body.assign(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
-	std::cout << BG_GREEN << _body << RESET << std::endl;
-
-    // std::cout << "getting next few lines:" << std::endl;
-    // std::cout << line << std::endl;
-    // std::getline(requestStream, line);
-    // std::cout << line << std::endl;
-    // std::getline(requestStream, line);
-    // std::cout << line << std::endl;
-    // std::getline(requestStream, line);
-    // std::cout << line << std::endl;
-    // std::cout << "assigning body" << std::endl;
-    // _body.assign(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
-    // std::cout << _body << std::endl;
+    _body.assign(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
     _incomingRequest["Redirection"] = "";
 }
 
@@ -151,46 +142,26 @@ void HttpRequest::parseContentType()
     _contentType = findContentType(_path);
 }
 
-bool HttpRequest::isAcceptedField(std::string field, std::vector<std::string> acceptedFields) {
-	if (std::find(acceptedFields.begin(), acceptedFields.end(), field) != acceptedFields.end())
-		return true;
-	return false;
-}
-
-void HttpRequest::parseHeaderLine(const std::string& line, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields) {
+void HttpRequest::parseHeaderLine(const std::string& line, std::map<std::string, std::string> &headers) {
 	std::string::size_type colonPos = line.find(':');
 	if (colonPos != std::string::npos) {
 		std::string field = line.substr(0, colonPos);
-		toLowerCase(field); // headers are case insensitive, so convert to and deal with in lower case only
 		std::string value = line.substr(colonPos + 1);
-		if(isAcceptedField(field, acceptedFields))
-		{
-			// Remove leading whitespaces from the value
-			std::string::size_type valueStart = value.find_first_not_of(" \t");
-			if (valueStart != std::string::npos)
-				value = value.substr(valueStart);
-			// Store the field and value in the map
-			headers[field] = value;
-		}
+		// Remove leading whitespaces from the value
+		std::string::size_type valueStart = value.find_first_not_of(" \t");
+		if (valueStart != std::string::npos)
+			value = value.substr(valueStart);
+		// Store the field and value in the map
+		headers[field] = value;
 	}
 }
 
-void HttpRequest::parseHeaderBlock(std::fstream &requestFile, std::string &line, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields)
-{
-	while(!line.empty())
-	{
-		getline(requestFile, line);
-		parseHeaderLine(line, headers, acceptedFields);
-	}
-}
-
-
-void HttpRequest::parseHeaderBlockFromString(std::string& inputString, std::string& line, std::map<std::string, std::string> &headers, std::vector<std::string> acceptedFields)
+void HttpRequest::parseHeaderBlockFromString(std::string& inputString, std::string& line, std::map<std::string, std::string> &headers)
 {
 	std::istringstream iss(inputString);  // Treat the input string as a stream
 	// Read lines from the stringstream
 	while (std::getline(iss, line) && !line.empty()) {
-		parseHeaderLine(line, headers, acceptedFields);
+		parseHeaderLine(line, headers);
 		removeFromStringStart(inputString, line);
 	}
 }
@@ -220,7 +191,10 @@ void HttpRequest::parseContentTypeValue()
 void HttpRequest::parseVectorParts()
 {
     if (getMethod() == "POST" && _incomingRequest["Content-Type"] == "multipart/form-data")
+	{
         parseBody();
+		validate();
+	}
 }
 
 void HttpRequest::parseBody()
@@ -230,7 +204,6 @@ void HttpRequest::parseBody()
 	// look for end Boundary and erase it and everything after, treating this as our body
 	size_t foundPos = body.find(endBoundary);
 	if (!(foundPos != std::string::npos)) {
-        std::cout << body << std::endl;
 		std::cout << "End boundary not found.\n";
 		exit(EXIT_FAILURE);
 	}
@@ -245,7 +218,7 @@ void HttpRequest::parseBody()
 		std::string line;
 		Part part;
 		_parts.push_back(part);
-		parseHeaderBlockFromString(parts[i], line, _parts[i].headers, partsAcceptedFields);
+		parseHeaderBlockFromString(parts[i], line, _parts[i].headers);
 		parseContentDisposition(_parts[i]);
 		_parts[i].data = parts[i];
 	}
@@ -255,10 +228,7 @@ void HttpRequest::parseContentDisposition(Part &part)
 {
 	std::vector<std::string> tokens;
 	splitString(part.headers["Content-Disposition"], ";", tokens);
-	if (tokens.empty())
-		return;
 	part.contentDisposition.type = tokens[0];
-
 	// loop over remaining tokens and extract any that match 'name' or 'filename'
 	for(size_t i = 1; i < tokens.size(); i++)
 	{
@@ -276,7 +246,7 @@ void HttpRequest::parseContentDisposition(Part &part)
 
 bool HttpRequest::isContentOfType(std::map<std::string, std::string> headers, std::string typeToMatch)
 {
-	if (headers["content-type"] != typeToMatch) {
+	if (headers["Content-Type"] != typeToMatch) {
 		return false;
 	}
 	return true;
@@ -312,15 +282,11 @@ void HttpRequest::validate()
 		std::cout << "Content-Length field must be present in header" << std::endl;
 		exit(EXIT_FAILURE);
 	}
+	removeNonPrintableChars(_incomingRequest["Content-Length"]); // why is this needed? try to resolve issue before here
 	if(!isValidNonNegativeIntegerString(_incomingRequest["Content-Length"])) {
 		std::cout << "Content-Length field is not a valid non-negative integer string" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	if (!isContentOfType(_incomingRequest, "multipart/form-data"))
-	{
-		std::cout << "Header block does not have content-type of 'multipart/form-data'" << std::endl;
-		exit(EXIT_FAILURE);
-	}	
 	for(size_t i = 0; i < _parts.size(); i++)
 	{
 		if (!(_parts[i].contentDisposition.type == "form-data"))
@@ -384,12 +350,6 @@ bool HttpRequest::isValidNonNegativeIntegerString(const std::string& str) {
 // Check if the HTTP version follows the format HTTP/x.y
 bool HttpRequest::isValidHttpVersion(const std::string& httpVersion) {
 	return (httpVersion.length() >= 8 && httpVersion.substr(0, 5) == "HTTP/" && httpVersion[5] == '1' && httpVersion[6] == '.' && httpVersion[7] >= '0' && httpVersion[7] <= '9');
-}
-
-void HttpRequest::toLowerCase(std::string& str) {
-	for (std::string::iterator it = str.begin(); it != str.end(); ++it) {
-		*it = std::tolower(*it);
-	}
 }
 
 void HttpRequest::splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output) {
@@ -469,6 +429,7 @@ void HttpRequest::printPostUploadRequest() {
 }	
 
 void HttpRequest::printPartHeaders() {
+	std::cout << "Printing Multipart Headers:" << std::endl;
 	for(size_t i = 0; i < _parts.size(); i++)
 	{
 		printHeaders(_parts[i].headers);
