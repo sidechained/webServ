@@ -15,43 +15,66 @@ $boundary = $_SERVER['BOUNDARY'];
 // Split the request into parts using the boundary
 $parts = explode("--$boundary", $request);
 
-//// Loop through each part to process the file uploads
-//foreach ($parts as $part) {
-//    // Skip empty parts
-//    if (trim($part) == '') continue;
-
-//    // Extract content disposition and file name
-//    if (preg_match('/Content-Disposition: form-data; name="fileToUpload"; filename="(.+)"(.+)/s', $part, $matches)) {
-//        $fileName = trim($matches[1]);
-//		echo $fileName;
-//        $content = trim($matches[2]);
-//		echo "\n\n content is: $content\n" ;
-
-//        // Save the content to a file in the upload folder
-//        file_put_contents("$uploadPath/$fileName", $content);
-//    }
-//}
 
 // Initialize variables to store Content-Type and content
-$contentType = '';
+$content = '';
+$fileName = '';
 $fileContent = '';
+$body = '';
 
 // Loop through each part to process the file uploads
 foreach ($parts as $part) {
-    // Skip empty parts
-    if (trim($part) == '') continue;
+	echo "part<br>";
+	echo $part;
 
-    // Check if the part contains Content-Type
-    if (strpos($part, 'Content-Type:') !== false) {
-        // Extract Content-Type
-        $contentType = trim(preg_replace('/Content-Type: (.+)/', '$1', $part));
-		echo "\n\n content is: $contentType\n" ;
-    } else {
-        // This part contains file content
-        $fileContent .= trim($part);
-		echo "\n\n content is: $fileContent\n" ;
-    }
+	$part = str_replace($boundary, '', $part);
+
+	// Extract name and filename using regular expressions
+	if (preg_match('/name="([^"]+)"/', $part, $matches)) {
+		$name = $matches[1];
+	}
+	
+	if (preg_match('/filename="([^"]+)"/', $part, $matches)) {
+		$fileName = $matches[1];
+	}
+	
+	// Remove the first two lines
+	$part = preg_replace('/^(.*\n){3}/', '', $part);
+	
+	// Remove the last two lines
+	$part = preg_replace('/\n-----------------------------[^\n]+--$/', '', $part);
+	
+	// Remove leading and trailing newlines from the body
+	$body = trim($part);
+	
+	// Output the results
+	echo "Name: $name<br>";
+	echo "Filename: $fileName<br>";
+	echo "Body:<br>$body<br>";
+	$filePath = $uploadPath . "/" . $fileName;
+	
+	// Open the file for writing
+	$file = fopen($filePath, "w");
+	
+	if ($file) {
+		// Write "hello world" to the file
+		fwrite($file, $body);
+	
+		// Close the file
+		fclose($file);
+	
+		//echo "File '$fileName' has been created and saved to '$uploadPath'.";
+	} else {
+		echo "Failed to create the file.";
+	}
 }
+
+// Define the file name and upload path
+//$fileName = "example.txt"; // Change this to your desired file name
+//$uploadPath = "/path/to/your/upload/directory/"; // Change this to your desired directory path
+
+// Create the full file path
+
 
 // Generate a custom HTML response
 $htmlResponse = "<html>

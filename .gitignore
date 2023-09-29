@@ -1,2 +1,3 @@
 *.o
 server_sandbox/server
+uploads/
