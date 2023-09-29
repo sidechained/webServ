@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <cstring>
+#include "../WebServ.hpp"
 
 
 class FormResponse : public ErrResponse

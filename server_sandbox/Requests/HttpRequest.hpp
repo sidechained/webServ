@@ -88,5 +88,6 @@ public:
     std::string const getResource();
     std::string const getHttpVersion();
     std::string const &getBody() const;
+	std::string const &getBoundary() const;
     ServerConfig *getConfig() const;
 };

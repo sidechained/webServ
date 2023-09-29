@@ -538,3 +538,8 @@ std::string const &HttpRequest::getBody() const
 {
     return _body;
 }
+
+std::string const &HttpRequest::getBoundary() const
+{
+	return _boundary;
+}
