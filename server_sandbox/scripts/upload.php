@@ -53,7 +53,7 @@ foreach ($parts as $part) {
 	echo "Filename: $fileName<br>";
 	echo "Body:<br>$body<br>";
 	$filePath = $uploadPath . "/" . $fileName;
-	$body = str_replace(["\r", "--"], "", $body);
+	$body = str_replace(["\r\n", "--"], "", $body);
 	echo "Body after:<br>$body<br>";
 	
 	// Open the file for writing
