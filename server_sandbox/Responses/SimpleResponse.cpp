@@ -65,7 +65,8 @@ void SimpleResponse::updateBodyOffset(size_t offset)
 
 std::string const &SimpleResponse::getResponse() 
 {
-    _response = _header + _body;
+    if (_response.empty())
+		_response = _header + _body;
     return _response;
 }
 
