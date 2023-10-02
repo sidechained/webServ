@@ -269,7 +269,7 @@ void HttpRequest::validate()
 		std::cout << "Request is not a post request" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	if(getResource() != "/upload.php") { // hardcoded for now
+	if(getResource() != "/upload.py") { // hardcoded for now
 		std::cout << "Resource requested does not match server-side resource" << std::endl;
 		exit(EXIT_FAILURE);
 	}

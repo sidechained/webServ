@@ -14,7 +14,7 @@ void FormResponse::createResponse(HttpRequest &request)
     std::cout << BG_YELLOW << "Create form response" << std::endl;
     std::cout << request.getBody() << std::endl;
 
-    const char *phpInterpreter = "/usr/bin/php";
+    const char *phpInterpreter = "/usr/bin/python3";
     std::string resource = "./scripts" + request.getResource(); // Make a copy of the string
     const char *phpScript = resource.c_str();
 
