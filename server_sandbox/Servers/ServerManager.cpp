@@ -207,12 +207,9 @@ void ServerManager::readRequest(const int &i, Socket *client)
 	std::vector<char> bufferVector;
 	for (int i = 0; i < bytes_read; i++)
 		bufferVector.push_back(buffer[i]);
-	bufferVector.push_back('\0');
+	// bufferVector.push_back('\0');
 	//print bufferVector
-	for (std::vector<char>::iterator it = bufferVector.begin(); it != bufferVector.end(); ++it)
-	{
-		std::cout << *it;
-	}
+	
 
 	if (bytes_read == 0)
 	{
@@ -232,7 +229,7 @@ void ServerManager::readRequest(const int &i, Socket *client)
 
 		ServerConfig *config = server->getConfig();
 		//std::cout << "REQUEST:" << std::endl << buffer << std::endl;
-		HttpRequest parsedRequest(buffer, config);
+		HttpRequest parsedRequest(buffer, bufferVector, config);
 		// std::cout << "Printing request" << std::endl;
   	 	// parsedRequest.printRequest();
 		std::cout << BG_GREEN << parsedRequest.getMethod() << std::endl;

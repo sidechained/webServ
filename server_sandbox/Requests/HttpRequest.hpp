@@ -5,6 +5,7 @@
 #include <sstream>
 #include <map>
 #include <algorithm>
+#include <vector>
 #include "../Parser/ServerParser.hpp"
 #include "../Parser/LocationParser.hpp"
 #include "../WebServ.hpp"
@@ -32,12 +33,14 @@ private:
     std::string _path;
     std::string _contentType;
     std::string _body;
+    std::vector<char> _bodyVector;
     std::vector<Part> _parts;
     std::string _boundary;
     std::map<std::string, std::string> _errorPages;
     LocationConfig *_locationConfig;
 
     void fillIncomingRequestMap(std::string const &request);
+    void fillBodyVector(std::vector<char> const &bufferVector);
     void parseLocationConfig();
     void parsePath(std::string &key, long i);
     void parseIndex();
@@ -75,7 +78,7 @@ private:
 protected:
 public:
     HttpRequest();
-    HttpRequest(std::string const &request, ServerConfig *config);
+    HttpRequest(std::string const &request, std::vector<char> &requestVector, ServerConfig *config);
     ~HttpRequest();
     void printRequest();
     LocationConfig *getLocationConfig() const;
@@ -88,6 +91,7 @@ public:
     std::string const getResource();
     std::string const getHttpVersion();
     std::string const &getBody() const;
+    std::vector<char> const &getBodyVector() const;
 	std::string const &getBoundary() const;
     ServerConfig *getConfig() const;
 };

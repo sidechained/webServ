@@ -97,9 +97,15 @@ void FormResponse::createResponse(HttpRequest &request)
         close(input_pipefd[0]);  // Close the read end of the input pipe in the parent
         close(output_pipefd[1]); // Close the write end of the output pipe in the parent
 
-        std::string body = request.getBody();
-        const char* message = body.c_str();
-        write(input_pipefd[1], message, strlen(message));
+        // std::string body = request.getBody();
+        // const char* message = body.c_str();
+        std::vector<char> body = request.getBodyVector();
+    //write body to input pipe
+        for (std::vector<char>::iterator it = body.begin(); it != body.end(); ++it)
+        {
+            write(input_pipefd[1], &(*it), 1);
+        }
+        // write(input_pipefd[1], message, strlen(message));
         close(input_pipefd[1]);
 
         		// Create a file for writing the HTML output
