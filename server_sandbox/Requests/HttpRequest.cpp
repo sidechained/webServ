@@ -203,10 +203,25 @@ void HttpRequest::parseBody()
 	std::string endBoundary = "--" + _boundary + "--";
 	// look for end Boundary and erase it and everything after, treating this as our body
 	size_t foundPos = body.find(endBoundary);
-	if (!(foundPos != std::string::npos)) {
+	/*if (!(foundPos != std::string::npos)) {
 		std::cout << "End boundary not found.\n";
 		exit(EXIT_FAILURE);
-	}
+	}*/
+	if (foundPos == std::string::npos) {
+        std::cout << "End boundary not found. Manually adding it.\n";
+        
+        // You can insert the endBoundary at a specific position in the string
+        // or at the end if you prefer.
+        // Here, I'm adding it at the end of the string:
+        body += endBoundary;
+        
+        // You can also insert it at a specific position:
+        // body.insert(position, endBoundary);
+        
+        // Now, foundPos will point to the position where endBoundary was inserted.
+        foundPos = body.size() - endBoundary.size();
+    }
+
 	body.erase(foundPos);
 	// split the new body by the boundary string
 	std::string splitBoundary = "--" + _boundary;
