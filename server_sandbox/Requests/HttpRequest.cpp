@@ -48,11 +48,11 @@ HttpRequest::HttpRequest(std::string const &request, std::vector<char> &requestV
 		}
 	}
 
-	std::cout << "Printing bodyVector:" << std::endl;
+	/*std::cout << "Printing bodyVector:" << std::endl;
 	for (std::vector<char>::const_iterator it = _bodyVector.begin(); it != _bodyVector.end(); ++it)
 	{
 		std::cout << *it;
-	}
+	}*/
 
  }
 
