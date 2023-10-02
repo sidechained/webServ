@@ -46,12 +46,15 @@ foreach ($parts as $part) {
 	
 	// Remove leading and trailing newlines from the body
 	$body = trim($part);
+
 	
 	// Output the results
 	echo "Name: $name<br>";
 	echo "Filename: $fileName<br>";
 	echo "Body:<br>$body<br>";
 	$filePath = $uploadPath . "/" . $fileName;
+	$body = str_replace(["\r", "--"], "", $body);
+	echo "Body after:<br>$body<br>";
 	
 	// Open the file for writing
 	$file = fopen($filePath, "w");
