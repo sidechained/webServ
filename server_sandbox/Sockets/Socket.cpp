@@ -101,9 +101,18 @@ std::string Socket::getIp() const
 	return _ip;
 }
 
-void Socket::appendBuffer(const char *buffer)
+void Socket::appendBuffer(const char *buffer, int size)
 {
 	strcat(_buffer, buffer);
+	for (int i = 0; i < size; i++)
+	{
+		_buffer_vector.push_back(buffer[i]);
+	}
+}
+
+std::vector<char> Socket::getBufferVector() const
+{
+	return _buffer_vector;
 }
 
 char *Socket::getBuffer()

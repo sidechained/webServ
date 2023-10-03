@@ -144,6 +144,7 @@ void ServerManager::runServers()
 			}
 		}
 		checkTimeout();
+		PRINT(SERVERMANAGER, BG_BOLD_RED, "select()" )
 	}
 }
 
@@ -290,25 +291,35 @@ Server *ServerManager::findServer(Socket *client)
 
 void ServerManager::readRequest(const int &i, Socket *client)
 {
+	PRINT(SERVERMANAGER, BG_BOLD_GREEN, "\tread response entered")
 
-	char buffer[REQUEST_BUFFER];
-	bzero(buffer, REQUEST_BUFFER);
+	char chunk[REQUEST_BUFFER];
+	//bzero(chunk, REQUEST_BUFFER);
 	int bytes_read = 0;
 
 	
-	bytes_read = read(i, buffer, REQUEST_BUFFER);
+	bytes_read = read(i, chunk, REQUEST_BUFFER);
+	PRINT(SERVERMANAGER, BG_BOLD_RED, "\tREQUEST read bytes:" << bytes_read << "buffer read variable "<<client->isBufferRead() )
+
+	/*// later
 	std::vector<char> bufferVector;
+
 	for (int i = 0; i < bytes_read; i++)
 		bufferVector.push_back(buffer[i]);
 	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tREQUEST read bytes:" << bytes_read << " from client: " << client->getIp() << " : " << client->getPort())
-	// bufferVector.push_back('\0');
-	//print bufferVector
+	// bufferVector.push_back('\0');*/
+
 	
 
 	if (bytes_read == 0)
 	{
+		PRINT(SERVERMANAGER, BG_BOLD_RED, "bytes read is 0")
+		if (client->getBuffer()[0] != '\0')
+		{
+			client->setBufferRead(true);
+		}
 		closeConnection(i);
-		return;
+		//return;
 	}
 	else if (bytes_read < 0)
 	{
@@ -316,12 +327,28 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		closeConnection(i);
 		return;
 	}
-	else
+	else if (bytes_read > 0)
+	{
+		client->appendBuffer(chunk, bytes_read);
+		PRINT(SERVERMANAGER, BOLD_GREEN, "\t\tNOT entire data read, bytes: " << bytes_read << "  " << client->getBufferVector().size())
+		memset(chunk, 0, REQUEST_BUFFER);
+	}
+	if (client->isBufferRead())
 	{
 		PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tREQUEST from client: " << client->getIp() << " : " << client->getPort() << " has been read")
 		Server *server = findServer(client);
 
 		ServerConfig *config = server->getConfig();
+
+
+		std::vector<char> bufferVector = client->getBufferVector();
+
+		char *buffer = client->getBuffer();
+
+
+	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tREQUEST read bytes:" << bytes_read << " from client: " << client->getIp() << " : " << client->getPort())
+	// bufferVector.push_back('\0');
+
 		//std::cout << "REQUEST:" << std::endl << buffer << std::endl;
 		HttpRequest parsedRequest(buffer, bufferVector, config);
 		PRINT(CGI, BG_RED, "content length request: " << parsedRequest.getContentLength())
@@ -342,6 +369,7 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
 		PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " communication Socket set to write mode for the response. fd: " << i)
+		//return;
 	}
 	 
 }
