@@ -1,7 +1,7 @@
 #include "Socket.hpp"
 
 // Default constructor
-Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int backlog) : _ip(ip), _port(port)
+Socket::Socket(int domain, int type, int protocol, int port, std::string ip, int backlog) : _ip(ip), _port(port), _buffer_read(false)
 {
 	(void)backlog;
 	// Define address structure
@@ -99,4 +99,24 @@ int Socket::getPort() const
 std::string Socket::getIp() const
 {
 	return _ip;
+}
+
+void Socket::appendBuffer(const char *buffer)
+{
+	strcat(_buffer, buffer);
+}
+
+char *Socket::getBuffer()
+{
+	return _buffer;
+}
+
+bool Socket::isBufferRead() const
+{
+	return _buffer_read;
+}
+
+void Socket::setBufferRead(bool read)
+{
+	_buffer_read = read;
 }

@@ -10,6 +10,9 @@
 #include <sys/time.h>
 #include <cstdlib>
 #include "../Colors.hpp"
+#include "../WebServ.hpp"
+#include <cstring>
+//#include "../Servers/ServerManager.hpp"
 //#define MAX_CLIENTS 10
 
 class Socket
@@ -22,6 +25,8 @@ protected:
 	time_t _last_request_time;
 	std::string _ip;
 	int _port;
+	char _buffer[REQUEST_BUFFER];
+	bool _buffer_read;
 
 public:
 	Socket(int domain, int type, int protocol, int port, std::string ip, int backlog);
@@ -37,4 +42,8 @@ public:
 	int getAddressSize() const;
 	int getPort() const;
 	std::string getIp() const;
+	void appendBuffer(const char *buffer);
+	char* getBuffer();
+	bool isBufferRead() const;
+	void setBufferRead(bool read);
 };

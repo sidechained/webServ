@@ -4,6 +4,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#define REQUEST_BUFFER 90000
+#define MESSAGE_BUFFER 20000
+#define CONNECTION_TIMEOUT 500
 
 extern bool isRunning;
 
