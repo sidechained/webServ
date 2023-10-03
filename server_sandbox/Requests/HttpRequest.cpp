@@ -19,6 +19,7 @@ HttpRequest::HttpRequest(std::string const &request, std::vector<char> &requestV
 	_errorPages = _config->error_pages;
 	fillIncomingRequestMap(request);
 	fillBodyVector(requestVector);
+	parseIsFile();
 	parseLocationConfig();
 	parseIndex();
 	parseMethod();
@@ -27,6 +28,17 @@ HttpRequest::HttpRequest(std::string const &request, std::vector<char> &requestV
 	parseVectorParts();
 	printPartHeaders();
 	cleanUpMap(_incomingRequest);
+}
+
+void HttpRequest::parseIsFile()
+{
+	std::string resource = getResource();
+	size_t dotPosition = resource.rfind('.');
+	if (dotPosition != std::string::npos && dotPosition > 0 && dotPosition < resource.length() - 1) {
+        _isFile = true;
+		return;
+    }
+	_isFile = false;
 }
 
  void HttpRequest::fillBodyVector(std::vector<char> const &bufferVector)
@@ -118,6 +130,8 @@ void HttpRequest::parseLocationConfig()
 		{
 			_locationConfig = &_config->locationConfigs[key];
 			PRINT(HTTPREQUEST, BG_BLUE, "location is set");
+            std::cout << "key:" << key << std::endl;
+            std::cout << "autoindex" << _locationConfig->autoindex << std::endl;
 			parsePath(key, i);
 			break;
 		}
@@ -631,4 +645,9 @@ std::vector<char> const &HttpRequest::getBodyVector() const
 std::string const &HttpRequest::getBoundary() const
 {
 	return _boundary;
+}
+
+bool const &HttpRequest::isFile() const
+{
+	return _isFile;
 }

@@ -11,8 +11,8 @@
 class TextResponse : public ErrResponse
 {
 private:
-	void createAutoIndexResponse(const char *dirName);
-	void genDir(const char *dirName);
+    void createAutoIndexResponse(std::string dirName, std::string resource);
+	void genDir(std::string dirName, std::string resource);
 	void genLink(std::string entryName, std::string dirName);
 public:
     TextResponse(HttpRequest &request);

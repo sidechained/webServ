@@ -38,10 +38,12 @@ private:
     std::string _boundary;
     std::map<std::string, std::string> _errorPages;
     LocationConfig *_locationConfig;
+    bool _isFile;
 
     void fillIncomingRequestMap(std::string const &request);
     void fillBodyVector(std::vector<char> const &bufferVector);
     void parseLocationConfig();
+    void parseIsFile();
     void parsePath(std::string &key, long i);
     void parseIndex();
     void parseMethod();
@@ -94,4 +96,5 @@ public:
     std::vector<char> const &getBodyVector() const;
 	std::string const &getBoundary() const;
     ServerConfig *getConfig() const;
+    bool const &isFile() const;
 };
