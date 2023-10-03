@@ -155,6 +155,8 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
     if (cgiResponse->input_pipefd[1] != -1) {
         // Write the entire body to the input pipe at once
         ssize_t bytes_written = write(cgiResponse->input_pipefd[1], body.data(), body.size());
+		char EOF_char = EOF;
+		write(cgiResponse->input_pipefd[1], &EOF_char, 1);
 	PRINT(CGI, BG_YELLOW, "body size sent to cgi is: " << body.size() << " bytes written: " << bytes_written)
 
         if (bytes_written == -1) {
@@ -179,7 +181,7 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 {
 	PRINT(CGI, BG_BLUE, "readBodyFromCgi")
 
-	/*std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
+	std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
 
 	// Read the output from the child process and store it in htmlOutputBuffer
 	char output_buffer[256];
@@ -193,15 +195,15 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 
 	// Convert the vector to a string
 	std::string htmlString(htmlOutputBuffer.begin(), htmlOutputBuffer.end());
-	// std::cout << "htmlString: " << htmlString << std::endl;*/
+	// std::cout << "htmlString: " << htmlString << std::endl;
 
-	char    buffer[MESSAGE_BUFFER * 2];
+	/*char    buffer[MESSAGE_BUFFER * 2];
     int     bytes_read = 0;
     bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER* 2);
 
 	close(cgiResponse->output_pipefd[0]);
 
-	std::string htmlString(buffer, bytes_read);
+	std::string htmlString(buffer, bytes_read);*/
 	
 
 	cgiResponse->setBody(htmlString);
@@ -290,7 +292,10 @@ void ServerManager::readRequest(const int &i, Socket *client)
 {
 
 	char buffer[REQUEST_BUFFER];
+	bzero(buffer, REQUEST_BUFFER);
 	int bytes_read = 0;
+
+	
 	bytes_read = read(i, buffer, REQUEST_BUFFER);
 	std::vector<char> bufferVector;
 	for (int i = 0; i < bytes_read; i++)
@@ -319,6 +324,7 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		ServerConfig *config = server->getConfig();
 		//std::cout << "REQUEST:" << std::endl << buffer << std::endl;
 		HttpRequest parsedRequest(buffer, bufferVector, config);
+		PRINT(CGI, BG_RED, "content length request: " << parsedRequest.getContentLength())
 		// std::cout << "Printing request" << std::endl;
   	 	// parsedRequest.printRequest();
 		std::cout << BG_GREEN << parsedRequest.getMethod() << std::endl;

@@ -94,4 +94,5 @@ public:
     std::vector<char> const &getBodyVector() const;
 	std::string const &getBoundary() const;
     ServerConfig *getConfig() const;
+	std::string getContentLength();
 };

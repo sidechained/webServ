@@ -632,3 +632,8 @@ std::string const &HttpRequest::getBoundary() const
 {
 	return _boundary;
 }
+
+std::string HttpRequest::getContentLength()
+{
+	return _incomingRequest["Content-Length"];
+}
