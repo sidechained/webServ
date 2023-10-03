@@ -33,8 +33,8 @@ void FormResponse::initPipe()
 void FormResponse::createResponse(HttpRequest &request)
 {
 	_cgi = true;
-    std::cout << BG_YELLOW << "Create form response" << std::endl;
-    std::cout << request.getBody() << std::endl;
+    std::cout << BG_YELLOW << "Create form response"  RESET << std::endl;
+    //std::cout << request.getBody() << std::endl;
 
     const char *phpInterpreter = "/usr/bin/php";
     std::string resource = "./scripts" + request.getResource(); // Make a copy of the string

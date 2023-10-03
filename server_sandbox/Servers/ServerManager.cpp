@@ -192,7 +192,7 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 	}
 	cgiResponse->setCgi(false);
 
-	std::cout << BG_BLUE << cgiResponse->getResponse() << RESET << std::endl;
+	//std::cout << BG_BLUE << cgiResponse->getResponse() << RESET << std::endl;
 }
 
 
@@ -263,12 +263,13 @@ Server *ServerManager::findServer(Socket *client)
 void ServerManager::readRequest(const int &i, Socket *client)
 {
 
-	char buffer[MESSAGE_BUFFER];
+	char buffer[REQUEST_BUFFER];
 	int bytes_read = 0;
-	bytes_read = read(i, buffer, MESSAGE_BUFFER);
+	bytes_read = read(i, buffer, REQUEST_BUFFER);
 	std::vector<char> bufferVector;
 	for (int i = 0; i < bytes_read; i++)
 		bufferVector.push_back(buffer[i]);
+	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tREQUEST read bytes:" << bytes_read << " from client: " << client->getIp() << " : " << client->getPort())
 	// bufferVector.push_back('\0');
 	//print bufferVector
 	
@@ -304,7 +305,7 @@ void ServerManager::readRequest(const int &i, Socket *client)
             addToSet(c->getInputPipefd(), _write_fd_pool);
             addToSet(c->getOutputPipefd(), _recv_fd_pool);
 			c->createResponse(parsedRequest);
-			PRINT(CGI, BG_BLUE, "cgi form response text")
+			PRINT(CGI, BG_BLUE, "cgi created from read request")
 		}
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
