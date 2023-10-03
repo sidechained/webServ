@@ -10,3 +10,5 @@
 #define TEXTRESPONSE	1
 #define SERVERMANAGER	1
 #define SOCKET			1
+#define CGI				1
+#define FORMRESPONSE	1

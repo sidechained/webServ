@@ -1,6 +1,6 @@
 #include "SimpleResponse.hpp"
 
-SimpleResponse::SimpleResponse() : _request(), _header(""), _body(""), _response(""), _bodyLength(0)
+SimpleResponse::SimpleResponse() : _request(), _header(""), _body(""), _response(""), _bodyLength(0), _cgi(false)
 {
 }
 
@@ -82,4 +82,9 @@ int SimpleResponse::fileLength(std::ifstream &file)
 void SimpleResponse::cutRes(std::string& response, size_t i)
 {
     _response = response.substr(i);
+}
+
+bool SimpleResponse::isCgi() const
+{
+	return _cgi;
 }

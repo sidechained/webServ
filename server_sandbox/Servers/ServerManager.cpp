@@ -128,12 +128,66 @@ void ServerManager::runServers()
 				readRequest(i, _clients_map[i]);
 			else if (FD_ISSET(i, &write_set_cpy) && _clients_map.count(i))
 			{
-				sendResponse(i, _clients_map[i]);
+				//SimpleResponse *responsePtr = _pendingResponses[i];
+				int cgi = _pendingResponses[i]->isCgi();
+				if (cgi)
+				{
+					PRINT(CGI, BG_BLUE, "cgi form response text")
+					FormResponse* cgiResponse = dynamic_cast<FormResponse*>(_pendingResponses[i]);
+					if (FD_ISSET(cgiResponse->input_pipefd[1], &write_set_cpy))
+						sendBodyToCgi(cgiResponse);
+					else if (FD_ISSET(cgiResponse->output_pipefd[0], &recv_set_cpy))
+						readBodyFromCgi(cgiResponse);
+				}
+				else
+					sendResponse(i, _clients_map[i]);
 			}
 		}
 		checkTimeout();
 	}
 }
+
+void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
+{
+	PRINT(CGI, BG_BLUE, "sendBodyToCgi")
+	std::vector<char> body = cgiResponse->getRequest().getBodyVector();
+    //write body to input pipe
+        for (std::vector<char>::iterator it = body.begin(); it != body.end(); ++it)
+        {
+            write(cgiResponse->input_pipefd[1], &(*it), 1);
+        }
+        // write(input_pipefd[1], message, strlen(message));
+        close(cgiResponse->input_pipefd[1]);
+		removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
+}
+
+void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
+{
+
+
+	std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
+
+	// Read the output from the child process and store it in htmlOutputBuffer
+	char output_buffer[256];
+	ssize_t output_bytes_read;
+	while ((output_bytes_read = read(cgiResponse->output_pipefd[0], output_buffer, sizeof(output_buffer))) > 0) {
+		htmlOutputBuffer.insert(htmlOutputBuffer.end(), output_buffer, output_buffer + output_bytes_read);
+	}
+	close(cgiResponse->output_pipefd[0]);
+
+	// Convert the vector to a string
+	std::string htmlString(htmlOutputBuffer.begin(), htmlOutputBuffer.end());
+	// std::cout << "htmlString: " << htmlString << std::endl;
+	cgiResponse->setBody(htmlString);
+	//_body = htmlString;
+
+	cgiResponse->setHeader(OkHeader(cgiResponse->getRequest().getContentType(), cgiResponse->getBodyLength()).getHeader());
+	removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
+
+	std::cout << BG_BLUE << cgiResponse->getResponse() << RESET << std::endl;
+}
+
+
 void ServerManager::checkTimeout()
 {
 	for (std::map<int, Socket *>::iterator it = _clients_map.begin(); it != _clients_map.end(); ++it)
@@ -235,10 +289,20 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		std::cout << BG_GREEN << parsedRequest.getMethod() << std::endl;
 		client->updateTime();
 		_pendingResponses[i] = ResponseFactory::createResponse(parsedRequest);
+		if (_pendingResponses[i]->isCgi())
+        {
+			std::cout << BG_BLUE "cgi " RESET << _pendingResponses[i]->isCgi() << std::endl;
+			FormResponse* c = dynamic_cast<FormResponse*>(_pendingResponses[i]);
+            addToSet(c->getInputPipefd(), _write_fd_pool);
+            addToSet(c->getOutputPipefd(), _recv_fd_pool);
+			c->createResponse(parsedRequest);
+			PRINT(CGI, BG_BLUE, "cgi form response text")
+		}
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
 		PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " communication Socket set to write mode for the response. fd: " << i)
 	}
+	 
 }
 
 void ServerManager::sendResponse(const int &i, Socket *client)
