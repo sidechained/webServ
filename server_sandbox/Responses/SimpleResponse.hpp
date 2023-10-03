@@ -34,6 +34,7 @@ public:
     int fileLength(std::ifstream &htmlFile);
     void cutRes(std::string& response, size_t i);
 	bool isCgi() const;
+	void setCgi(bool cgi);
 
 };
 

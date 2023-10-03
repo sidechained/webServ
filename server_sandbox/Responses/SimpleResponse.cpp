@@ -88,3 +88,8 @@ bool SimpleResponse::isCgi() const
 {
 	return _cgi;
 }
+
+void SimpleResponse::setCgi(bool cgi)
+{
+	_cgi = cgi;
+}

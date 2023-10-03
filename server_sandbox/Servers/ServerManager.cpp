@@ -132,7 +132,7 @@ void ServerManager::runServers()
 				int cgi = _pendingResponses[i]->isCgi();
 				if (cgi)
 				{
-					PRINT(CGI, BG_BLUE, "cgi form response text")
+					//PRINT(CGI, BG_BLUE, "cgi form response text")
 					FormResponse* cgiResponse = dynamic_cast<FormResponse*>(_pendingResponses[i]);
 					if (FD_ISSET(cgiResponse->input_pipefd[1], &write_set_cpy))
 						sendBodyToCgi(cgiResponse);
@@ -163,7 +163,7 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
 
 void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 {
-
+	PRINT(CGI, BG_BLUE, "readBodyFromCgi")
 
 	std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
 
@@ -183,6 +183,14 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 
 	cgiResponse->setHeader(OkHeader(cgiResponse->getRequest().getContentType(), cgiResponse->getBodyLength()).getHeader());
 	removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
+
+	int status;
+	waitpid(cgiResponse->child_pid, &status, 0);
+
+	if (WIFEXITED(status)) {
+		std::cout << "Child process exited with status: " << WEXITSTATUS(status) << std::endl;
+	}
+	cgiResponse->setCgi(false);
 
 	std::cout << BG_BLUE << cgiResponse->getResponse() << RESET << std::endl;
 }

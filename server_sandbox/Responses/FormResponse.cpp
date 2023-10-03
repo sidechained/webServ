@@ -69,7 +69,7 @@ void FormResponse::createResponse(HttpRequest &request)
     char *const envVars[] = {fileNameVar, boundary, uploadPath,  NULL};
 
     // Fork a child process
-    pid_t child_pid = fork();
+    child_pid = fork();
 
     if (child_pid == -1)
     {
@@ -141,12 +141,12 @@ void FormResponse::createResponse(HttpRequest &request)
 
          // Wait for the child process to finish
 		PRINT(FORMRESPONSE, BG_YELLOW, "Waiting for child process to finish")
-        int status;
+        /*int status;
         waitpid(child_pid, &status, 0);
 
         if (WIFEXITED(status)) {
             std::cout << "Child process exited with status: " << WEXITSTATUS(status) << std::endl;
-        }
+        }*/
     }
 }
 

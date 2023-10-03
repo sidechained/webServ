@@ -10,6 +10,7 @@ class FormResponse : public ErrResponse
 {
 private:
 public:
+	pid_t child_pid;
     int input_pipefd[2];  // Pipe for sending input to child
     int output_pipefd[2]; // Pipe for receiving output from child
     FormResponse(HttpRequest &request);
