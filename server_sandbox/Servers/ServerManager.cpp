@@ -151,13 +151,27 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
 {
 	PRINT(CGI, BG_BLUE, "sendBodyToCgi")
 	std::vector<char> body = cgiResponse->getRequest().getBodyVector();
-    //write body to input pipe
-        for (std::vector<char>::iterator it = body.begin(); it != body.end(); ++it)
-        {
-            write(cgiResponse->input_pipefd[1], &(*it), 1);
+        // Check if the pipe is valid
+    if (cgiResponse->input_pipefd[1] != -1) {
+        // Write the entire body to the input pipe at once
+        ssize_t bytes_written = write(cgiResponse->input_pipefd[1], body.data(), body.size());
+	PRINT(CGI, BG_YELLOW, "body size sent to cgi is: " << body.size() << " bytes written: " << bytes_written)
+
+        if (bytes_written == -1) {
+            // Handle write error
+            perror("write");
+			PRINT(CGI, BG_BOLD_RED, "write error")
+            // Add error handling as needed
         }
-        // write(input_pipefd[1], message, strlen(message));
+
         close(cgiResponse->input_pipefd[1]);
+        removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
+    } else {
+		PRINT(CGI, BG_BOLD_RED, "invalid pipe")
+        // Handle invalid pipe
+        // Add error handling as needed
+    }
+
 		removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
 }
 
@@ -165,7 +179,7 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 {
 	PRINT(CGI, BG_BLUE, "readBodyFromCgi")
 
-	std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
+	/*std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
 
 	// Read the output from the child process and store it in htmlOutputBuffer
 	char output_buffer[256];
@@ -173,11 +187,23 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 	while ((output_bytes_read = read(cgiResponse->output_pipefd[0], output_buffer, sizeof(output_buffer))) > 0) {
 		htmlOutputBuffer.insert(htmlOutputBuffer.end(), output_buffer, output_buffer + output_bytes_read);
 	}
+
+	PRINT(CGI, BG_BLUE, "body size read from cgi is: " << htmlOutputBuffer.size())
 	close(cgiResponse->output_pipefd[0]);
 
 	// Convert the vector to a string
 	std::string htmlString(htmlOutputBuffer.begin(), htmlOutputBuffer.end());
-	// std::cout << "htmlString: " << htmlString << std::endl;
+	// std::cout << "htmlString: " << htmlString << std::endl;*/
+
+	char    buffer[MESSAGE_BUFFER * 2];
+    int     bytes_read = 0;
+    bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER* 2);
+
+	close(cgiResponse->output_pipefd[0]);
+
+	std::string htmlString(buffer, bytes_read);
+	
+
 	cgiResponse->setBody(htmlString);
 	//_body = htmlString;
 
@@ -343,6 +369,7 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 	else if (bytes_sent == 0 || (size_t)bytes_sent == response.length())
 	{
 		PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " bytes sent: " << bytes_sent << "  fd: " << i)
+		PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tRESPONSE length: " << response.length() << " bytes sent: " << bytes_sent << "  fd: " << i)
 		_pendingResponses.erase(i);
 		closeConnection(i);
 	}
