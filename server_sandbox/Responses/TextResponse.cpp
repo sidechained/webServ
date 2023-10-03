@@ -115,7 +115,6 @@ void TextResponse::genLink(std::string entryName, std::string resource)
     std::cout << "resource: " << resource << std::endl;
     std::cout << "entryName: " << entryName << std::endl;
 
-    // std::stringstream ss;
-    // ss << port;
+
     _body += "\t\t<p><a href=\"http://" + host + "/" + resource + entryName + "\">" + entryName + "</a></p>\n";
 }

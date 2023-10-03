@@ -1,0 +1,14 @@
+{
+	"version":"0.2.0",
+	"configurations":[
+	{
+	"name":"Launch",
+	"type":"cppdbg",
+	"program":"${workspaceFolder}/server_sandbox/server",
+	"args":["${workspaceFolder}/server_sandbox/configs/servers.txt"],
+	"cwd":"${workspaceFolder}",
+	"request":"launch",
+	"MIMode":"gdb"
+	}
+	]
+}
