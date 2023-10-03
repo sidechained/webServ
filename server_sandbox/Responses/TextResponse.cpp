@@ -34,8 +34,6 @@ void TextResponse::createResponse(HttpRequest &request)
         std::cout << BG_YELLOW << "resource:" << request.getResource() << RESET << std::endl;
         createAutoIndexResponse(request.getPath(), request.getResource());
         setHeader(OkHeader(request.getContentType(), this->getBodyLength()).getHeader());
-        std::cout << "header: " << this->getHeader() << std::endl;
-        std::cout << "body: " << this->getBody() << std::endl;
         return;
     }
     std::ifstream htmlFile(request.getPath().c_str(), std::ios::binary);
@@ -107,13 +105,17 @@ void TextResponse::genDir(std::string dirName, std::string resource)
 void TextResponse::genLink(std::string entryName, std::string resource)
 {
     std::string host = _request->getHost();
-    std::cout << "host: " << host << std::endl;
     if (resource[0] == '.')
         resource = resource.substr(1);
     if (resource[0] == '/')
         resource = resource.substr(1);
 
+    std::cout << BG_BOLD_RED << "genLink" << std::endl;
+    std::cout << "host: " << host << std::endl;
+    std::cout << "resource: " << resource << std::endl;
+    std::cout << "entryName: " << entryName << std::endl;
+
     // std::stringstream ss;
     // ss << port;
-    _body += "\t\t<p><a href=\"http://" + host + resource + "/" + entryName + "\">" + entryName + "</a></p>\n";
+    _body += "\t\t<p><a href=\"http://" + host + "/" + resource + entryName + "\">" + entryName + "</a></p>\n";
 }

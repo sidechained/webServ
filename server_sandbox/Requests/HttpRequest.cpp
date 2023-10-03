@@ -129,9 +129,14 @@ void HttpRequest::parseLocationConfig()
 		if (locationIsSet(key))
 		{
 			_locationConfig = &_config->locationConfigs[key];
+			std::cout << BG_BLUE << "location is set" << RESET << std::endl;
+			std::cout << "HttpRequest" << std::endl;
 			PRINT(HTTPREQUEST, BG_BLUE, "location is set");
             std::cout << "key:" << key << std::endl;
-            std::cout << "autoindex" << _locationConfig->autoindex << std::endl;
+			if (_locationConfig->autoindex)
+            	std::cout << "autoindexed"  << std::endl;
+			else
+				std::cout << "autoindexed"  << std::endl;
 			parsePath(key, i);
 			break;
 		}
