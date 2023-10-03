@@ -117,6 +117,7 @@ void ServerManager::runServers()
 
 		if ((select_ret = select(_biggest_fd + 1, &recv_set_cpy, &write_set_cpy, NULL, &timer)) < 0)
 		{
+			std::cout << "select error" << std::endl;
 			exit(1);
 			continue;
 		}
@@ -144,7 +145,7 @@ void ServerManager::runServers()
 			}
 		}
 		checkTimeout();
-		PRINT(SERVERMANAGER, BG_BOLD_RED, "select()" )
+		//PRINT(SERVERMANAGER, BG_BOLD_RED, "select()" )
 	}
 }
 
@@ -293,12 +294,12 @@ void ServerManager::readRequest(const int &i, Socket *client)
 {
 	PRINT(SERVERMANAGER, BG_BOLD_GREEN, "\tread response entered")
 
-	char chunk[REQUEST_BUFFER];
+	char chunk[200];
 	//bzero(chunk, REQUEST_BUFFER);
 	int bytes_read = 0;
 
 	
-	bytes_read = read(i, chunk, REQUEST_BUFFER);
+	bytes_read = read(i, chunk, 200);
 	PRINT(SERVERMANAGER, BG_BOLD_RED, "\tREQUEST read bytes:" << bytes_read << "buffer read variable "<<client->isBufferRead() )
 
 	/*// later
@@ -311,17 +312,8 @@ void ServerManager::readRequest(const int &i, Socket *client)
 
 	
 
-	if (bytes_read == 0)
-	{
-		PRINT(SERVERMANAGER, BG_BOLD_RED, "bytes read is 0")
-		if (client->getBuffer()[0] != '\0')
-		{
-			client->setBufferRead(true);
-		}
-		closeConnection(i);
-		//return;
-	}
-	else if (bytes_read < 0)
+	
+	 if (bytes_read < 0)
 	{
 		std::cout << "read error" << std::endl;
 		closeConnection(i);
@@ -331,9 +323,19 @@ void ServerManager::readRequest(const int &i, Socket *client)
 	{
 		client->appendBuffer(chunk, bytes_read);
 		PRINT(SERVERMANAGER, BOLD_GREEN, "\t\tNOT entire data read, bytes: " << bytes_read << "  " << client->getBufferVector().size())
-		memset(chunk, 0, REQUEST_BUFFER);
+		memset(chunk, 0, 200);
 	}
-	if (client->isBufferRead())
+	if (bytes_read < 200)
+	{
+		PRINT(SERVERMANAGER, BG_BOLD_RED, "last byte read")
+		if (client->getBuffer()[0] != '\0')
+		{
+			client->setBufferRead(true);
+		}
+		
+		//return;
+	}
+	if (client->isBufferRead() )
 	{
 		PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tREQUEST from client: " << client->getIp() << " : " << client->getPort() << " has been read")
 		Server *server = findServer(client);
@@ -368,6 +370,8 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		}
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
+
+		//closeConnection(i);
 		PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " communication Socket set to write mode for the response. fd: " << i)
 		//return;
 	}
