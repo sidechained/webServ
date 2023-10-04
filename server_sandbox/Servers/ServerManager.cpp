@@ -151,6 +151,8 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
 {
 	PRINT(CGI, BG_BLUE, "sendBodyToCgi")
 	std::vector<char> body = cgiResponse->getRequest().getBodyVector();
+	//std::string bodyStr(body.begin(), body.end());
+	//std::cout << "body is" << bodyStr << std:: endl;
         // Check if the pipe is valid
     if (cgiResponse->input_pipefd[1] != -1) {
         // Write the entire body to the input pipe at once
@@ -266,6 +268,7 @@ void ServerManager::acceptNewConnection(int fd)
 
 	if (new_client)
 	{
+		new_client->updateTime();
 		_clients_map_server.insert(std::make_pair(client_sock, server));
 		_clients_map.insert(std::make_pair(client_sock, new_client));
 	}
@@ -297,10 +300,12 @@ void ServerManager::readRequest(const int &i, Socket *client)
 
 	
 	bytes_read = read(i, buffer, REQUEST_BUFFER);
+	std::cout << "request is " << buffer << std::endl;
 	std::vector<char> bufferVector;
 	for (int i = 0; i < bytes_read; i++)
 		bufferVector.push_back(buffer[i]);
-	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tREQUEST read bytes:" << bytes_read << " from client: " << client->getIp() << " : " << client->getPort())
+	//std::string bufferString(bufferVector.begin(), bufferVector.end());
+	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tREQUEST read bytes:"  << " from client: " << client->getIp() << " : " << client->getPort())
 	// bufferVector.push_back('\0');
 	//print bufferVector
 	
@@ -360,6 +365,7 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 		return;
 	}
 	std::string response = responsePtr->getResponse();
+	std::cout << "Response is: " << response << std::endl;
 	//PRINT(SERVERMANAGER, CYAN, "response is: " << response << "response")
 
 	if (response.length() >= MESSAGE_BUFFER)

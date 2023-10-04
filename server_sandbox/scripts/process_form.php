@@ -8,6 +8,8 @@
 	 //echo "ciao";
  }
 
+ echo $request;
+
  // Parse the input string to extract variables
 parse_str($request, $requestData);
 
@@ -30,6 +32,7 @@ $htmlResponse = "<html>
 </head>
 <body>
     <h1>Form Submission Result</h1>
+    <p>Request: $request</p>
     <p>Name: $name</p>
     <p>Color: $color</p>
 </body>
