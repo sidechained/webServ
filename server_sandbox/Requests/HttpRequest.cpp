@@ -18,6 +18,8 @@ HttpRequest::HttpRequest(std::string const &request, std::vector<char> &requestV
 	this->clearErrors();
 	_errorPages = _config->error_pages;
 	fillIncomingRequestMap(request);
+	if (checkContentLength(config) == EXIT_FAILURE)
+		return;
 	fillBodyVector(requestVector);
 	parseLocationConfig();
 	parseIndex();
@@ -28,34 +30,6 @@ HttpRequest::HttpRequest(std::string const &request, std::vector<char> &requestV
 	printPartHeaders();
 	cleanUpMap(_incomingRequest);
 }
-
- void HttpRequest::fillBodyVector(std::vector<char> const &bufferVector)
- {
-	//iterate over bodyVector and skip the header lines and the empty line and save the rest to _bodyVector
-	for (std::vector<char>::const_iterator it = bufferVector.begin(); it != bufferVector.end(); ++it)
-	{
-		//check if we are at the end of the header
-		if (*it == '\r' && *(it + 1) == '\n' && *(it + 2) == '\r' && *(it + 3) == '\n')
-		{
-			//skip the empty line
-			it += 4;
-			//save the rest of the buffer to _bodyVector
-			for (std::vector<char>::const_iterator it2 = it; it2 != bufferVector.end(); ++it2)
-			{
-				_bodyVector.push_back(*it2);
-			}
-			break;
-		}
-	}
-
-	/*std::cout << "Printing bodyVector:" << std::endl;
-	for (std::vector<char>::const_iterator it = _bodyVector.begin(); it != _bodyVector.end(); ++it)
-	{
-		std::cout << *it;
-	}*/
-
- }
-
 
 void HttpRequest::fillIncomingRequestMap(std::string const &request)
 {
@@ -91,6 +65,52 @@ void HttpRequest::fillIncomingRequestMap(std::string const &request)
 	_body.assign(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
 
 	_incomingRequest["Redirection"] = "";
+}
+
+int HttpRequest::checkContentLength(ServerConfig *config)
+{
+	// if Content-Length is in request map
+	if (!(_incomingRequest["Content-Length"].empty()))
+	{	
+    	std::istringstream ss(_incomingRequest["Content-Length"]);
+		unsigned int contentLength;
+		if (!(ss >> contentLength)) {
+			std::cerr << "Failed to convert content-length string to int." << std::endl;
+			return EXIT_FAILURE;
+		}
+		if (contentLength > config->clientMaxBodySizeMB * 1000)
+		{
+			std::cerr << "Content length exceeds client max body size." << std::endl;
+			// how to generate a response here?
+			return EXIT_FAILURE;
+		}
+	}
+	return EXIT_SUCCESS;
+}
+
+void HttpRequest::fillBodyVector(std::vector<char> const &bufferVector)
+{
+	//iterate over bodyVector and skip the header lines and the empty line and save the rest to _bodyVector
+	for (std::vector<char>::const_iterator it = bufferVector.begin(); it != bufferVector.end(); ++it)
+	{
+		//check if we are at the end of the header
+		if (*it == '\r' && *(it + 1) == '\n' && *(it + 2) == '\r' && *(it + 3) == '\n')
+		{
+			//skip the empty line
+			it += 4;
+			//save the rest of the buffer to _bodyVector
+			for (std::vector<char>::const_iterator it2 = it; it2 != bufferVector.end(); ++it2)
+			{
+				_bodyVector.push_back(*it2);
+			}
+			break;
+		}
+	}
+	/*std::cout << "Printing bodyVector:" << std::endl;
+	for (std::vector<char>::const_iterator it = _bodyVector.begin(); it != _bodyVector.end(); ++it)
+	{
+		std::cout << *it;
+	}*/
 }
 
 void HttpRequest::cleanUpMap(std::map<std::string, std::string> _map)

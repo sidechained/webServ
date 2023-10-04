@@ -325,8 +325,8 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		//std::cout << "REQUEST:" << std::endl << buffer << std::endl;
 		HttpRequest parsedRequest(buffer, bufferVector, config);
 		PRINT(CGI, BG_RED, "content length request: " << parsedRequest.getContentLength())
-		// std::cout << "Printing request" << std::endl;
-  	 	// parsedRequest.printRequest();
+		std::cout << "Printing request" << std::endl;
+  	 	parsedRequest.printRequest();
 		std::cout << BG_GREEN << parsedRequest.getMethod() << std::endl;
 		client->updateTime();
 		_pendingResponses[i] = ResponseFactory::createResponse(parsedRequest);

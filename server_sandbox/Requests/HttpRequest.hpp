@@ -40,6 +40,7 @@ private:
     LocationConfig *_locationConfig;
 
     void fillIncomingRequestMap(std::string const &request);
+	int checkContentLength(ServerConfig *config);
     void fillBodyVector(std::vector<char> const &bufferVector);
     void parseLocationConfig();
     void parsePath(std::string &key, long i);
