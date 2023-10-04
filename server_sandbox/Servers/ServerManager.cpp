@@ -179,48 +179,42 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
 
 void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 {
-	PRINT(CGI, BG_BLUE, "readBodyFromCgi")
-
-	std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
-
-	// Read the output from the child process and store it in htmlOutputBuffer
-	char output_buffer[256];
-	ssize_t output_bytes_read;
-	while ((output_bytes_read = read(cgiResponse->output_pipefd[0], output_buffer, sizeof(output_buffer))) > 0) {
-		htmlOutputBuffer.insert(htmlOutputBuffer.end(), output_buffer, output_buffer + output_bytes_read);
-	}
-
-	PRINT(CGI, BG_BLUE, "body size read from cgi is: " << htmlOutputBuffer.size())
-	close(cgiResponse->output_pipefd[0]);
-
-	// Convert the vector to a string
-	std::string htmlString(htmlOutputBuffer.begin(), htmlOutputBuffer.end());
-	// std::cout << "htmlString: " << htmlString << std::endl;
-
-	/*char    buffer[MESSAGE_BUFFER * 2];
-    int     bytes_read = 0;
-    bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER* 2);
-
-	close(cgiResponse->output_pipefd[0]);
-
-	std::string htmlString(buffer, bytes_read);*/
-	
-
-	cgiResponse->setBody(htmlString);
-	//_body = htmlString;
-
-	cgiResponse->setHeader(OkHeader(cgiResponse->getRequest().getContentType(), cgiResponse->getBodyLength()).getHeader());
-	removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
-
-	int status;
-	waitpid(cgiResponse->child_pid, &status, 0);
-
-	if (WIFEXITED(status)) {
-		std::cout << "Child process exited with status: " << WEXITSTATUS(status) << std::endl;
-	}
-	cgiResponse->setCgi(false);
-
-	//std::cout << BG_BLUE << cgiResponse->getResponse() << RESET << std::endl;
+    PRINT(CGI, BG_BLUE, "readBodyFromCgi")
+    int status;
+    waitpid(cgiResponse->child_pid, &status, 0);
+    if (WIFEXITED(status)) {
+        std::cout << "Child process exited with status: " << WEXITSTATUS(status) << std::endl;
+    }
+    cgiResponse->setCgi(false);
+    /* char buffer[MESSAGE_BUFFER];
+    bzero(buffer, MESSAGE_BUFFER);
+    int bytes_read = 0;
+    bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER);
+    std::cout << BG_GREEN << "buffer created" << buffer << RESET << std::endl;
+    // Use a vector to store the binary data and its length.
+    std::vector<char> bufferVector(buffer, buffer + bytes_read);
+    for (size_t i = 0; i < bufferVector.size(); ++i) {
+    std::cout << bufferVector[i];
+    }
+    close(cgiResponse->output_pipefd[0]);
+    std::string htmlString(bufferVector.begin(), bufferVector.end());
+    std::cout << BG_GREEN << "string created" << htmlString << RESET << std::endl; */
+    std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
+    // Read the output from the child process and store it in htmlOutputBuffer
+    char output_buffer[256];
+    ssize_t output_bytes_read;
+    while ((output_bytes_read = read(cgiResponse->output_pipefd[0], output_buffer, sizeof(output_buffer))) > 0) {
+        htmlOutputBuffer.insert(htmlOutputBuffer.end(), output_buffer, output_buffer + output_bytes_read);
+    }
+    PRINT(CGI, BG_BLUE, "body size read from cgi is: " << htmlOutputBuffer.size())
+    close(cgiResponse->output_pipefd[0]);
+    // Convert the vector to a string
+    std::string htmlString(htmlOutputBuffer.begin(), htmlOutputBuffer.end());
+    cgiResponse->setBody(htmlString);
+    //_body = htmlString;
+    cgiResponse->setHeader(OkHeader(cgiResponse->getRequest().getContentType(), cgiResponse->getBodyLength()).getHeader());
+    removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
+    //std::cout << BG_BLUE << cgiResponse->getResponse() << RESET << std::endl;
 }
 
 
