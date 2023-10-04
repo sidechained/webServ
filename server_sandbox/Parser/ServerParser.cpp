@@ -23,7 +23,7 @@ ServerParser::~ServerParser() {
 
 void ServerParser::setDefaults()
 {
-	serverConfig.hostname = DEFAULT_SERVER_HOSTNAME;
+	serverConfig.ip = DEFAULT_SERVER_IP;
 	serverConfig.clientMaxBodySizeMB = DEFAULT_SERVER_CLIENTMAXBODYSIZEMB;	
 }
 
@@ -58,9 +58,9 @@ void ServerParser::extract(std::fstream &configFile) {
 			extractValue(value, colonPos);
 			extractPorts(value);
 			portFlag = true;
-		} else if (key == "hostname") {
+		} else if (key == "ip") {
 			extractValue(value, colonPos);
-			serverConfig.hostname = value;
+			serverConfig.ip = value;
 		} else if (key == "client_max_body_size_mb") {
 			extractValue(value, colonPos);
 			std::istringstream iss(value);
@@ -154,7 +154,7 @@ void ServerParser::print(ServerConfig serverConfig){
 		std::cout << " " << it->number << "(" << (it->isDefault ? "default" : "non-default") << ")";
 	}
 	std::cout << std::endl;
-	std::cout << "  Name: \"" << serverConfig.hostname << "\"" << std::endl;
+	std::cout << "  Name: \"" << serverConfig.ip << "\"" << std::endl;
 	std::cout << "  Client Max Body Size (MB): " << serverConfig.clientMaxBodySizeMB << std::endl;
 	std::cout << "  Error Pages:" << std::endl;
 	for (std::map<std::string, std::string>::const_iterator it = serverConfig.error_pages.begin(); it != serverConfig.error_pages.end(); ++it) {

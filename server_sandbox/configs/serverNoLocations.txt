@@ -1,6 +1,6 @@
 server:
 	ports: 80 90 100
-	hostname: eighty.com
+	ip: eighty.com
 	client_max_body_size_mb: 10
 	error_pages:
 		404: /404.html
@@ -9,7 +9,7 @@ server:
 
 server:
 	ports: 82
-	hostname: eightytwo.com
+	ip: eightytwo.com
 	client_max_body_size_mb: 10
 	error_pages:
 		404: /404.html
