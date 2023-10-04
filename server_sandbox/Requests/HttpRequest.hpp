@@ -98,5 +98,5 @@ public:
 	std::string const &getBoundary() const;
     ServerConfig *getConfig() const;
 	std::string getContentLength();
-
+    bool const &isFile() const;
 };

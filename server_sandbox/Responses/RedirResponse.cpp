@@ -11,6 +11,7 @@ RedirResponse::~RedirResponse()
 
 void RedirResponse::createResponse(HttpRequest &request)
 {
+    _cgi = false;
     if (request.getError("noSlash"))
     {
         std::cout << BG_BOLD_MAGENTA << "No slash in resource" << RESET << std::endl;

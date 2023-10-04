@@ -62,13 +62,6 @@ void HttpRequest::parseIsFile()
 			break;
 		}
 	}
-
-	/*std::cout << "Printing bodyVector:" << std::endl;
-	for (std::vector<char>::const_iterator it = _bodyVector.begin(); it != _bodyVector.end(); ++it)
-	{
-		std::cout << *it;
-	}*/
-
  }
 
 
@@ -128,31 +121,6 @@ int HttpRequest::checkContentLength(ServerConfig *config)
 		}
 	}
 	return EXIT_SUCCESS;
-}
-
-void HttpRequest::fillBodyVector(std::vector<char> const &bufferVector)
-{
-	//iterate over bodyVector and skip the header lines and the empty line and save the rest to _bodyVector
-	for (std::vector<char>::const_iterator it = bufferVector.begin(); it != bufferVector.end(); ++it)
-	{
-		//check if we are at the end of the header
-		if (*it == '\r' && *(it + 1) == '\n' && *(it + 2) == '\r' && *(it + 3) == '\n')
-		{
-			//skip the empty line
-			it += 4;
-			//save the rest of the buffer to _bodyVector
-			for (std::vector<char>::const_iterator it2 = it; it2 != bufferVector.end(); ++it2)
-			{
-				_bodyVector.push_back(*it2);
-			}
-			break;
-		}
-	}
-	/*std::cout << "Printing bodyVector:" << std::endl;
-	for (std::vector<char>::const_iterator it = _bodyVector.begin(); it != _bodyVector.end(); ++it)
-	{
-		std::cout << *it;
-	}*/
 }
 
 void HttpRequest::cleanUpMap(std::map<std::string, std::string> _map)
