@@ -102,51 +102,6 @@ void FormResponse::createResponse(HttpRequest &request)
     {
         close(input_pipefd[0]);  // Close the read end of the input pipe in the parent
         close(output_pipefd[1]); // Close the write end of the output pipe in the parent
-
-       /* // std::string body = request.getBody();
-        // const char* message = body.c_str();
-        std::vector<char> body = request.getBodyVector();
-    //write body to input pipe
-        for (std::vector<char>::iterator it = body.begin(); it != body.end(); ++it)
-        {
-            write(input_pipefd[1], &(*it), 1);
-        }
-        // write(input_pipefd[1], message, strlen(message));
-        close(input_pipefd[1]);*/
-
-
-
-		/*std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
-
-		// Read the output from the child process and store it in htmlOutputBuffer
-		char output_buffer[256];
-		ssize_t output_bytes_read;
-		while ((output_bytes_read = read(output_pipefd[0], output_buffer, sizeof(output_buffer))) > 0) {
-			htmlOutputBuffer.insert(htmlOutputBuffer.end(), output_buffer, output_buffer + output_bytes_read);
-		}
-		close(output_pipefd[0]);
-
-
-		// Convert the vector to a string
-		std::string htmlString(htmlOutputBuffer.begin(), htmlOutputBuffer.end());
-		setBody(htmlString);
-		//_body = htmlString;
-
-		setHeader(OkHeader(this->getRequest().getContentType(), this->getBodyLength()).getHeader());
-
-		std::cout << BG_BLUE << _response << RESET << std::endl;*/
-
-
-		
-
-         // Wait for the child process to finish
-		PRINT(FORMRESPONSE, BG_YELLOW, "Waiting for child process to finish")
-        /*int status;
-        waitpid(child_pid, &status, 0);
-
-        if (WIFEXITED(status)) {
-            std::cout << "Child process exited with status: " << WEXITSTATUS(status) << std::endl;
-        }*/
     }
 }
 
