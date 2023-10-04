@@ -37,8 +37,19 @@ void FormResponse::createResponse(HttpRequest &request)
     //std::cout << request.getBody() << std::endl;
 
     const char *phpInterpreter = "/usr/bin/php";
-    std::string resource = "./scripts" + request.getResource(); // Make a copy of the string
-    const char *phpScript = resource.c_str();
+
+	std::string relativeScriptFolder = "./scripts"; // Modify this as needed
+    char absoluteScriptFolder[SCRIPT_PATH_MAX];
+    if (realpath(relativeScriptFolder.c_str(), absoluteScriptFolder) == NULL)
+    {
+        perror("realpath");
+        return;
+    }
+
+	std::string absoluteScriptFolderStr = absoluteScriptFolder + request.getResource();
+    const char *phpScript = absoluteScriptFolderStr.c_str();
+	//std::cout << absoluteScriptFolder << std::endl;
+	//std::cout << phpScript << std::endl;
 
     // Build the argument vector
     const char *args[] = {
@@ -90,6 +101,12 @@ void FormResponse::createResponse(HttpRequest &request)
         // Redirect stdout to the write end of the output pipe
         dup2(output_pipefd[1], 1);
         close(output_pipefd[1]);
+
+		if (chdir(absoluteScriptFolder) != 0)
+		{
+			perror("chdir");
+			return;
+		}
 
         // Execute the PHP script within the child process
         if (execve(phpInterpreter, const_cast<char *const *>(args), envVars) == -1)

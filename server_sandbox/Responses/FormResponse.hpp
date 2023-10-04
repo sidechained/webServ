@@ -5,6 +5,8 @@
 #include <cstring>
 #include "../WebServ.hpp"
 
+#define SCRIPT_PATH_MAX 200
+
 
 class FormResponse : public ErrResponse
 {
