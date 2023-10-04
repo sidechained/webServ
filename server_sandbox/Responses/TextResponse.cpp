@@ -92,7 +92,9 @@ void TextResponse::genDir(std::string dirName, std::string resource)
     if (!dir)
     {
         perror("opendir");
-        exit(EXIT_FAILURE);
+        std::string error = "404";
+        this->createErrResponse(error);
+        return;
     }
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL)
