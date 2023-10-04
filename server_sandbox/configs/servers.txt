@@ -17,7 +17,7 @@ server:
 			root: /tmp
 		/:
 			root: /www
-			autoindex: true
+			autoindex: false
 		/my_game:
 			autoindex: true
 			root: /tictactoe

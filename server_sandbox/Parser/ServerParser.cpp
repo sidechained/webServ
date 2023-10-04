@@ -25,6 +25,7 @@ void ServerParser::setDefaults()
 {
 	serverConfig.hostname = DEFAULT_SERVER_HOSTNAME;
 	serverConfig.clientMaxBodySizeMB = DEFAULT_SERVER_CLIENTMAXBODYSIZEMB;	
+	serverConfig.error_pages["404"] = DEFAULT_ERROR_404;
 }
 
 void ServerParser::extract(std::fstream &configFile) {
