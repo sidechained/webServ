@@ -31,6 +31,9 @@ server:
 			root: /tictactoe
 		/my_game/hello:
 			root: /other_location
+		/uploads:
+			autoindex: true
+			root: /scripts/uploads
 
 server:
 	ports: 8080 4545
