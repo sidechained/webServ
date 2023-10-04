@@ -376,6 +376,7 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 	{
 		PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " bytes sent: " << bytes_sent << "  fd: " << i)
 		PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tRESPONSE length: " << response.length() << " bytes sent: " << bytes_sent << "  fd: " << i)
+		delete _pendingResponses[i];
 		_pendingResponses.erase(i);
 		closeConnection(i);
 	}
