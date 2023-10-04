@@ -300,7 +300,6 @@ void ServerManager::readRequest(const int &i, Socket *client)
 
 	
 	bytes_read = read(i, buffer, REQUEST_BUFFER);
-	std::cout << "request is " << buffer << std::endl;
 	std::vector<char> bufferVector;
 	for (int i = 0; i < bytes_read; i++)
 		bufferVector.push_back(buffer[i]);
@@ -365,7 +364,7 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 		return;
 	}
 	std::string response = responsePtr->getResponse();
-	std::cout << "Response is: " << response << std::endl;
+	//std::cout << "Response is: " << response << std::endl;
 	//PRINT(SERVERMANAGER, CYAN, "response is: " << response << "response")
 
 	if (response.length() >= MESSAGE_BUFFER)
