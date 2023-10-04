@@ -1,5 +1,5 @@
 server:
-	ports: 8080
+	ports: 8080 10 8080 8090 8080 8090
 	ip: 127.0.0.1
 	client_max_body_size_mb: 10
 	error_pages:
@@ -23,22 +23,3 @@ server:
 			root: /tictactoe
 		/my_game/hello:
 			root: /other_location
-
-server:
-	ports: 8080 4545
-	ip: 127.0.0.3
-	client_max_body_size_mb: 10
-	error_pages:
-		500: /50x.html
-		501: /50x.html
-	locationConfigs:
-		/test:
-			methods: GET
-			redir: /new-url
-			root: /tmp
-			autoindex: true
-			uploads: /uploads
-		/new-url:
-			methods: GET
-		/:
-			root: /www

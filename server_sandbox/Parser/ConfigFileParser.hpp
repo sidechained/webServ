@@ -17,6 +17,7 @@ class ConfigFileParser : public GenericParser
 		~ConfigFileParser();
 		std::vector<ServerConfig> serverConfigs;
 		int numServers;
+		void validatePorts();
 		void print() const;
 };
 
