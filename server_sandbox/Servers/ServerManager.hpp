@@ -15,6 +15,7 @@
 #include "../Responses/ResponseFactory.hpp"
 
 //#define MAX_CLIENTS 10
+#define REQUEST_BUFFER 90000
 #define MESSAGE_BUFFER 20000
 #define CONNECTION_TIMEOUT 5000
 
@@ -52,6 +53,8 @@ public:
 	void acceptNewConnection(int fd);
 	void readRequest(const int &i, Socket *client);
 	void sendResponse(const int &i, Socket *client);
+	void sendBodyToCgi(FormResponse *cgiResponse);
+	void readBodyFromCgi(FormResponse *cgiResponse);
 
 	ServerManager();
 	~ServerManager();

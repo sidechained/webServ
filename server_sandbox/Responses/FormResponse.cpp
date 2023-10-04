@@ -2,17 +2,39 @@
 
 FormResponse::FormResponse(HttpRequest &request) : ErrResponse(request)
 {
-    createResponse(request);
+	_cgi = true;
+	initPipe();
+    //createResponse(request);
 }
 
 FormResponse::~FormResponse()
 {
 }
 
+void FormResponse::initPipe()
+{
+	// Create the input pipe
+	if (pipe(input_pipefd) == -1)
+	{
+		perror("pipe");
+		// fill error response
+		return;
+	}
+
+	// Create the output pipe
+	if (pipe(output_pipefd) == -1)
+	{
+		perror("pipe");
+		// fill error response
+		return;
+	}
+}
+
 void FormResponse::createResponse(HttpRequest &request)
 {
-    std::cout << BG_YELLOW << "Create form response" << std::endl;
-    std::cout << request.getBody() << std::endl;
+	_cgi = true;
+    std::cout << BG_YELLOW << "Create form response"  RESET << std::endl;
+    //std::cout << request.getBody() << std::endl;
 
     const char *phpInterpreter = "/usr/bin/php";
     std::string resource = "./scripts" + request.getResource(); // Make a copy of the string
@@ -46,24 +68,8 @@ void FormResponse::createResponse(HttpRequest &request)
     // Execute the PHP script with custom environmental variables set in C++
     char *const envVars[] = {fileNameVar, boundary, uploadPath,  NULL};
 
-    // Create the input pipe
-    if (pipe(input_pipefd) == -1)
-    {
-        perror("pipe");
-        // fill error response
-        return;
-    }
-
-    // Create the output pipe
-    if (pipe(output_pipefd) == -1)
-    {
-        perror("pipe");
-        // fill error response
-        return;
-    }
-
     // Fork a child process
-    pid_t child_pid = fork();
+    child_pid = fork();
 
     if (child_pid == -1)
     {
@@ -97,7 +103,7 @@ void FormResponse::createResponse(HttpRequest &request)
         close(input_pipefd[0]);  // Close the read end of the input pipe in the parent
         close(output_pipefd[1]); // Close the write end of the output pipe in the parent
 
-        // std::string body = request.getBody();
+       /* // std::string body = request.getBody();
         // const char* message = body.c_str();
         std::vector<char> body = request.getBodyVector();
     //write body to input pipe
@@ -106,17 +112,11 @@ void FormResponse::createResponse(HttpRequest &request)
             write(input_pipefd[1], &(*it), 1);
         }
         // write(input_pipefd[1], message, strlen(message));
-        close(input_pipefd[1]);
+        close(input_pipefd[1]);*/
 
-        		// Create a file for writing the HTML output
-		/*std::ofstream htmlFile("output.html");
 
-		if (!htmlFile) {
-			std::cerr << "Failed to open HTML output file." << std::endl;
-			return ;
-		}*/
 
-		std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
+		/*std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
 
 		// Read the output from the child process and store it in htmlOutputBuffer
 		char output_buffer[256];
@@ -134,21 +134,29 @@ void FormResponse::createResponse(HttpRequest &request)
 
 		setHeader(OkHeader(this->getRequest().getContentType(), this->getBodyLength()).getHeader());
 
-		std::cout << BG_BLUE << _response << RESET << std::endl;
+		std::cout << BG_BLUE << _response << RESET << std::endl;*/
 
 
-		/*// Write the HTML output to the file
-		htmlFile.write(htmlOutputBuffer.data(), htmlOutputBuffer.size());
-
-		// Close the HTML file
-		htmlFile.close();*/
+		
 
          // Wait for the child process to finish
-        int status;
+		PRINT(FORMRESPONSE, BG_YELLOW, "Waiting for child process to finish")
+        /*int status;
         waitpid(child_pid, &status, 0);
 
         if (WIFEXITED(status)) {
             std::cout << "Child process exited with status: " << WEXITSTATUS(status) << std::endl;
-        }
+        }*/
     }
 }
+
+int FormResponse::getInputPipefd()
+{
+	return input_pipefd[1];
+}
+
+int FormResponse::getOutputPipefd()
+{
+	return output_pipefd[0];
+}
+

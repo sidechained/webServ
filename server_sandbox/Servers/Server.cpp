@@ -8,7 +8,7 @@
 // 	}
 // }
 
-Server::Server(ServerConfig &config) : _config(&config), _ports(config.portConfigs), _ip(config.hostname)
+Server::Server(ServerConfig &config) : _config(&config), _ports(config.portConfigs), _ip(config.ip)
 {
     for (unsigned long i = 0; i < config.portConfigs.size(); i++)
     {

@@ -1,24 +1,16 @@
 server:
-	ports: 8080
+	ports: 8080 10 8080 8090 8080 8090
 	ip: 127.0.0.1
 	client_max_body_size_mb: 10
 	error_pages:
 		404: ./www/custom_404.html
 	locationConfigs:
-		/new_index:
-			root: /www/new_index
-			index: hello.html
-		/allowonlypost:
-			methods: POST
-			root: /www
 		/test:
 			methods: GET
 			redir: /new-url
 			root: /tmp
 			autoindex: true
 			uploads: /uploads
-		/new_root:
-			root: /my_new_root
 		/new-url:
 			methods: GET
 			index: test.html
@@ -31,17 +23,13 @@ server:
 			root: /tictactoe
 		/my_game/hello:
 			root: /other_location
-		/uploads:
-			autoindex: true
-			root: /scripts/uploads
 
 server:
-	ports: 8080 4545
+	ports: 9080 1000 9080 9090 9080 9090
 	ip: 127.0.0.3
 	client_max_body_size_mb: 10
 	error_pages:
-		500: /50x.html
-		501: /50x.html
+		404: ./www/custom_404.html
 	locationConfigs:
 		/test:
 			methods: GET
@@ -51,5 +39,13 @@ server:
 			uploads: /uploads
 		/new-url:
 			methods: GET
+			index: test.html
+			root: /tmp
 		/:
 			root: /www
+			autoindex: false
+		/my_game:
+			autoindex: true
+			root: /tictactoe
+		/my_game/hello:
+			root: /other_location

@@ -6,6 +6,7 @@
 #include "Parser/ConfigFileParser.hpp"
 #include "Colors.hpp"
 #include "Servers/ServerManager.hpp"
+#define DEFAULT_CONFIG_FILE_PATH "configs/servers.txt"
 
 bool isRunning = true;
 
@@ -38,15 +39,25 @@ void sigIntHandler(int sig)
 //     return 0;
 // }
 
-int main(int argc, char const *argv[])
+int main(int argc, const char *argv[])
 {
-
-    if (argc != 2)
+    // todolist changes start here >>>
+    if (argc < 1 || argc > 2)
     {
         std::cout << "Wrong number of arguments" << std::endl;
         return EXIT_FAILURE;
     }
-    ConfigFileParser cfp(argv[1]);
+    const char *path;
+    if (argc == 1)
+    {
+    	path = DEFAULT_CONFIG_FILE_PATH;
+    }
+    if (argc == 2)
+    {
+    	path = argv[1];
+    }
+    ConfigFileParser cfp(path);
+    // todolist changes end here <<<    	
     signal(SIGINT, sigIntHandler);
     signal(SIGPIPE, SIG_IGN);
     /*std::vector<int> ports;

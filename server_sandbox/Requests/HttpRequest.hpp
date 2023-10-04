@@ -41,6 +41,7 @@ private:
     bool _isFile;
 
     void fillIncomingRequestMap(std::string const &request);
+	int checkContentLength(ServerConfig *config);
     void fillBodyVector(std::vector<char> const &bufferVector);
     void parseLocationConfig();
     void parseIsFile();
@@ -96,5 +97,6 @@ public:
     std::vector<char> const &getBodyVector() const;
 	std::string const &getBoundary() const;
     ServerConfig *getConfig() const;
-    bool const &isFile() const;
+	std::string getContentLength();
+
 };

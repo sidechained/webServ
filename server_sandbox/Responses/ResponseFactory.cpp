@@ -12,12 +12,18 @@ ResponseFactory::~ResponseFactory()
 
 SimpleResponse *ResponseFactory::GETresponse(HttpRequest &request)
 {
-    SimpleResponse *response = NULL;
-    if (request.hasError() && request.getError("noSlash"))
-        response = new RedirResponse(request);
-    else
-        response = new TextResponse(request);
-    return response;
+
+	SimpleResponse *response = NULL;
+	if (request.hasError() && request.getError("noSlash"))
+		response = new RedirResponse(request);
+	else
+		response = new TextResponse(request);
+
+	if (response)
+		std::cout << BG_BLUE "cgi form response text" RESET << response->isCgi() << std::endl;
+
+	return response;
+
 }
 
 SimpleResponse *ResponseFactory::POSTresponse(HttpRequest &request)

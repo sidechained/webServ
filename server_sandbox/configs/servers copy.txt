@@ -5,20 +5,12 @@ server:
 	error_pages:
 		404: ./www/custom_404.html
 	locationConfigs:
-		/new_index:
-			root: /www/new_index
-			index: hello.html
-		/allowonlypost:
-			methods: POST
-			root: /www
 		/test:
 			methods: GET
 			redir: /new-url
 			root: /tmp
 			autoindex: true
 			uploads: /uploads
-		/new_root:
-			root: /my_new_root
 		/new-url:
 			methods: GET
 			index: test.html
@@ -31,9 +23,6 @@ server:
 			root: /tictactoe
 		/my_game/hello:
 			root: /other_location
-		/uploads:
-			autoindex: true
-			root: /scripts/uploads
 
 server:
 	ports: 8080 4545

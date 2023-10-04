@@ -17,7 +17,7 @@ struct PortConfig
 
 struct ServerConfig
 {
-	std::string hostname;
+	std::string ip;
 	unsigned int clientMaxBodySizeMB;
 	std::vector<PortConfig> portConfigs;
 	std::map<std::string, std::string> error_pages;

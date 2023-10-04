@@ -14,6 +14,8 @@ protected:
     std::string _body;
     std::string _response;
     int _bodyLength;
+	bool _cgi;
+
 public:
     SimpleResponse();
     SimpleResponse(HttpRequest &request);
@@ -31,5 +33,8 @@ public:
     void updateBodyOffset(size_t offset);
     int fileLength(std::ifstream &htmlFile);
     void cutRes(std::string& response, size_t i);
+	bool isCgi() const;
+	void setCgi(bool cgi);
+
 };
 
