@@ -8,6 +8,32 @@ ErrResponse::~ErrResponse()
 {
 }
 
+void ErrResponse::createErrResponse(std::string &error, ServerConfig *config)
+{
+    std::string errPath = config->error_pages[error];
+    std::cout << BG_RED << "Error path: " << errPath << std::endl;
+	//print current working directory
+	char cwd[1024];
+	if (getcwd(cwd, sizeof(cwd)) != NULL)
+		std::cout << BG_RED << "Current working dir: " << cwd << RESET << std::endl;
+    std::ifstream htmlFile(errPath.c_str(), std::ios::binary);
+    if (!htmlFile)
+    {
+        createDefaultErrResponse(error);
+        return;
+    }
+    setBody(htmlFile);
+    std::cout << BG_RED << "Body: " << getBody() << std::endl;
+
+    std::ostringstream oss1;
+    oss1 << "HTTP/1.1 " << error << "\r\n";
+    oss1 << "Content-Type: text/html\r\n";
+    oss1 << "Content-Length: " << this->getBodyLength() << "\r\n";
+    oss1 << "\r\n";
+    std::string header = oss1.str();
+    setHeader(header);
+}
+
 void ErrResponse::createErrResponse(std::string &error)
 {
     HttpRequest request = getRequest();

@@ -137,7 +137,7 @@ void ServerManager::runServers()
 					if (FD_ISSET(cgiResponse->input_pipefd[1], &write_set_cpy))
 						sendBodyToCgi(cgiResponse);
 					else if (FD_ISSET(cgiResponse->output_pipefd[0], &recv_set_cpy))
-						readBodyFromCgi(cgiResponse);
+						readBodyFromCgi(cgiResponse, _clients_map[i]);
 				}
 				else
 					sendResponse(i, _clients_map[i]);
@@ -181,7 +181,7 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
 	removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
 }
 
-void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
+void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
 {
 	PRINT(CGI, BG_BLUE, "readBodyFromCgi")
 
@@ -221,20 +221,15 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 	{
 		int exit_status = WEXITSTATUS(status);
 		std::cout << "Child process exited with status: " << exit_status << std::endl;
-		char cwd[1024];
-		if (getcwd(cwd, sizeof(cwd)) != NULL)
-			std::cout << BG_RED << "Current working dir before changing: " << cwd << RESET << std::endl;
-		/* if (exit_status != 0)
+		if (exit_status != 0)
 		{
-			
-			std::cout << BG_RED << "PRE "  << RESET << std::endl;
-			std::string error = "405";
-			cgiResponse->createErrResponse(error);
-			std::cout << BG_RED << "POST "  << RESET << std::endl;
+			std::string error = "501";
+			Server *server = findServer(client);
+			ServerConfig *config = server->getConfig();
+			cgiResponse->createErrResponse(error, config);
 			return;
-		} */
+		}
 	}
-	// std::cout << BG_BLUE << cgiResponse->getResponse() << RESET << std::endl;
 }
 
 void ServerManager::checkTimeout()
