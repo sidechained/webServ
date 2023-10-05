@@ -1,6 +1,7 @@
 #pragma once
 #include "HttpError.hpp"
 #include "../Colors.hpp"
+#include <cstdio>
 #include <string>
 #include <sstream>
 #include <map>

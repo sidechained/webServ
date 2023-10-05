@@ -38,7 +38,11 @@ NOTE: default clientMaxBodySize is 1MB, but in our "configs/serversClientMaxBody
 
 ## DELETE
 
+<<<<<<< HEAD
 `touch www/deleteTest.html`
+=======
+`touch www/deleteTest.html` // must do this to create the file
+>>>>>>> 8ab4e22326d721263f2faf0912308a3df5808dea
 `curl -X DELETE http://127.0.0.1:8080/deleteTest.html`
 
 # CGI-php Requests

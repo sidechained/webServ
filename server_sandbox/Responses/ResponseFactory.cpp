@@ -33,6 +33,15 @@ SimpleResponse *ResponseFactory::POSTresponse(HttpRequest &request)
     return response;
 }
 
+// what should this do?
+SimpleResponse *ResponseFactory::DELETEresponse(HttpRequest &request)
+{
+	std::cout << "DELETE response" << std::endl;
+    SimpleResponse *response = NULL;
+    response = new FormResponse(request);
+    return response;
+}
+
 SimpleResponse *ResponseFactory::createResponse(HttpRequest &request)
 {
     SimpleResponse *response = NULL;
@@ -45,5 +54,7 @@ SimpleResponse *ResponseFactory::createResponse(HttpRequest &request)
         response = GETresponse(request);
     else if (method == "POST")
         response = POSTresponse(request);
+	else if (method == "DELETE")
+		response = DELETEresponse(request);
     return response;
 }
