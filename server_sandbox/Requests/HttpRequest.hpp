@@ -35,6 +35,7 @@ private:
     std::string _body;
     std::vector<char> _bodyVector;
     std::vector<Part> _parts;
+	std::vector<std::string> _envVars;
     std::string _boundary;
     std::map<std::string, std::string> _errorPages;
     LocationConfig *_locationConfig;
@@ -99,4 +100,6 @@ public:
     ServerConfig *getConfig() const;
 	std::string getContentLength();
     bool const &isFile() const;
+	void setDefaultEnvVars();
+	std::vector<std::string> getEnvVars() const;
 };

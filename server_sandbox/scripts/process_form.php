@@ -1,19 +1,9 @@
 <?php
 
- // Read the HTTP request from stdin
- $request = '';
- while ($line = fgets(STDIN)) {
-     $request .= $line;
-	 //echo $line;
-	 //echo "ciao";
- }
-
- // Parse the input string to extract variables
-parse_str($request, $requestData);
 
 // Extract the "name" and "color" variables
-$name = $requestData['name'] ?? '';
-$color = $requestData['color'] ?? '';
+$name = getenv('NAME');
+$color = getenv('COLOR');
 
 
 // Check if the name is "marco"
