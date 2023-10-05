@@ -15,9 +15,9 @@
 #include "../Responses/ResponseFactory.hpp"
 
 //#define MAX_CLIENTS 10
-#define REQUEST_BUFFER 90000
+#define REQUEST_BUFFER 30000
 #define MESSAGE_BUFFER 20000
-#define CONNECTION_TIMEOUT 500
+#define CONNECTION_TIMEOUT 5000
 
 class Server;
 class SimpleResponse;

@@ -21,6 +21,7 @@ HttpRequest::HttpRequest(std::string const &request, std::vector<char> &requestV
 	if (checkContentLength(config) == EXIT_FAILURE)
 		return;
 	fillBodyVector(requestVector);
+	parseIsFile();
 	parseLocationConfig();
 	parseIndex();
 	parseMethod();
@@ -31,6 +32,40 @@ HttpRequest::HttpRequest(std::string const &request, std::vector<char> &requestV
 	attemptDelete();
 	cleanUpMap(_incomingRequest);
 }
+
+
+void HttpRequest::parseIsFile()
+{
+	std::string resource = getResource();
+	size_t dotPosition = resource.rfind('.');
+	if (dotPosition != std::string::npos && dotPosition > 0 && dotPosition < resource.length() - 1) {
+        _isFile = true;
+		return;
+    }
+	_isFile = false;
+}
+
+ void HttpRequest::fillBodyVector(std::vector<char> const &bufferVector)
+ {
+	//iterate over bodyVector and skip the header lines and the empty line and save the rest to _bodyVector
+	for (std::vector<char>::const_iterator it = bufferVector.begin(); it != bufferVector.end(); ++it)
+	{
+		//check if we are at the end of the header
+		if (*it == '\r' && *(it + 1) == '\n' && *(it + 2) == '\r' && *(it + 3) == '\n')
+		{
+			//skip the empty line
+			it += 4;
+			//save the rest of the buffer to _bodyVector
+			for (std::vector<char>::const_iterator it2 = it; it2 != bufferVector.end(); ++it2)
+			{
+				_bodyVector.push_back(*it2);
+			}
+			break;
+		}
+	}
+ }
+
+
 
 void HttpRequest::fillIncomingRequestMap(std::string const &request)
 {
@@ -89,31 +124,6 @@ int HttpRequest::checkContentLength(ServerConfig *config)
 	return EXIT_SUCCESS;
 }
 
-void HttpRequest::fillBodyVector(std::vector<char> const &bufferVector)
-{
-	//iterate over bodyVector and skip the header lines and the empty line and save the rest to _bodyVector
-	for (std::vector<char>::const_iterator it = bufferVector.begin(); it != bufferVector.end(); ++it)
-	{
-		//check if we are at the end of the header
-		if (*it == '\r' && *(it + 1) == '\n' && *(it + 2) == '\r' && *(it + 3) == '\n')
-		{
-			//skip the empty line
-			it += 4;
-			//save the rest of the buffer to _bodyVector
-			for (std::vector<char>::const_iterator it2 = it; it2 != bufferVector.end(); ++it2)
-			{
-				_bodyVector.push_back(*it2);
-			}
-			break;
-		}
-	}
-	/*std::cout << "Printing bodyVector:" << std::endl;
-	for (std::vector<char>::const_iterator it = _bodyVector.begin(); it != _bodyVector.end(); ++it)
-	{
-		std::cout << *it;
-	}*/
-}
-
 void HttpRequest::cleanUpMap(std::map<std::string, std::string> _map)
 {
 	for (std::map<std::string, std::string>::iterator it = _map.begin(); it != _map.end(); ++it)
@@ -138,7 +148,14 @@ void HttpRequest::parseLocationConfig()
 		if (locationIsSet(key))
 		{
 			_locationConfig = &_config->locationConfigs[key];
+			std::cout << BG_BLUE << "location is set" << RESET << std::endl;
+			std::cout << "HttpRequest" << std::endl;
 			PRINT(HTTPREQUEST, BG_BLUE, "location is set");
+            std::cout << "key:" << key << std::endl;
+			if (_locationConfig->autoindex)
+            	std::cout << "autoindexed"  << std::endl;
+			else
+				std::cout << "autoindexed"  << std::endl;
 			parsePath(key, i);
 			break;
 		}
@@ -676,6 +693,10 @@ std::string const &HttpRequest::getBoundary() const
 	return _boundary;
 }
 
+bool const &HttpRequest::isFile() const
+{
+	return _isFile;
+}
 std::string HttpRequest::getContentLength()
 {
 	return _incomingRequest["Content-Length"];
