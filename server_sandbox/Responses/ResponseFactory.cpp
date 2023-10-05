@@ -39,7 +39,9 @@ SimpleResponse *ResponseFactory::createResponse(HttpRequest &request)
     
     std::string method = request.getMethod();
     std::cout << "Method: " << method << std::endl;
-    if (method == "GET")
+	if (method == "GET" && request.getContentType() == "application/x-httpd-php")
+		response = POSTresponse(request);
+    else if (method == "GET")
         response = GETresponse(request);
     else if (method == "POST")
         response = POSTresponse(request);

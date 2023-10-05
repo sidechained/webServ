@@ -8,7 +8,10 @@ std::string findContentType(const std::string &resource)
     if (_contentTypes.empty())
         loadMapFromFile("./config/content_types.txt", _contentTypes);
     if (resource.empty() || resource == "/")
+	{
+		std::cout << BG_BOLD_RED << "No resource found" << RESET << std::endl;
         return "text/html";
+	}
     size_t lastDotPosition = resource.find_last_of(".");
     if (lastDotPosition != std::string::npos)
     {

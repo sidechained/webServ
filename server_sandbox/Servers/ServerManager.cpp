@@ -190,15 +190,15 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
     bzero(buffer, MESSAGE_BUFFER);
     int bytes_read = 0;
     bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER);
-    std::cout << BG_GREEN << "buffer created" << buffer << RESET << std::endl;
+    //std::cout << BG_GREEN << "buffer created" << buffer << RESET << std::endl;
     // Use a vector to store the binary data and its length.
     std::vector<char> bufferVector(buffer, buffer + bytes_read);
-    for (size_t i = 0; i < bufferVector.size(); ++i) {
+    /*for (size_t i = 0; i < bufferVector.size(); ++i) {
     std::cout << bufferVector[i];
-    }
+    }*/
     close(cgiResponse->output_pipefd[0]);
     std::string htmlString(bufferVector.begin(), bufferVector.end());
-    std::cout << BG_GREEN << "string created" << htmlString << RESET << std::endl; 
+    //std::cout << BG_GREEN << "string created" << htmlString << RESET << std::endl; 
     /*std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
     // Read the output from the child process and store it in htmlOutputBuffer
     char output_buffer[256];
@@ -212,7 +212,7 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
     std::string htmlString(htmlOutputBuffer.begin(), htmlOutputBuffer.end());*/
     cgiResponse->setBody(htmlString);
     //_body = htmlString;
-    cgiResponse->setHeader(OkHeader(cgiResponse->getRequest().getContentType(), cgiResponse->getBodyLength()).getHeader());
+    cgiResponse->setHeader(OkHeader("text/html", cgiResponse->getBodyLength()).getHeader());
     removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
     //std::cout << BG_BLUE << cgiResponse->getResponse() << RESET << std::endl;
 }
@@ -320,8 +320,8 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		HttpRequest parsedRequest(buffer, bufferVector, config);
 		PRINT(CGI, BG_RED, "content length request: " << parsedRequest.getContentLength())
 		std::cout << "Printing request" << std::endl;
-  	 	parsedRequest.printRequest();
-		std::cout << BG_GREEN << parsedRequest.getMethod() << std::endl;
+  	 	//parsedRequest.printRequest();
+		std::cout << BG_GREEN << parsedRequest.getMethod() << " and file type " << parsedRequest.getContentType() << std::endl;
 		client->updateTime();
 		_pendingResponses[i] = ResponseFactory::createResponse(parsedRequest);
 		if (_pendingResponses[i]->isCgi())

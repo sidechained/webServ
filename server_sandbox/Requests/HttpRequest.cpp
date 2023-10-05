@@ -80,6 +80,34 @@ void HttpRequest::fillIncomingRequestMap(std::string const &request)
 		if (pos2 != std::string::npos)
 		{
 			std::string resource = line.substr(pos + 1, pos2 - pos - 1);
+
+            // Check if there are query parameters in the resource
+            size_t query_start = resource.find('?');
+            if (query_start != std::string::npos)
+            {
+                std::string query_string = resource.substr(query_start + 1);
+                // You can parse and process the query string here as needed
+                // For example, you can split it into key-value pairs
+                // and store them in your data structures.
+                // Example parsing code:
+                std::istringstream queryStream(query_string);
+                std::string parameter;
+                while (std::getline(queryStream, parameter, '&'))
+                {
+                    size_t equal_sign_pos = parameter.find('=');
+                    if (equal_sign_pos != std::string::npos)
+                    {
+                        std::string param_name = parameter.substr(0, equal_sign_pos);
+						std::cout << "param_name: " << param_name << std::endl;
+                        std::string param_value = parameter.substr(equal_sign_pos + 1);
+						std::cout << "param_value: " << param_value << std::endl;
+                        // Store param_name and param_value as needed
+                    }
+                }
+            }
+			  // Reassign the resource variable to remove query parameters
+            resource = resource.substr(0, query_start);
+
 			_incomingRequest["Resource"] = resource;
 			std::string protocol = line.substr(pos2 + 1);
 			_incomingRequest["Protocol"] = protocol;
