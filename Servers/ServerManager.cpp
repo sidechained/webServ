@@ -224,19 +224,15 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 		char cwd[1024];
 		if (getcwd(cwd, sizeof(cwd)) != NULL)
 			std::cout << BG_RED << "Current working dir before changing: " << cwd << RESET << std::endl;
-		if (exit_status != 0)
+		/* if (exit_status != 0)
 		{
-			/*if (chdir("../") != 0)
-			{
-				perror("chdir");
-				return;
-			}*/
+			
 			std::cout << BG_RED << "PRE "  << RESET << std::endl;
 			std::string error = "405";
 			cgiResponse->createErrResponse(error);
 			std::cout << BG_RED << "POST "  << RESET << std::endl;
 			return;
-		}
+		} */
 	}
 	// std::cout << BG_BLUE << cgiResponse->getResponse() << RESET << std::endl;
 }
