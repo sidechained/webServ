@@ -3,18 +3,32 @@
 $uploadPath = $_SERVER['UPLOAD_PATH'];
 $boundary = $_SERVER['BOUNDARY'];
 
-//echo "path = $uploadPath";
+
+// ~~ CREATE UPLOAD DIRECTORY IF IT DOES NOT EXIST ~~
+echo "path = $uploadPath <br>";
+echo getcwd() . "<br>";
+if (is_dir($uploadPath)) {
+	echo "upload path exists <br>";
+} else {
+	echo "upload path does not exist <br>";
+	echo "creating upload path <br>";
+	mkdir($uploadPath, 0777, true);
+}
+
 //echo "path = $boundary";
 
  // Read the HTTP request from stdin
  $request = '';
+ 
+ echo "was here<br>";
  while ($line = fgets(STDIN)) {
+	echo "$line<br>";		
      $request .= $line;
  }
+ echo "was there<br>";
 
 // Split the request into parts using the boundary
 $parts = explode("--$boundary", $request);
-
 
 // Initialize variables to store Content-Type and content
 $content = '';
@@ -25,7 +39,7 @@ $body = '';
 // Loop through each part to process the file uploads
 foreach ($parts as $part) {
 	echo "part<br>";
-	echo $part;
+	//echo $part;
 
 	$part = str_replace($boundary, '', $part);
 

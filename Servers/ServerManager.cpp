@@ -220,7 +220,7 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
 	if (WIFEXITED(status))
 	{
 		int exit_status = WEXITSTATUS(status);
-		std::cout << "Child process exited with status: " << exit_status << std::endl;
+		std::cout << BG_RED << "Child process exited with status: " << exit_status << RESET << std::endl;
 		(void) client;
 		if (exit_status != 0 && exit_status != 255)
 		{
