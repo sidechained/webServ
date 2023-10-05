@@ -2,8 +2,6 @@ server:
 	ports: 8080 1111
 	ip: 127.0.0.1
 	client_max_body_size_mb: 10
-	error_pages:
-		404: ./www/custom_404.html
 	locationConfigs:
 		/new_index:
 			root: /www/new_index

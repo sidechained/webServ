@@ -128,12 +128,12 @@ void ServerManager::runServers()
 				readRequest(i, _clients_map[i]);
 			else if (FD_ISSET(i, &write_set_cpy) && _clients_map.count(i))
 			{
-				//SimpleResponse *responsePtr = _pendingResponses[i];
+				// SimpleResponse *responsePtr = _pendingResponses[i];
 				int cgi = _pendingResponses[i]->isCgi();
 				if (cgi)
 				{
-					//PRINT(CGI, BG_BLUE, "cgi form response text")
-					FormResponse* cgiResponse = dynamic_cast<FormResponse*>(_pendingResponses[i]);
+					// PRINT(CGI, BG_BLUE, "cgi form response text")
+					FormResponse *cgiResponse = dynamic_cast<FormResponse *>(_pendingResponses[i]);
 					if (FD_ISSET(cgiResponse->input_pipefd[1], &write_set_cpy))
 						sendBodyToCgi(cgiResponse);
 					else if (FD_ISSET(cgiResponse->output_pipefd[0], &recv_set_cpy))
@@ -151,72 +151,95 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
 {
 	PRINT(CGI, BG_BLUE, "sendBodyToCgi")
 	std::vector<char> body = cgiResponse->getRequest().getBodyVector();
-        // Check if the pipe is valid
-    if (cgiResponse->input_pipefd[1] != -1) {
-        // Write the entire body to the input pipe at once
-        ssize_t bytes_written = write(cgiResponse->input_pipefd[1], body.data(), body.size());
+	// Check if the pipe is valid
+	if (cgiResponse->input_pipefd[1] != -1)
+	{
+		// Write the entire body to the input pipe at once
+		ssize_t bytes_written = write(cgiResponse->input_pipefd[1], body.data(), body.size());
 		char EOF_char = EOF;
 		write(cgiResponse->input_pipefd[1], &EOF_char, 1);
-	PRINT(CGI, BG_YELLOW, "body size sent to cgi is: " << body.size() << " bytes written: " << bytes_written)
+		PRINT(CGI, BG_YELLOW, "body size sent to cgi is: " << body.size() << " bytes written: " << bytes_written)
 
-        if (bytes_written == -1) {
-            // Handle write error
-            perror("write");
+		if (bytes_written == -1)
+		{
+			// Handle write error
+			perror("write");
 			PRINT(CGI, BG_BOLD_RED, "write error")
-            // Add error handling as needed
-        }
+			// Add error handling as needed
+		}
 
-        close(cgiResponse->input_pipefd[1]);
-        removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
-    } else {
-		PRINT(CGI, BG_BOLD_RED, "invalid pipe")
-        // Handle invalid pipe
-        // Add error handling as needed
-    }
-
+		close(cgiResponse->input_pipefd[1]);
 		removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
+	}
+	else
+	{
+		PRINT(CGI, BG_BOLD_RED, "invalid pipe")
+		// Handle invalid pipe
+		// Add error handling as needed
+	}
+
+	removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
 }
 
 void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 {
-    PRINT(CGI, BG_BLUE, "readBodyFromCgi")
-    int status;
-    waitpid(cgiResponse->child_pid, &status, 0);
-    if (WIFEXITED(status)) {
-        std::cout << "Child process exited with status: " << WEXITSTATUS(status) << std::endl;
-    }
-    cgiResponse->setCgi(false);
-    /* char buffer[MESSAGE_BUFFER];
-    bzero(buffer, MESSAGE_BUFFER);
-    int bytes_read = 0;
-    bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER);-
-    std::cout << BG_GREEN << "buffer created" << buffer << RESET << std::endl;
-    // Use a vector to store the binary data and its length.
-    std::vector<char> bufferVector(buffer, buffer + bytes_read);
-    for (size_t i = 0; i < bufferVector.size(); ++i) {
-    std::cout << bufferVector[i];
-    }
-    close(cgiResponse->output_pipefd[0]);
-    std::string htmlString(bufferVector.begin(), bufferVector.end());
-    std::cout << BG_GREEN << "string created" << htmlString << RESET << std::endl; */
-    std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
-    // Read the output from the child process and store it in htmlOutputBuffer
-    char output_buffer[256];
-    ssize_t output_bytes_read;
-    while ((output_bytes_read = read(cgiResponse->output_pipefd[0], output_buffer, sizeof(output_buffer))) > 0) {
-        htmlOutputBuffer.insert(htmlOutputBuffer.end(), output_buffer, output_buffer + output_bytes_read);
-    }
-    PRINT(CGI, BG_BLUE, "body size read from cgi is: " << htmlOutputBuffer.size())
-    close(cgiResponse->output_pipefd[0]);
-    // Convert the vector to a string
-    std::string htmlString(htmlOutputBuffer.begin(), htmlOutputBuffer.end());
-    cgiResponse->setBody(htmlString);
-    //_body = htmlString;
-    cgiResponse->setHeader(OkHeader(cgiResponse->getRequest().getContentType(), cgiResponse->getBodyLength()).getHeader());
-    removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
-    //std::cout << BG_BLUE << cgiResponse->getResponse() << RESET << std::endl;
-}
+	PRINT(CGI, BG_BLUE, "readBodyFromCgi")
 
+	cgiResponse->setCgi(false);
+	char buffer[MESSAGE_BUFFER];
+	bzero(buffer, MESSAGE_BUFFER);
+	int bytes_read = 0;
+	bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER);
+	// std::cout << BG_GREEN << "buffer created" << buffer << RESET << std::endl;
+	//  Use a vector to store the binary data and its length.
+	std::vector<char> bufferVector(buffer, buffer + bytes_read);
+	/*for (size_t i = 0; i < bufferVector.size(); ++i) {
+	std::cout << bufferVector[i];
+	}*/
+	close(cgiResponse->output_pipefd[0]);
+	std::string htmlString(bufferVector.begin(), bufferVector.end());
+	// std::cout << BG_GREEN << "string created" << htmlString << RESET << std::endl;
+	/*std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
+	// Read the output from the child process and store it in htmlOutputBuffer
+	char output_buffer[256];
+	ssize_t output_bytes_read;
+	while ((output_bytes_read = read(cgiResponse->output_pipefd[0], output_buffer, sizeof(output_buffer))) > 0) {
+		htmlOutputBuffer.insert(htmlOutputBuffer.end(), output_buffer, output_buffer + output_bytes_read);
+	}
+	PRINT(CGI, BG_BLUE, "body size read from cgi is: " << htmlOutputBuffer.size())
+	close(cgiResponse->output_pipefd[0]);
+	// Convert the vector to a string
+	std::string htmlString(htmlOutputBuffer.begin(), htmlOutputBuffer.end());*/
+	cgiResponse->setBody(htmlString);
+	//_body = htmlString;
+	cgiResponse->setHeader(OkHeader("text/html", cgiResponse->getBodyLength()).getHeader());
+	removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
+
+	int status;
+	waitpid(cgiResponse->child_pid, &status, 0);
+	if (WIFEXITED(status))
+	{
+		int exit_status = WEXITSTATUS(status);
+		std::cout << "Child process exited with status: " << exit_status << std::endl;
+		char cwd[1024];
+		if (getcwd(cwd, sizeof(cwd)) != NULL)
+			std::cout << BG_RED << "Current working dir before changing: " << cwd << RESET << std::endl;
+		if (exit_status != 0)
+		{
+			/*if (chdir("../") != 0)
+			{
+				perror("chdir");
+				return;
+			}*/
+			std::cout << BG_RED << "PRE "  << RESET << std::endl;
+			std::string error = "405";
+			cgiResponse->createErrResponse(error);
+			std::cout << BG_RED << "POST "  << RESET << std::endl;
+			return;
+		}
+	}
+	// std::cout << BG_BLUE << cgiResponse->getResponse() << RESET << std::endl;
+}
 
 void ServerManager::checkTimeout()
 {
@@ -289,15 +312,13 @@ void ServerManager::readRequest(const int &i, Socket *client)
 	bzero(buffer, REQUEST_BUFFER);
 	int bytes_read = 0;
 
-	
 	bytes_read = read(i, buffer, REQUEST_BUFFER);
 	std::vector<char> bufferVector;
 	for (int i = 0; i < bytes_read; i++)
 		bufferVector.push_back(buffer[i]);
 	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tREQUEST read bytes:" << bytes_read << " from client: " << client->getIp() << " : " << client->getPort())
 	// bufferVector.push_back('\0');
-	//print bufferVector
-	
+	// print bufferVector
 
 	if (bytes_read == 0)
 	{
@@ -316,20 +337,20 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		Server *server = findServer(client);
 
 		ServerConfig *config = server->getConfig();
-		//std::cout << "REQUEST:" << std::endl << buffer << std::endl;
+		// std::cout << "REQUEST:" << std::endl << buffer << std::endl;
 		HttpRequest parsedRequest(buffer, bufferVector, config);
 		PRINT(CGI, BG_RED, "content length request: " << parsedRequest.getContentLength())
 		std::cout << "Printing request" << std::endl;
-  	 	parsedRequest.printRequest();
-		std::cout << BG_GREEN << parsedRequest.getMethod() << std::endl;
+		// parsedRequest.printRequest();
+		std::cout << BG_GREEN << parsedRequest.getMethod() << " and file type " << parsedRequest.getContentType() << std::endl;
 		client->updateTime();
 		_pendingResponses[i] = ResponseFactory::createResponse(parsedRequest);
 		if (_pendingResponses[i]->isCgi())
-        {
+		{
 			std::cout << BG_BLUE "cgi " RESET << _pendingResponses[i]->isCgi() << std::endl;
-			FormResponse* c = dynamic_cast<FormResponse*>(_pendingResponses[i]);
-            addToSet(c->getInputPipefd(), _write_fd_pool);
-            addToSet(c->getOutputPipefd(), _recv_fd_pool);
+			FormResponse *c = dynamic_cast<FormResponse *>(_pendingResponses[i]);
+			addToSet(c->getInputPipefd(), _write_fd_pool);
+			addToSet(c->getOutputPipefd(), _recv_fd_pool);
 			c->createResponse(parsedRequest);
 			PRINT(CGI, BG_BLUE, "cgi created from read request")
 		}
@@ -337,7 +358,6 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		addToSet(i, _write_fd_pool);
 		PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " communication Socket set to write mode for the response. fd: " << i)
 	}
-	 
 }
 
 void ServerManager::sendResponse(const int &i, Socket *client)
@@ -354,7 +374,7 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 		return;
 	}
 	std::string response = responsePtr->getResponse();
-	//PRINT(SERVERMANAGER, CYAN, "response is: " << response << "response")
+	// PRINT(SERVERMANAGER, CYAN, "response is: " << response << "response")
 
 	if (response.length() >= MESSAGE_BUFFER)
 		bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);

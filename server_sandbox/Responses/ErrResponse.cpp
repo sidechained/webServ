@@ -13,6 +13,10 @@ void ErrResponse::createErrResponse(std::string &error)
     HttpRequest request = getRequest();
     std::string errPath = request.getConfig()->error_pages[error];
     std::cout << BG_RED << "Error path: " << errPath << std::endl;
+	//print current working directory
+	char cwd[1024];
+	if (getcwd(cwd, sizeof(cwd)) != NULL)
+		std::cout << BG_RED << "Current working dir: " << cwd << RESET << std::endl;
     std::ifstream htmlFile(errPath.c_str(), std::ios::binary);
     if (!htmlFile)
     {

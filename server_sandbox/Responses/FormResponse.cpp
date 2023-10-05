@@ -52,7 +52,7 @@ void FormResponse::createResponse(HttpRequest &request)
         phpInterpreter,
         phpScript,
         NULL};
-    // Define your custom environmental variables
+    /*// Define your custom environmental variables
     char fileNameVar[] = "REQUEST_METHOD=POST";
     // Get the boundary string from request
     std::string strBoundary = "BOUNDARY=" + request.getBoundary();
@@ -66,9 +66,24 @@ void FormResponse::createResponse(HttpRequest &request)
     std::cout << BG_RED << strUploadPath << RESET << std::endl;
     // Convert the boundary string to a mutable character array
     char uploadPath[strUploadPath.size() + 1]; // +1 for null terminator
-    strcpy(uploadPath, strUploadPath.c_str());
+    strcpy(uploadPath, strUploadPath.c_str());*/
+
+
+	std::vector<std::string> envVarsVect = request.getEnvVars();
+	std::vector<const char*> envVars(envVarsVect.size() + 1, NULL);
+
+	for (size_t i = 0; i < envVarsVect.size(); i++)
+	{
+		// Assign the c_str() of the strings to the vector of const char*
+		envVars[i] = envVarsVect[i].c_str();
+		std::cout << "envVars[" << i << "]: " << envVarsVect[i] << std::endl;
+	}
+
+	// Ensure the last element is NULL to terminate the array
+	envVars[envVarsVect.size()] = NULL;
+
     // Execute the PHP script with custom environmental variables set in C++
-    char *const envVars[] = {fileNameVar, boundary, uploadPath,  NULL};
+    //char *const envVars[] = {NULL};
     // Fork a child process
     child_pid = fork();
     if (child_pid == -1)
@@ -94,17 +109,19 @@ void FormResponse::createResponse(HttpRequest &request)
             return;
         }
         // Execute the PHP script within the child process
-        if (execve(phpInterpreter, const_cast<char *const *>(args), envVars) == -1)
-        {
-            perror("execve");
-            exit(EXIT_FAILURE);
-        }
+        if (execve(phpInterpreter, const_cast<char *const *>(args), const_cast<char *const *>(envVars.data())) == -1)
+		{
+			// Handle the execve error
+			perror("execve");
+			exit(EXIT_FAILURE);
+		}
     }
     else
     {
         close(input_pipefd[0]);  // Close the read end of the input pipe in the parent
         close(output_pipefd[1]); // Close the write end of the output pipe in the parent
-    }
+
+	}
 }
 
 int FormResponse::getInputPipefd()

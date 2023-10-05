@@ -50,7 +50,9 @@ SimpleResponse *ResponseFactory::createResponse(HttpRequest &request)
     std::cout << "Method: " << method << std::endl;
     if (request.hasError() && !request.getError("noSlash"))
         response = new TextResponse(request);
-    if (method == "GET")
+	else if (method == "GET" && request.getContentType() == "application/x-httpd-php")
+		response = POSTresponse(request);
+    else if (method == "GET")
         response = GETresponse(request);
     else if (method == "POST")
         response = POSTresponse(request);

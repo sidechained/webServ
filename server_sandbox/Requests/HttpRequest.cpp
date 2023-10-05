@@ -31,6 +31,38 @@ HttpRequest::HttpRequest(std::string const &request, std::vector<char> &requestV
 	printPartHeaders();
 	attemptDelete();
 	cleanUpMap(_incomingRequest);
+	setDefaultEnvVars();
+}
+
+void HttpRequest::setDefaultEnvVars()
+{
+	    // Define your custom environmental variables
+    std::string requestMethod = "REQUEST_METHOD=POST";
+	_envVars.push_back(requestMethod);
+    // Get the boundary string from request
+    std::string strBoundary = "BOUNDARY=" + getBoundary();
+    removeNonPrintableChars(strBoundary);
+	_envVars.push_back(strBoundary);
+    //std::cout << BG_RED << strBoundary << RESET << std::endl;
+    // Convert the boundary string to a mutable character array
+    //char boundary[strBoundary.size() + 1]; // +1 for null terminator
+    //strcpy(boundary, strBoundary.c_str());
+    std::string strUploadPath = "UPLOAD_PATH=." + getLocationConfig()->uploads;
+    removeNonPrintableChars(strUploadPath);
+	_envVars.push_back(strUploadPath);
+	for (size_t i = 0; i < _envVars.size(); i++)
+	{
+		std::cout << "envVars[" << i << "]: " << _envVars[i] << std::endl;
+	}
+    //std::cout << BG_RED << strUploadPath << RESET << std::endl;
+    // Convert the boundary string to a mutable character array
+    //char uploadPath[strUploadPath.size() + 1]; // +1 for null terminator
+    //strcpy(uploadPath, strUploadPath.c_str());
+}
+
+std::vector<std::string> HttpRequest::getEnvVars() const
+{
+	return _envVars;
 }
 
 
@@ -81,6 +113,38 @@ void HttpRequest::fillIncomingRequestMap(std::string const &request)
 		if (pos2 != std::string::npos)
 		{
 			std::string resource = line.substr(pos + 1, pos2 - pos - 1);
+
+            // Check if there are query parameters in the resource
+            size_t query_start = resource.find('?');
+            if (query_start != std::string::npos)
+            {
+                std::string query_string = resource.substr(query_start + 1);
+                // You can parse and process the query string here as needed
+                // For example, you can split it into key-value pairs
+                // and store them in your data structures.
+                // Example parsing code:
+                std::istringstream queryStream(query_string);
+                std::string parameter;
+                while (std::getline(queryStream, parameter, '&'))
+                {
+                    size_t equal_sign_pos = parameter.find('=');
+                    if (equal_sign_pos != std::string::npos)
+                    {
+                        std::string param_name = parameter.substr(0, equal_sign_pos);
+						std::transform(param_name.begin(), param_name.end(), param_name.begin(), ::toupper);
+						//std::cout << "param_name: " << param_name << std::endl;
+                        std::string param_value = parameter.substr(equal_sign_pos + 1);
+						//std::cout << "param_value: " << param_value << std::endl;
+						std::string env_var = param_name + "=" + param_value;
+						std::cout << "env_var: " << env_var << std::endl;
+						_envVars.push_back(env_var);
+                        // Store param_name and param_value as needed
+                    }
+                }
+            }
+			  // Reassign the resource variable to remove query parameters
+            resource = resource.substr(0, query_start);
+
 			_incomingRequest["Resource"] = resource;
 			std::string protocol = line.substr(pos2 + 1);
 			_incomingRequest["Protocol"] = protocol;
