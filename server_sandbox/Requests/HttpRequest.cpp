@@ -28,6 +28,7 @@ HttpRequest::HttpRequest(std::string const &request, std::vector<char> &requestV
 	parseContentTypeValue();
 	parseVectorParts();
 	printPartHeaders();
+	attemptDelete();
 	cleanUpMap(_incomingRequest);
 }
 
@@ -372,6 +373,28 @@ void HttpRequest::validate()
 			std::cout << "Content disposition type must be 'form-data'" << std::endl;
 			exit(EXIT_FAILURE);
 		}
+	}
+}
+
+void HttpRequest::attemptDelete()
+{
+	if (getMethod() == "DELETE")
+	{
+		// don't know how to get _config at a given location here
+		// std::vector<std::string> methods = _config["location"].methods;
+		// bool methodFound = std::find(methods.begin(), methods.end(), target) != methods.end();;
+		// if (!methodFound) {
+		// 	std::cout << "File " << _path << " not found" << std::endl;
+		// 	//add 403 to responses
+		// 	return ;
+		// }
+		std::cout << "Attempting to delete file: " << _path << std::endl;
+		if (std::remove(_path.c_str()) != 0) {	
+			// add 404 to responses
+			std::cout << "File " << _path << " not found" << std::endl;
+		}
+		std::cout << "File " << _path << " successfully deleted." << std::endl;
+		// if success add 200 OK to reponses
 	}
 }
 

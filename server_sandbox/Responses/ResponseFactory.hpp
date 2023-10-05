@@ -18,4 +18,5 @@ public:
     static SimpleResponse *createResponse(HttpRequest &request);
     static SimpleResponse *GETresponse(HttpRequest &request);
     static SimpleResponse *POSTresponse(HttpRequest &request);
+	static SimpleResponse *DELETEresponse(HttpRequest &request);
 };
