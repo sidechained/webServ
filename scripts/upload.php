@@ -104,3 +104,4 @@ $htmlResponse = "<html>
 
 // Output the HTML response to stdout
 echo $htmlResponse;
+exit(0);

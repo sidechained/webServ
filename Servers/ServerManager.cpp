@@ -221,7 +221,8 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
 	{
 		int exit_status = WEXITSTATUS(status);
 		std::cout << "Child process exited with status: " << exit_status << std::endl;
-		if (exit_status != 0)
+		(void) client;
+		if (exit_status != 0 && exit_status != 255)
 		{
 			std::string error = "501";
 			Server *server = findServer(client);

@@ -48,6 +48,8 @@ void HttpRequest::setDefaultEnvVars()
     //char boundary[strBoundary.size() + 1]; // +1 for null terminator
     //strcpy(boundary, strBoundary.c_str());
     std::string strUploadPath = "UPLOAD_PATH=." + getLocationConfig()->uploads;
+	std::cout << "BG_RED" << "PRINTING UPLOAD PATH" << RESET << std::endl;
+	std::cout << "BG_RED" << strUploadPath << RESET << std::endl;
     removeNonPrintableChars(strUploadPath);
 	_envVars.push_back(strUploadPath);
 	for (size_t i = 0; i < _envVars.size(); i++)
