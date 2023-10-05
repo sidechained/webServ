@@ -13,6 +13,9 @@
 #include <cstddef>
 #include "../Parser/ConfigFileParser.hpp"
 #include "../Responses/ResponseFactory.hpp"
+#include <time.h>
+#include <stdio.h>
+#include <ctime>
 
 //#define MAX_CLIENTS 10
 #define REQUEST_BUFFER 30000

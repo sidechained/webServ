@@ -179,6 +179,49 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
 	}
 
 	removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
+
+		time_t startTime = time(NULL);
+			int status;
+	bool killed = false; // Flag to track if the child process has been killed
+
+	while (!killed)
+	{
+		std::cout << "Checking if child process has terminated..." << std::endl;
+		// Check if the child process has terminated
+		pid_t result = waitpid(cgiResponse->child_pid, &status, WNOHANG);
+
+		if (result == 0)
+		{
+			std::cout << "Child process is still running" << std::endl;
+			// Child process is still running
+			time_t currentTime = time(NULL);
+			int elapsedSeconds = static_cast<int>(currentTime - startTime);
+
+			if (elapsedSeconds >= 6)
+			{
+				// Timeout exceeded, kill the child process
+				std::cout << "Child process timed out. Killing it..." << std::endl;
+				kill(cgiResponse->child_pid, SIGKILL); // or SIGKILL for a forceful termination
+				killed = true;						   // Set the flag to indicate that the child process has been killed
+			}
+			else
+			{
+				// Sleep for a short time before checking again
+				sleep(1);
+			}
+		}
+		else if (result == -1)
+		{
+			// Error occurred, handle it as needed
+			perror("waitpid");
+			break;
+		}
+		else
+		{
+			// Child process has terminated
+			break;
+		}
+	}
 }
 
 void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
@@ -190,32 +233,25 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 	bzero(buffer, MESSAGE_BUFFER);
 	int bytes_read = 0;
 	bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER);
-	// std::cout << BG_GREEN << "buffer created" << buffer << RESET << std::endl;
-	//  Use a vector to store the binary data and its length.
+	//close(cgiResponse->output_pipefd[1]);
 	std::vector<char> bufferVector(buffer, buffer + bytes_read);
-	/*for (size_t i = 0; i < bufferVector.size(); ++i) {
-	std::cout << bufferVector[i];
-	}*/
+
 	close(cgiResponse->output_pipefd[0]);
 	std::string htmlString(bufferVector.begin(), bufferVector.end());
-	// std::cout << BG_GREEN << "string created" << htmlString << RESET << std::endl;
-	/*std::vector<char> htmlOutputBuffer;  // Dynamic buffer to store the HTML output
-	// Read the output from the child process and store it in htmlOutputBuffer
-	char output_buffer[256];
-	ssize_t output_bytes_read;
-	while ((output_bytes_read = read(cgiResponse->output_pipefd[0], output_buffer, sizeof(output_buffer))) > 0) {
-		htmlOutputBuffer.insert(htmlOutputBuffer.end(), output_buffer, output_buffer + output_bytes_read);
-	}
-	PRINT(CGI, BG_BLUE, "body size read from cgi is: " << htmlOutputBuffer.size())
-	close(cgiResponse->output_pipefd[0]);
-	// Convert the vector to a string
-	std::string htmlString(htmlOutputBuffer.begin(), htmlOutputBuffer.end());*/
+
 	cgiResponse->setBody(htmlString);
-	//_body = htmlString;
+
 	cgiResponse->setHeader(OkHeader("text/html", cgiResponse->getBodyLength()).getHeader());
 	removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
 
-	int status;
+
+	// Launch the child process
+
+	// ...
+
+
+
+	/*int status;
 	waitpid(cgiResponse->child_pid, &status, 0);
 	if (WIFEXITED(status))
 	{
@@ -224,17 +260,7 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 		char cwd[1024];
 		if (getcwd(cwd, sizeof(cwd)) != NULL)
 			std::cout << BG_RED << "Current working dir before changing: " << cwd << RESET << std::endl;
-		/* if (exit_status != 0)
-		{
-			
-			std::cout << BG_RED << "PRE "  << RESET << std::endl;
-			std::string error = "405";
-			cgiResponse->createErrResponse(error);
-			std::cout << BG_RED << "POST "  << RESET << std::endl;
-			return;
-		} */
-	}
-	// std::cout << BG_BLUE << cgiResponse->getResponse() << RESET << std::endl;
+	}*/
 }
 
 void ServerManager::checkTimeout()

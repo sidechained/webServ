@@ -118,8 +118,15 @@ void FormResponse::createResponse(HttpRequest &request)
     }
     else
     {
-        close(input_pipefd[0]);  // Close the read end of the input pipe in the parent
-        close(output_pipefd[1]); // Close the write end of the output pipe in the parent
+		close(input_pipefd[0]);  // Close the read end of the input pipe in the parent
+    	close(output_pipefd[1]); // Close the write end of the output pipe in the parent
+
+
+		// Record the current system time before starting the child process
+
+
+	//close(output_pipefd[1]); // Close the write end of the output pipe in the parent
+
 
 	}
 }

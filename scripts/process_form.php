@@ -13,6 +13,7 @@ $color = getenv('COLOR');
      exit(5);
  }
 
+
 // Generate a custom HTML response
 $htmlResponse = "<html>
 <head>
