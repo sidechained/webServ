@@ -1,5 +1,6 @@
 #pragma once
 #include "SimpleResponse.hpp"
+#include <unistd.h>
 
 class ErrResponse : public SimpleResponse
 {
