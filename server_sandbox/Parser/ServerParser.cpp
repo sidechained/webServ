@@ -28,6 +28,8 @@ void ServerParser::setDefaults()
 	serverConfig.error_pages["404"] = DEFAULT_ERROR_404;
 	serverConfig.error_pages["405"] = DEFAULT_ERROR_405;
 	serverConfig.error_pages["501"] = DEFAULT_ERROR_501;
+	serverConfig.error_pages["413"] = DEFAULT_ERROR_413;
+	serverConfig.error_pages["200"] = DEFAULT_ERROR_200;
 }
 
 void ServerParser::extract(std::fstream &configFile) {

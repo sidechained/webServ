@@ -59,6 +59,7 @@ private:
     bool isContentOfType(std::map<std::string, std::string> headers, std::string typeToMatch);
     bool arePartContentsOfType(std::string typeToMatch);
     void validate();
+    void attemptDelete();
     void makeOutputFile();
     // utility functions:
     bool isValidMethod(const std::string& method);

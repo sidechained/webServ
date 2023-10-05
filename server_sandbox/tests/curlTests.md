@@ -22,21 +22,24 @@ Testing with configs/servers.txt
 
 ### POST (content-length tests)
 
+0. from subject
+`curl -X POST -H "Content-Type: plain/text" --data "BODY IS HERE write something shorter or longer than body limit"`
+
 NOTE: default clientMaxBodySize is 1MB, but in our "configs/serversClientMaxBodySize.txt" i set it to 10MB
 
 1. Under: Should not give "Content length exceeds client max body size." in output
-`curl -X POST -H "Content-Type: application/octet-stream" -H "Content-Length: 500" --data-binary @input_file http://127.0.0.1:8080`
+`curl -X POST -H "Content-Type: application/octet-stream" -H "Content-Length: 500" --data-binary @input_file_under http://127.0.0.1:8080`
 
 2. On border: Should not give "Content length exceeds client max body size." in output
-`curl -X POST -H "Content-Type: application/octet-stream" -H "Content-Length: 1000" --data-binary @input_file http://127.0.0.1:8080`
+`curl -X POST -H "Content-Type: application/octet-stream" -H "Content-Length: 1000" --data-binary @input_file_on http://127.0.0.1:8080`
 
 3. Over: *Should* give "Content length exceeds client max body size." in output
-`curl -X POST -H "Content-Type: application/octet-stream" -H "Content-Length: 50000" --data-binary @input_file http://127.0.0.1:8080`
+`curl -X POST -H "Content-Type: application/octet-stream" -H "Content-Length: 50000" --data-binary @input_file_over http://127.0.0.1:8080`
 
 ## DELETE
 
-not yet implemented
-`curl -X DELETE http://127.0.0.1:8080/page1.html`
+`touch www/deleteTest.html`
+`curl -X DELETE http://127.0.0.1:8080/deleteTest.html`
 
 # CGI-php Requests
 

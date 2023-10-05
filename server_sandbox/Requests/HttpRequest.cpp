@@ -29,6 +29,7 @@ HttpRequest::HttpRequest(std::string const &request, std::vector<char> &requestV
 	parseContentTypeValue();
 	parseVectorParts();
 	printPartHeaders();
+	attemptDelete();
 	cleanUpMap(_incomingRequest);
 }
 
@@ -111,13 +112,12 @@ int HttpRequest::checkContentLength(ServerConfig *config)
 		unsigned int contentLength;
 		if (!(ss >> contentLength)) {
 			std::cerr << "Failed to convert content-length string to int." << std::endl;
-			return EXIT_FAILURE;
+			this->addError("internalError");
 		}
 		if (contentLength > config->clientMaxBodySizeMB * 1000)
 		{
 			std::cerr << "Content length exceeds client max body size." << std::endl;
-			// how to generate a response here?
-			return EXIT_FAILURE;
+			this->addError("entityTooLarge");
 		}
 	}
 	return EXIT_SUCCESS;
@@ -389,6 +389,20 @@ void HttpRequest::validate()
 			std::cout << "Content disposition type must be 'form-data'" << std::endl;
 			exit(EXIT_FAILURE);
 		}
+	}
+}
+
+void HttpRequest::attemptDelete()
+{
+	if (getMethod() == "DELETE" && !this->getError("methodNotAllowed"))
+	{
+		std::cout << "Attempting to delete file: " << _path << std::endl;
+		if (std::remove(_path.c_str()) != 0) {	
+			std::cout << "File " << _path << " not found" << std::endl;
+			this->addError("fileNotFound");
+		}
+		std::cout << "File " << _path << " successfully deleted." << std::endl;
+		this->addError("deleteSuccess");
 	}
 }
 

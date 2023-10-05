@@ -189,7 +189,7 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
     /* char buffer[MESSAGE_BUFFER];
     bzero(buffer, MESSAGE_BUFFER);
     int bytes_read = 0;
-    bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER);
+    bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER);-
     std::cout << BG_GREEN << "buffer created" << buffer << RESET << std::endl;
     // Use a vector to store the binary data and its length.
     std::vector<char> bufferVector(buffer, buffer + bytes_read);

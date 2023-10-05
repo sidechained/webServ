@@ -9,3 +9,5 @@
 # define DEFAULT_ERROR_404 "./config/error_pages/404.html"
 # define DEFAULT_ERROR_405 "./config/error_pages/405.html"
 # define DEFAULT_ERROR_501 "./config/error_pages/501.html"
+# define DEFAULT_ERROR_413 "./config/error_pages/413.html"
+# define DEFAULT_ERROR_200 "./config/error_pages/200.html"

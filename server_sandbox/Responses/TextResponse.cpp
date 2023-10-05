@@ -20,11 +20,36 @@ void TextResponse::createResponse(HttpRequest &request)
         setHeader(MovedHeader(request.getHost(), request.getRedirection()).getHeader());
         return;
     }
-
+    if (request.getError("entityTooLarge"))
+    {
+        std::cout << BG_BOLD_MAGENTA << "Entity too large" << RESET << std::endl;
+        std::string error = "413";
+        this->createErrResponse(error);
+        return;
+    }
+    if (request.getError("internalError"))
+    {
+        std::cout << BG_BOLD_MAGENTA << "Internal server error" << RESET << std::endl;
+        std::string error = "501";
+        this->createErrResponse(error);
+        return;
+    }
     if (request.getError("methodNotAllowed"))
     {
         std::cout << BG_BOLD_MAGENTA << "Method not allowed" << RESET << std::endl;
         std::string error = "405";
+        this->createErrResponse(error);
+        return;
+    }
+    if (request.getError("fileNotFound"))
+    {
+        std::string error = "404";
+        this->createErrResponse(error);
+        return;
+    }
+    if (request.getError("deleteSuccess"))
+    {
+        std::string error = "200";
         this->createErrResponse(error);
         return;
     }

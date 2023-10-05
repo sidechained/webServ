@@ -39,6 +39,8 @@ SimpleResponse *ResponseFactory::createResponse(HttpRequest &request)
     
     std::string method = request.getMethod();
     std::cout << "Method: " << method << std::endl;
+    if (request.hasError() && !request.getError("noSlash"))
+        response = new TextResponse(request);
     if (method == "GET")
         response = GETresponse(request);
     else if (method == "POST")
