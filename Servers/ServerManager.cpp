@@ -128,11 +128,9 @@ void ServerManager::runServers()
 				readRequest(i, _clients_map[i]);
 			else if (FD_ISSET(i, &write_set_cpy) && _clients_map.count(i))
 			{
-				// SimpleResponse *responsePtr = _pendingResponses[i];
 				int cgi = _pendingResponses[i]->isCgi();
 				if (cgi)
 				{
-					// PRINT(CGI, BG_BLUE, "cgi form response text")
 					FormResponse *cgiResponse = dynamic_cast<FormResponse *>(_pendingResponses[i]);
 					if (FD_ISSET(cgiResponse->input_pipefd[1], &write_set_cpy))
 						sendBodyToCgi(cgiResponse, _clients_map[i]);
@@ -390,24 +388,22 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		_pendingResponses[i] = ResponseFactory::createResponse(parsedRequest);
 		if (_pendingResponses[i]->isCgi())
 		{
-			// std::cout << BG_BLUE "cgi " RESET << _pendingResponses[i]->isCgi() << std::endl;
 			FormResponse *c = dynamic_cast<FormResponse *>(_pendingResponses[i]);
 			addToSet(c->getInputPipefd(), _write_fd_pool);
 			addToSet(c->getOutputPipefd(), _recv_fd_pool);
 			c->createResponse(parsedRequest);
-			// PRINT(CGI, BG_BLUE, "cgi created from read request")
 		}
 
 		// setting the socket to write mode
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
-		// PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " communication Socket set to write mode for the response. fd: " << i)
+		PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " communication Socket set to write mode for the response. fd: " << i)
 	}
 }
 
 void ServerManager::sendResponse(const int &i, Socket *client)
 {
-	// PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tRESPONSE to client: " << client->getIp() << " : " << client->getPort() << " has been written")
+	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tRESPONSE to client: " << client->getIp() << " : " << client->getPort() << " has been written")
 
 	int bytes_sent;
 
