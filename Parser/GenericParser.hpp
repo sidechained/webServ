@@ -38,6 +38,7 @@ class GenericParser
 		int countTabIndents(const std::string line);
 		void stripTabIndents(std::string &line);
 		void splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output);
+		void trimWhitespace(std::string &str);
 	public:
 		std::string line; // public because serverConfig needs to revisit the line that the location ended at
 };

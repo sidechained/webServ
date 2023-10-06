@@ -5,6 +5,7 @@ void GenericParser::extractKey(std::string &key, std::size_t &colonPos) {
 	if (colonPos == std::string::npos)
 		errorExit(ERR_PARSE, ERR_PARSE_NOFIELD);
 	key = line.substr(0, colonPos);
+	trimWhitespace(key);
 }
 
 void GenericParser::extractValue(std::string &value, std::size_t &colonPos) {
@@ -12,6 +13,7 @@ void GenericParser::extractValue(std::string &value, std::size_t &colonPos) {
 	if (value[0] != ' ')
 		errorExit(ERR_PARSE, ERR_PARSE_SPACE);
 	value.erase(0, 1); // strip the space
+	trimWhitespace(value);
 	if (value.empty())
 		errorExit(ERR_PARSE, ERR_NO_VALUE);
 }
@@ -52,5 +54,26 @@ void GenericParser::splitString(const std::string& input, const std::string& del
 		std::string lastToken = input.substr(start);
 		if (!lastToken.empty())
 			output.push_back(lastToken);
+	}
+}
+
+void GenericParser::trimWhitespace(std::string &str)
+{
+	// Trim leading whitespace
+	std::string::size_type start = str.find_first_not_of(" \t\n\r");
+	if (start != std::string::npos)
+	{
+		str.erase(0, start);
+	}
+	else
+	{
+		str.clear(); // String contains only whitespace
+		return;
+	}
+	// Trim trailing whitespace
+	std::string::size_type end = str.find_last_not_of(" \t\n\r");
+	if (end != std::string::npos)
+	{
+		str.erase(end + 1);
 	}
 }

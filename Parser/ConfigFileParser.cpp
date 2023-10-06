@@ -15,8 +15,6 @@ ConfigFileParser::ConfigFileParser(std::string filename) {
 	configFile.close();
 	validateIPs();
 	validatePorts();
-	print();
-
 }
 
 ConfigFileParser::ConfigFileParser(const ConfigFileParser &o)
@@ -59,9 +57,9 @@ void ConfigFileParser::validateIPs() {
 
 // check for and remove duplicate ports in a server config
 void ConfigFileParser::validatePorts() {
-    std::vector<int> seenPortNumbers;  // Vector to store seen port numbers
 	for (unsigned int i = 0; i < serverConfigs.size(); i++)
 	{
+    	std::vector<int> seenPortNumbers;  // Vector to store seen port numbers
 		for (std::vector<PortConfig>::iterator it = serverConfigs[i].portConfigs.begin(); it != serverConfigs[i].portConfigs.end(); /* increment inside loop */) {
 			int portNumber = it->number;
 			// Check if the port number has been seen before
