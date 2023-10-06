@@ -1,13 +1,5 @@
 #include "Server.hpp"
 
-// Server::Server(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog)
-// {
-// 	for (unsigned long i = 0; i < ports.size(); i++)
-// 	{
-// 		_sockets.push_back(new Socket(domain, type, protocol, ports[i], ip, backlog));
-// 	}
-// }
-
 Server::Server(ServerConfig &config) : _config(&config), _ports(config.portConfigs), _ip(config.ip)
 {
     for (unsigned long i = 0; i < config.portConfigs.size(); i++)

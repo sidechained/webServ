@@ -2,9 +2,8 @@
 
 FormResponse::FormResponse(HttpRequest &request) : ErrResponse(request)
 {
-	_cgi = true;
-	initPipe();
-    //createResponse(request);
+    _cgi = true;
+    initPipe();
 }
 
 FormResponse::~FormResponse()
@@ -13,28 +12,25 @@ FormResponse::~FormResponse()
 
 void FormResponse::initPipe()
 {
-	// Create the input pipe
-	if (pipe(input_pipefd) == -1)
-	{
-		perror("pipe");
-		// fill error response
-		return;
-	}
+    // Create the input pipe
+    if (pipe(input_pipefd) == -1)
+    {
+        perror("pipe");
+        return;
+    }
 
-	// Create the output pipe
-	if (pipe(output_pipefd) == -1)
-	{
-		perror("pipe");
-		// fill error response
-		return;
-	}
+    // Create the output pipe
+    if (pipe(output_pipefd) == -1)
+    {
+        perror("pipe");
+        return;
+    }
 }
 
 void FormResponse::createResponse(HttpRequest &request)
 {
     _cgi = true;
-    std::cout << BG_YELLOW << "Create form response"  RESET << std::endl;
-    //std::cout << request.getBody() << std::endl;
+    std::cout << BG_YELLOW << "Create form response" RESET << std::endl;
     const char *phpInterpreter = "/usr/bin/php";
     std::string relativeScriptFolder = "./scripts"; // Modify this as needed
     char absoluteScriptFolder[SCRIPT_PATH_MAX];
@@ -45,45 +41,28 @@ void FormResponse::createResponse(HttpRequest &request)
     }
     std::string absoluteScriptFolderStr = absoluteScriptFolder + request.getResource();
     const char *phpScript = absoluteScriptFolderStr.c_str();
-    //std::cout << absoluteScriptFolder << std::endl;
-    //std::cout << phpScript << std::endl;
-    // Build the argument vector
+
+    //  Build the argument vector
     const char *args[] = {
         phpInterpreter,
         phpScript,
         NULL};
-    /*// Define your custom environmental variables
-    char fileNameVar[] = "REQUEST_METHOD=POST";
-    // Get the boundary string from request
-    std::string strBoundary = "BOUNDARY=" + request.getBoundary();
-    removeNonPrintableChars(strBoundary);
-    std::cout << BG_RED << strBoundary << RESET << std::endl;
-    // Convert the boundary string to a mutable character array
-    char boundary[strBoundary.size() + 1]; // +1 for null terminator
-    strcpy(boundary, strBoundary.c_str());
-    std::string strUploadPath = "UPLOAD_PATH=." + request.getLocationConfig()->uploads;
-    removeNonPrintableChars(strUploadPath);
-    std::cout << BG_RED << strUploadPath << RESET << std::endl;
-    // Convert the boundary string to a mutable character array
-    char uploadPath[strUploadPath.size() + 1]; // +1 for null terminator
-    strcpy(uploadPath, strUploadPath.c_str());*/
 
+    std::vector<std::string> envVarsVect = request.getEnvVars();
+    std::vector<const char *> envVars(envVarsVect.size() + 1, NULL);
 
-	std::vector<std::string> envVarsVect = request.getEnvVars();
-	std::vector<const char*> envVars(envVarsVect.size() + 1, NULL);
+    for (size_t i = 0; i < envVarsVect.size(); i++)
+    {
+        // Assign the c_str() of the strings to the vector of const char*
+        envVars[i] = envVarsVect[i].c_str();
+        std::cout << "envVars[" << i << "]: " << envVarsVect[i] << std::endl;
+    }
 
-	for (size_t i = 0; i < envVarsVect.size(); i++)
-	{
-		// Assign the c_str() of the strings to the vector of const char*
-		envVars[i] = envVarsVect[i].c_str();
-		std::cout << "envVars[" << i << "]: " << envVarsVect[i] << std::endl;
-	}
-
-	// Ensure the last element is NULL to terminate the array
-	envVars[envVarsVect.size()] = NULL;
+    // Ensure the last element is NULL to terminate the array
+    envVars[envVarsVect.size()] = NULL;
 
     // Execute the PHP script with custom environmental variables set in C++
-    //char *const envVars[] = {NULL};
+    // char *const envVars[] = {NULL};
     // Fork a child process
     child_pid = fork();
     if (child_pid == -1)
@@ -110,34 +89,27 @@ void FormResponse::createResponse(HttpRequest &request)
         }
         // Execute the PHP script within the child process
         if (execve(phpInterpreter, const_cast<char *const *>(args), const_cast<char *const *>(envVars.data())) == -1)
-		{
-			// Handle the execve error
-			perror("execve");
-			exit(EXIT_FAILURE);
-		}
+        {
+            // Handle the execve error
+            perror("execve");
+            exit(EXIT_FAILURE);
+        }
     }
     else
     {
-		close(input_pipefd[0]);  // Close the read end of the input pipe in the parent
-    	close(output_pipefd[1]); // Close the write end of the output pipe in the parent
+        close(input_pipefd[0]);  // Close the read end of the input pipe in the parent
+        close(output_pipefd[1]); // Close the write end of the output pipe in the parent
 
-
-		// Record the current system time before starting the child process
-
-
-	//close(output_pipefd[1]); // Close the write end of the output pipe in the parent
-
-
-	}
+        // Record the current system time before starting the child process
+    }
 }
 
 int FormResponse::getInputPipefd()
 {
-	return input_pipefd[1];
+    return input_pipefd[1];
 }
 
 int FormResponse::getOutputPipefd()
 {
-	return output_pipefd[0];
+    return output_pipefd[0];
 }
-

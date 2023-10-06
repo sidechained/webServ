@@ -1,10 +1,5 @@
 #include "HttpRequest.hpp"
 
-// TODO
-// - exit in Luca-style :)
-// - consider adding extra first-line/header validations from G's code
-// - separate out extra processing of configs/location to later stage?
-
 HttpRequest::HttpRequest()
 {
 }
@@ -36,17 +31,11 @@ HttpRequest::HttpRequest(std::string const &request, std::vector<char> &requestV
 
 void HttpRequest::setDefaultEnvVars()
 {
-	    // Define your custom environmental variables
     std::string requestMethod = "REQUEST_METHOD=POST";
 	_envVars.push_back(requestMethod);
-    // Get the boundary string from request
     std::string strBoundary = "BOUNDARY=" + getBoundary();
     removeNonPrintableChars(strBoundary);
 	_envVars.push_back(strBoundary);
-    //std::cout << BG_RED << strBoundary << RESET << std::endl;
-    // Convert the boundary string to a mutable character array
-    //char boundary[strBoundary.size() + 1]; // +1 for null terminator
-    //strcpy(boundary, strBoundary.c_str());
     std::string strUploadPath = "UPLOAD_PATH=." + getLocationConfig()->uploads;
     removeNonPrintableChars(strUploadPath);
 	_envVars.push_back(strUploadPath);
@@ -54,10 +43,6 @@ void HttpRequest::setDefaultEnvVars()
 	{
 		std::cout << "envVars[" << i << "]: " << _envVars[i] << std::endl;
 	}
-    //std::cout << BG_RED << strUploadPath << RESET << std::endl;
-    // Convert the boundary string to a mutable character array
-    //char uploadPath[strUploadPath.size() + 1]; // +1 for null terminator
-    //strcpy(uploadPath, strUploadPath.c_str());
 }
 
 std::vector<std::string> HttpRequest::getEnvVars() const

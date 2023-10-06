@@ -73,9 +73,6 @@ void TextResponse::createResponse(HttpRequest &request)
     setBody(htmlFile);
     setHeader(OkHeader(this->getRequest().getContentType(), this->getBodyLength()).getHeader());
 
-    // PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Header: " << this->getHeader().substr(0, 1000))
-    // PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Body: " << this->getBody().substr(0, 100))
-
     htmlFile.clear();
     htmlFile.seekg(0, std::ios::beg);
     htmlFile.close();
