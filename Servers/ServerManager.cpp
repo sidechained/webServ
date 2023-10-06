@@ -135,7 +135,7 @@ void ServerManager::runServers()
 					// PRINT(CGI, BG_BLUE, "cgi form response text")
 					FormResponse *cgiResponse = dynamic_cast<FormResponse *>(_pendingResponses[i]);
 					if (FD_ISSET(cgiResponse->input_pipefd[1], &write_set_cpy))
-						sendBodyToCgi(cgiResponse);
+						sendBodyToCgi(cgiResponse, _clients_map[i]);
 					else if (FD_ISSET(cgiResponse->output_pipefd[0], &recv_set_cpy))
 						readBodyFromCgi(cgiResponse, _clients_map[i]);
 				}
@@ -147,7 +147,7 @@ void ServerManager::runServers()
 	}
 }
 
-void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
+void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 {
 	PRINT(CGI, BG_BLUE, "sendBodyToCgi")
 	std::vector<char> body = cgiResponse->getRequest().getBodyVector();
@@ -180,9 +180,25 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
 
 	removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
 
-		time_t startTime = time(NULL);
-			int status;
+	time_t startTime = time(NULL);
+	int status;
 	bool killed = false; // Flag to track if the child process has been killed
+
+	/*int status;
+	waitpid(cgiResponse->child_pid, &status, 0);
+	if (WIFEXITED(status))
+	{
+		int exit_status = WEXITSTATUS(status);
+		std::cout << "Child process exited with status: " << exit_status << std::endl;
+		if (exit_status != 0)
+		{
+			std::string error = "501";
+			Server *server = findServer(client);
+			ServerConfig *config = server->getConfig();
+			cgiResponse->createErrResponse(error, config);
+			return;
+		}
+	}*/
 
 	while (!killed)
 	{
@@ -218,6 +234,20 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
 		}
 		else
 		{
+			if (WIFEXITED(status))
+			{
+				int exit_status = WEXITSTATUS(status);
+				std::cout << "Child process exited with status: " << exit_status << std::endl;
+				if (exit_status != 0)
+				{
+					std::string error = "501";
+					Server *server = findServer(client);
+					ServerConfig *config = server->getConfig();
+					cgiResponse->createErrResponse(error, config);
+					return;
+				}
+			}
+
 			// Child process has terminated
 			break;
 		}
@@ -233,39 +263,24 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
 	bzero(buffer, MESSAGE_BUFFER);
 	int bytes_read = 0;
 	bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER);
-	//close(cgiResponse->output_pipefd[1]);
+	// close(cgiResponse->output_pipefd[1]);
 	std::vector<char> bufferVector(buffer, buffer + bytes_read);
 
 	close(cgiResponse->output_pipefd[0]);
 	std::string htmlString(bufferVector.begin(), bufferVector.end());
 
-	cgiResponse->setBody(htmlString);
-
-	cgiResponse->setHeader(OkHeader("text/html", cgiResponse->getBodyLength()).getHeader());
+	if (!htmlString.empty())
+	{
+		cgiResponse->setBody(htmlString);
+		cgiResponse->setHeader(OkHeader("text/html", cgiResponse->getBodyLength()).getHeader());
+	}
 	removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
-
 
 	// Launch the child process
 
 	// ...
 
 	(void)client;
-
-	/*int status;
-	waitpid(cgiResponse->child_pid, &status, 0);
-	if (WIFEXITED(status))
-	{
-		int exit_status = WEXITSTATUS(status);
-		std::cout << "Child process exited with status: " << exit_status << std::endl;
-		if (exit_status != 0)
-		{
-			std::string error = "501";
-			Server *server = findServer(client);
-			ServerConfig *config = server->getConfig();
-			cgiResponse->createErrResponse(error, config);
-			return;
-		}
-	}*/
 }
 
 void ServerManager::checkTimeout()

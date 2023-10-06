@@ -56,7 +56,7 @@ public:
 	void acceptNewConnection(int fd);
 	void readRequest(const int &i, Socket *client);
 	void sendResponse(const int &i, Socket *client);
-	void sendBodyToCgi(FormResponse *cgiResponse);
+	void sendBodyToCgi(FormResponse *cgiResponse, Socket *client);
 	void readBodyFromCgi(FormResponse *cgiResponse, Socket *client);
 
 	ServerManager();
