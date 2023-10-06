@@ -166,20 +166,26 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 
 		if (bytes_written == -1)
 		{
-			// Handle write error
 			perror("write");
-			PRINT(CGI, BG_BOLD_RED, "write error")
-			// Add error handling as needed
+			close(cgiResponse->input_pipefd[1]);
+			removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
+		}
+		else if (bytes_written == 0)
+		{
+			close(cgiResponse->input_pipefd[1]);
+			removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
+		}
+		else
+		{
+			close(cgiResponse->input_pipefd[1]);
+			removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
 		}
 
-		close(cgiResponse->input_pipefd[1]);
-		removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
 	}
 	else
 	{
-		PRINT(CGI, BG_BOLD_RED, "invalid pipe")
-		// Handle invalid pipe
-		// Add error handling as needed
+		perror("invalid pipe");
+		closeConnection(cgiResponse->input_pipefd[1]);
 	}
 
 	removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
@@ -187,22 +193,6 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 	time_t startTime = time(NULL);
 	int status;
 	bool killed = false; // Flag to track if the child process has been killed
-
-	/*int status;
-	waitpid(cgiResponse->child_pid, &status, 0);
-	if (WIFEXITED(status))
-	{
-		int exit_status = WEXITSTATUS(status);
-		std::cout << "Child process exited with status: " << exit_status << std::endl;
-		if (exit_status != 0)
-		{
-			std::string error = "501";
-			Server *server = findServer(client);
-			ServerConfig *config = server->getConfig();
-			cgiResponse->createErrResponse(error, config);
-			return;
-		}
-	}*/
 
 	while (!killed)
 	{
@@ -273,6 +263,19 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
 	bzero(buffer, MESSAGE_BUFFER);
 	int bytes_read = 0;
 	bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER);
+	if (bytes_read < 0)
+	{
+		perror("read");
+		close(cgiResponse->output_pipefd[0]);
+		removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
+		return;
+	}
+	if (bytes_read == 0)
+	{
+		close(cgiResponse->output_pipefd[0]);
+		removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
+		return;
+	}
 	// close(cgiResponse->output_pipefd[1]);
 	std::vector<char> bufferVector(buffer, buffer + bytes_read);
 
@@ -285,10 +288,6 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
 		cgiResponse->setHeader(OkHeader("text/html", cgiResponse->getBodyLength()).getHeader());
 	}
 	removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
-
-	// Launch the child process
-
-	// ...
 
 	(void)client;
 }
