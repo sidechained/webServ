@@ -389,32 +389,30 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		Server *server = findServer(client);
 
 		ServerConfig *config = server->getConfig();
-		// std::cout << "REQUEST:" << std::endl << buffer << std::endl;
 		HttpRequest parsedRequest(buffer, bufferVector, config);
-		PRINT(CGI, BG_RED, "content length request: " << parsedRequest.getContentLength())
-		std::cout << "Printing request" << std::endl;
+		// std::cout << "REQUEST:" << std::endl << buffer << std::endl;
 		// parsedRequest.printRequest();
-		std::cout << BG_GREEN << parsedRequest.getMethod() << " and file type " << parsedRequest.getContentType() << std::endl;
+		// std::cout << BG_GREEN << parsedRequest.getMethod() << " and file type " << parsedRequest.getContentType() << std::endl;
 		client->updateTime();
 		_pendingResponses[i] = ResponseFactory::createResponse(parsedRequest);
 		if (_pendingResponses[i]->isCgi())
 		{
-			std::cout << BG_BLUE "cgi " RESET << _pendingResponses[i]->isCgi() << std::endl;
+			// std::cout << BG_BLUE "cgi " RESET << _pendingResponses[i]->isCgi() << std::endl;
 			FormResponse *c = dynamic_cast<FormResponse *>(_pendingResponses[i]);
 			addToSet(c->getInputPipefd(), _write_fd_pool);
 			addToSet(c->getOutputPipefd(), _recv_fd_pool);
 			c->createResponse(parsedRequest);
-			PRINT(CGI, BG_BLUE, "cgi created from read request")
+			// PRINT(CGI, BG_BLUE, "cgi created from read request")
 		}
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
-		PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " communication Socket set to write mode for the response. fd: " << i)
+		// PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " communication Socket set to write mode for the response. fd: " << i)
 	}
 }
 
 void ServerManager::sendResponse(const int &i, Socket *client)
 {
-	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tRESPONSE to client: " << client->getIp() << " : " << client->getPort() << " has been written")
+	// PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tRESPONSE to client: " << client->getIp() << " : " << client->getPort() << " has been written")
 
 	int bytes_sent;
 
@@ -440,8 +438,8 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 	}
 	else if (bytes_sent == 0 || (size_t)bytes_sent == response.length())
 	{
-		PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " bytes sent: " << bytes_sent << "  fd: " << i)
-		PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tRESPONSE length: " << response.length() << " bytes sent: " << bytes_sent << "  fd: " << i)
+		// PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " bytes sent: " << bytes_sent << "  fd: " << i)
+		// PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tRESPONSE length: " << response.length() << " bytes sent: " << bytes_sent << "  fd: " << i)
 		delete _pendingResponses[i];
 		_pendingResponses.erase(i);
 		closeConnection(i);
@@ -449,7 +447,7 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 	else
 	{
 		client->updateTime();
-		PRINT(SERVERMANAGER, BOLD_BLUE, "\t\tNOT entire data sent, bytes: " << bytes_sent << "  " << responsePtr->getResponse().size())
+		// PRINT(SERVERMANAGER, BOLD_BLUE, "\t\tNOT entire data sent, bytes: " << bytes_sent << "  " << responsePtr->getResponse().size())
 
 		responsePtr->cutRes(response, bytes_sent);
 	}

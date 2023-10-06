@@ -55,7 +55,6 @@ void FormResponse::createResponse(HttpRequest &request)
     {
         // Assign the c_str() of the strings to the vector of const char*
         envVars[i] = envVarsVect[i].c_str();
-        std::cout << "envVars[" << i << "]: " << envVarsVect[i] << std::endl;
     }
 
     // Ensure the last element is NULL to terminate the array

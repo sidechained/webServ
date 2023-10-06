@@ -12,8 +12,8 @@ TextResponse::~TextResponse()
 void TextResponse::createResponse(HttpRequest &request)
 {
 	_cgi = false;
-    PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Creating HTML response for resource");
-    PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Path: " << request.getPath());
+    //PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Creating HTML response for resource");
+    //PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Path: " << request.getPath());
     if (request.getLocationConfig()->redirection != "")
     {
         std::cout << BG_BOLD_MAGENTA << "Redirection in resource" << RESET << std::endl;
