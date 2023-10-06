@@ -154,10 +154,14 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 	// Check if the pipe is valid
 	if (cgiResponse->input_pipefd[1] != -1)
 	{
-		// Write the entire body to the input pipe at once
-		ssize_t bytes_written = write(cgiResponse->input_pipefd[1], body.data(), body.size());
+
 		char EOF_char = EOF;
-		write(cgiResponse->input_pipefd[1], &EOF_char, 1);
+		std::vector<char> buffer(body.begin(), body.end());
+		buffer.push_back(EOF_char);
+
+		ssize_t bytes_written = write(cgiResponse->input_pipefd[1], buffer.data(), buffer.size());
+
+
 		PRINT(CGI, BG_YELLOW, "body size sent to cgi is: " << body.size() << " bytes written: " << bytes_written)
 
 		if (bytes_written == -1)
