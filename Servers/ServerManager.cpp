@@ -137,7 +137,7 @@ void ServerManager::runServers()
 					if (FD_ISSET(cgiResponse->input_pipefd[1], &write_set_cpy))
 						sendBodyToCgi(cgiResponse, _clients_map[i]);
 					else if (FD_ISSET(cgiResponse->output_pipefd[0], &recv_set_cpy))
-						readBodyFromCgi(cgiResponse, _clients_map[i]);
+						readBodyFromCgi(cgiResponse);
 				}
 				else
 					sendResponse(i, _clients_map[i]);
@@ -249,7 +249,7 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 	}
 }
 
-void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
+void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 {
 
 	cgiResponse->setCgi(false);
@@ -284,8 +284,6 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
 		cgiResponse->setHeader(OkHeader("text/html", cgiResponse->getBodyLength()).getHeader());
 	}
 	removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
-
-	(void)client;
 }
 
 void ServerManager::checkTimeout()
@@ -385,7 +383,7 @@ void ServerManager::readRequest(const int &i, Socket *client)
 
 		ServerConfig *config = server->getConfig();
 		HttpRequest parsedRequest(buffer, bufferVector, config);
-		PRINT(CGI, BG_BOLD_CYAN, "\tReading request with length: " << parsedRequest.getContentLength() << ", method: " << parsedRequest.getMethod() << ", and file type: " << parsedRequest.getContentType())
+		PRINT(CGI, BG_BOLD_CYAN, "\tReading request with method: " << parsedRequest.getMethod() << ", and file type: " << parsedRequest.getContentType())
 		client->updateTime();
 
 		// creating a response object
