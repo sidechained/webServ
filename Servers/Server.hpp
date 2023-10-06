@@ -22,7 +22,6 @@ protected:
 	std::vector<PortConfig> _ports;
 	std::string _ip;
 public:
-	//Server(int domain, int type, int protocol, std::vector<int> ports, std::string ip, int backlog);
 	Server(ServerConfig &config);
 	~Server();
 	void launch();

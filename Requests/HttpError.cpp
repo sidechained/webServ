@@ -2,7 +2,6 @@
 
 HttpError::HttpError()
 {
-    //add noSlash, methodNotAllowed to map
     _errors["noSlash"] = false;
     _errors["methodNotAllowed"] = false;
 }
