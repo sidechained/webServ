@@ -180,7 +180,12 @@ int HttpRequest::checkContentLength(ServerConfig *config)
 		}
 		if (contentLength > config->clientMaxBodySizeMB * 1000)
 		{
-			std::cerr << "Content length exceeds client max body size." << std::endl;
+			std::cerr << BG_BOLD_YELLOW "Content length exceeds client max body size." RESET << std::endl;
+			this->addError("entityTooLarge");
+		}
+		if (contentLength > MAX_BODY_SIZE)
+		{
+			std::cerr << BG_BOLD_YELLOW "Content length exceeds server max body size." RESET << std::endl;
 			this->addError("entityTooLarge");
 		}
 	}

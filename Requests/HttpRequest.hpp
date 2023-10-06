@@ -11,6 +11,8 @@
 #include "../Parser/LocationParser.hpp"
 #include "../WebServ.hpp"
 
+#define MAX_BODY_SIZE 15000
+
 // class LocationConfig;
 
 struct ContentDisposition {
