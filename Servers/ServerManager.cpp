@@ -149,20 +149,17 @@ void ServerManager::runServers()
 
 void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 {
-	PRINT(CGI, BG_BLUE, "sendBodyToCgi")
 	std::vector<char> body = cgiResponse->getRequest().getBodyVector();
 	// Check if the pipe is valid
 	if (cgiResponse->input_pipefd[1] != -1)
 	{
-
 		char EOF_char = EOF;
 		std::vector<char> buffer(body.begin(), body.end());
 		buffer.push_back(EOF_char);
 
 		ssize_t bytes_written = write(cgiResponse->input_pipefd[1], buffer.data(), buffer.size());
 
-
-		PRINT(CGI, BG_YELLOW, "body size sent to cgi is: " << body.size() << " bytes written: " << bytes_written)
+		PRINT(CGI, BG_BOLD_CYAN, "\t\tSending body to cgi. Size is: " << body.size())
 
 		if (bytes_written == -1)
 		{
@@ -180,7 +177,6 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 			close(cgiResponse->input_pipefd[1]);
 			removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
 		}
-
 	}
 	else
 	{
@@ -190,19 +186,19 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 
 	removeFromSet(cgiResponse->input_pipefd[1], _write_fd_pool);
 
+	/* TIMEOUT CHECK CGI */
+
 	time_t startTime = time(NULL);
 	int status;
 	bool killed = false; // Flag to track if the child process has been killed
 
 	while (!killed)
 	{
-		std::cout << "Checking if child process has terminated..." << std::endl;
 		// Check if the child process has terminated
 		pid_t result = waitpid(cgiResponse->child_pid, &status, WNOHANG);
 
 		if (result == 0)
 		{
-			std::cout << "Child process is still running" << std::endl;
 			// Child process is still running
 			time_t currentTime = time(NULL);
 			int elapsedSeconds = static_cast<int>(currentTime - startTime);
@@ -210,10 +206,10 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 			if (elapsedSeconds >= 6)
 			{
 				// Timeout exceeded, kill the child process
-				std::cout << "Child process timed out. Killing it..." << std::endl;
-				kill(cgiResponse->child_pid, SIGKILL); // or SIGKILL for a forceful termination
-				killed = true;						   // Set the flag to indicate that the child process has been killed
-				
+				PRINT(CGI, BG_RED, "\t\tTimeout exceeded, killing child process")
+				kill(cgiResponse->child_pid, SIGKILL);
+				killed = true;	// Set the flag to indicate that the child process has been killed
+
 				std::string error = "501";
 				Server *server = findServer(client);
 				ServerConfig *config = server->getConfig();
@@ -237,7 +233,7 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 			if (WIFEXITED(status))
 			{
 				int exit_status = WEXITSTATUS(status);
-				std::cout << "Child process exited with status: " << exit_status << std::endl;
+				PRINT(CGI, BG_GREEN, "\t\tChild process exited with status: " << exit_status)
 				if (exit_status != 0)
 				{
 					std::string error = "501";
@@ -247,7 +243,6 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 					return;
 				}
 			}
-
 			// Child process has terminated
 			break;
 		}
@@ -256,13 +251,13 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 
 void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
 {
-	PRINT(CGI, BG_BLUE, "readBodyFromCgi")
 
 	cgiResponse->setCgi(false);
 	char buffer[MESSAGE_BUFFER];
 	bzero(buffer, MESSAGE_BUFFER);
 	int bytes_read = 0;
 	bytes_read = read(cgiResponse->output_pipefd[0], buffer, MESSAGE_BUFFER);
+	PRINT(CGI, BG_BOLD_CYAN, "\t\tRead from cgi. Bytes read: " << bytes_read)
 	if (bytes_read < 0)
 	{
 		perror("read");
@@ -270,18 +265,19 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
 		removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
 		return;
 	}
-	if (bytes_read == 0)
+	else if (bytes_read == 0)
 	{
 		close(cgiResponse->output_pipefd[0]);
 		removeFromSet(cgiResponse->output_pipefd[0], _recv_fd_pool);
 		return;
 	}
-	// close(cgiResponse->output_pipefd[1]);
-	std::vector<char> bufferVector(buffer, buffer + bytes_read);
 
+	// converting the buffer to a string
+	std::vector<char> bufferVector(buffer, buffer + bytes_read);
 	close(cgiResponse->output_pipefd[0]);
 	std::string htmlString(bufferVector.begin(), bufferVector.end());
 
+	// if the string is not empty, set the body and the header
 	if (!htmlString.empty())
 	{
 		cgiResponse->setBody(htmlString);
@@ -320,6 +316,7 @@ void ServerManager::acceptNewConnection(int fd)
 
 	addToSet(client_sock, _recv_fd_pool);
 
+	// for non blocking
 	if (fcntl(client_sock, F_SETFL, O_NONBLOCK) < 0)
 	{
 		std::cout << "fcntl error" << std::endl;
@@ -369,8 +366,6 @@ void ServerManager::readRequest(const int &i, Socket *client)
 	for (int i = 0; i < bytes_read; i++)
 		bufferVector.push_back(buffer[i]);
 	PRINT(SERVERMANAGER, BG_BOLD_CYAN, "\tREQUEST read bytes:" << bytes_read << " from client: " << client->getIp() << " : " << client->getPort())
-	// bufferVector.push_back('\0');
-	// print bufferVector
 
 	if (bytes_read == 0)
 	{
@@ -389,13 +384,11 @@ void ServerManager::readRequest(const int &i, Socket *client)
 		Server *server = findServer(client);
 
 		ServerConfig *config = server->getConfig();
-		// std::cout << "REQUEST:" << std::endl << buffer << std::endl;
 		HttpRequest parsedRequest(buffer, bufferVector, config);
-		PRINT(CGI, BG_RED, "content length request: " << parsedRequest.getContentLength())
-		std::cout << "Printing request" << std::endl;
-		// parsedRequest.printRequest();
-		std::cout << BG_GREEN << parsedRequest.getMethod() << " and file type " << parsedRequest.getContentType() << std::endl;
+		PRINT(CGI, BG_BOLD_CYAN, "\tReading request with length: " << parsedRequest.getContentLength() << ", method: " << parsedRequest.getMethod() << ", and file type: " << parsedRequest.getContentType())
 		client->updateTime();
+
+		// creating a response object
 		_pendingResponses[i] = ResponseFactory::createResponse(parsedRequest);
 		if (_pendingResponses[i]->isCgi())
 		{
@@ -406,6 +399,8 @@ void ServerManager::readRequest(const int &i, Socket *client)
 			c->createResponse(parsedRequest);
 			PRINT(CGI, BG_BLUE, "cgi created from read request")
 		}
+
+		// setting the socket to write mode
 		removeFromSet(i, _recv_fd_pool);
 		addToSet(i, _write_fd_pool);
 		PRINT(SERVERMANAGER, CYAN, "\tFor server: " << client->getIp() << " on port: " << client->getPort() << " communication Socket set to write mode for the response. fd: " << i)
@@ -426,7 +421,6 @@ void ServerManager::sendResponse(const int &i, Socket *client)
 		return;
 	}
 	std::string response = responsePtr->getResponse();
-	// PRINT(SERVERMANAGER, CYAN, "response is: " << response << "response")
 
 	if (response.length() >= MESSAGE_BUFFER)
 		bytes_sent = write(i, response.c_str(), MESSAGE_BUFFER);
