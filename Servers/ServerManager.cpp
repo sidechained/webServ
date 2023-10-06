@@ -137,7 +137,7 @@ void ServerManager::runServers()
 					if (FD_ISSET(cgiResponse->input_pipefd[1], &write_set_cpy))
 						sendBodyToCgi(cgiResponse);
 					else if (FD_ISSET(cgiResponse->output_pipefd[0], &recv_set_cpy))
-						readBodyFromCgi(cgiResponse);
+						readBodyFromCgi(cgiResponse, _clients_map[i]);
 				}
 				else
 					sendResponse(i, _clients_map[i]);
@@ -224,7 +224,7 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse)
 	}
 }
 
-void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
+void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
 {
 	PRINT(CGI, BG_BLUE, "readBodyFromCgi")
 
@@ -251,16 +251,21 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse)
 
 
 
-	/*int status;
+	int status;
 	waitpid(cgiResponse->child_pid, &status, 0);
 	if (WIFEXITED(status))
 	{
 		int exit_status = WEXITSTATUS(status);
 		std::cout << "Child process exited with status: " << exit_status << std::endl;
-		char cwd[1024];
-		if (getcwd(cwd, sizeof(cwd)) != NULL)
-			std::cout << BG_RED << "Current working dir before changing: " << cwd << RESET << std::endl;
-	}*/
+		if (exit_status != 0)
+		{
+			std::string error = "501";
+			Server *server = findServer(client);
+			ServerConfig *config = server->getConfig();
+			cgiResponse->createErrResponse(error, config);
+			return;
+		}
+	}
 }
 
 void ServerManager::checkTimeout()
