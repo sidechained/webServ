@@ -219,6 +219,12 @@ void ServerManager::sendBodyToCgi(FormResponse *cgiResponse, Socket *client)
 				std::cout << "Child process timed out. Killing it..." << std::endl;
 				kill(cgiResponse->child_pid, SIGKILL); // or SIGKILL for a forceful termination
 				killed = true;						   // Set the flag to indicate that the child process has been killed
+				
+				std::string error = "501";
+				Server *server = findServer(client);
+				ServerConfig *config = server->getConfig();
+				cgiResponse->createErrResponse(error, config);
+				return;
 			}
 			else
 			{
