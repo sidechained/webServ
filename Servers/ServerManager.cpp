@@ -249,9 +249,9 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
 
 	// ...
 
+	(void)client;
 
-
-	int status;
+	/*int status;
 	waitpid(cgiResponse->child_pid, &status, 0);
 	if (WIFEXITED(status))
 	{
@@ -265,7 +265,7 @@ void ServerManager::readBodyFromCgi(FormResponse *cgiResponse, Socket *client)
 			cgiResponse->createErrResponse(error, config);
 			return;
 		}
-	}
+	}*/
 }
 
 void ServerManager::checkTimeout()
