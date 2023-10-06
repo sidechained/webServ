@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete HTML Page</title>
+</head>
+<body>
+    <button id="deleteButton">Delete Page</button>
+
+    <script>
+        // Function to send a DELETE request
+        function sendDeleteRequest() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('DELETE', 'http://127.0.0.1:8080/deleteTest.html', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // Handle the response here if needed
+                    console.log('DELETE request successful');
+                }
+            };
+            xhr.send();
+        }
+
+        // Attach the function to a button click event
+        document.getElementById('deleteButton').addEventListener('click', sendDeleteRequest);
+    </script>
+</body>
+</html>
