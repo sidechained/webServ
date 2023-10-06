@@ -325,6 +325,7 @@ void ServerManager::acceptNewConnection(int fd)
 		return;
 	}
 	Socket *new_client = findSocket(fd);
+	new_client->updateTime();
 	Server *server = findserver(fd);
 	PRINT(SERVERMANAGER, BG_BOLD_BLUE, "CONNECTION accepted from client: " << new_client->getIp() << " : " << new_client->getPort())
 	PRINT(SERVERMANAGER, CYAN, "\tFor server: " << new_client->getIp() << " on port: " << new_client->getPort() << " communication Socket creaed, in read mode waiting for a request. fd: " << client_sock)
