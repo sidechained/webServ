@@ -11,7 +11,6 @@ ErrResponse::~ErrResponse()
 void ErrResponse::createErrResponse(std::string &error, ServerConfig *config)
 {
     std::string errPath = config->error_pages[error];
-    std::cout << BG_RED << "Error path: " << errPath << std::endl;
 	//print current working directory
 	char cwd[1024];
 	if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -38,7 +37,7 @@ void ErrResponse::createErrResponse(std::string &error)
 {
     HttpRequest request = getRequest();
     std::string errPath = request.getConfig()->error_pages[error];
-    std::cout << BG_RED << "Error path: " << errPath << std::endl;
+    // std::cout << BG_RED << "Error path: " << errPath << std::endl;
 	//print current working directory
 	char cwd[1024];
 	if (getcwd(cwd, sizeof(cwd)) != NULL)

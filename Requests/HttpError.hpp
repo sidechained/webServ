@@ -7,7 +7,7 @@ class HttpError
 private:
    std::map<std::string, bool> _errors;
 public:
-    HttpError(/* args */);
+    HttpError();
     ~HttpError();
     bool hasError();
     void addError(std::string const &error);

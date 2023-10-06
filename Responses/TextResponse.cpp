@@ -12,8 +12,8 @@ TextResponse::~TextResponse()
 void TextResponse::createResponse(HttpRequest &request)
 {
 	_cgi = false;
-    PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Creating HTML response for resource");
-    PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Path: " << request.getPath());
+    //PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Creating HTML response for resource");
+    //PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Path: " << request.getPath());
     if (request.getLocationConfig()->redirection != "")
     {
         std::cout << BG_BOLD_MAGENTA << "Redirection in resource" << RESET << std::endl;
@@ -72,9 +72,6 @@ void TextResponse::createResponse(HttpRequest &request)
 
     setBody(htmlFile);
     setHeader(OkHeader(this->getRequest().getContentType(), this->getBodyLength()).getHeader());
-
-    // PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Header: " << this->getHeader().substr(0, 1000))
-    // PRINT(TEXTRESPONSE, BG_BOLD_MAGENTA, "Body: " << this->getBody().substr(0, 100))
 
     htmlFile.clear();
     htmlFile.seekg(0, std::ios::beg);

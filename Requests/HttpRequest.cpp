@@ -1,10 +1,5 @@
 #include "HttpRequest.hpp"
 
-// TODO
-// - exit in Luca-style :)
-// - consider adding extra first-line/header validations from G's code
-// - separate out extra processing of configs/location to later stage?
-
 HttpRequest::HttpRequest()
 {
 }
@@ -36,28 +31,18 @@ HttpRequest::HttpRequest(std::string const &request, std::vector<char> &requestV
 
 void HttpRequest::setDefaultEnvVars()
 {
-	    // Define your custom environmental variables
     std::string requestMethod = "REQUEST_METHOD=POST";
 	_envVars.push_back(requestMethod);
-    // Get the boundary string from request
     std::string strBoundary = "BOUNDARY=" + getBoundary();
     removeNonPrintableChars(strBoundary);
 	_envVars.push_back(strBoundary);
-    //std::cout << BG_RED << strBoundary << RESET << std::endl;
-    // Convert the boundary string to a mutable character array
-    //char boundary[strBoundary.size() + 1]; // +1 for null terminator
-    //strcpy(boundary, strBoundary.c_str());
     std::string strUploadPath = "UPLOAD_PATH=." + getLocationConfig()->uploads;
     removeNonPrintableChars(strUploadPath);
 	_envVars.push_back(strUploadPath);
-	for (size_t i = 0; i < _envVars.size(); i++)
-	{
-		std::cout << "envVars[" << i << "]: " << _envVars[i] << std::endl;
-	}
-    //std::cout << BG_RED << strUploadPath << RESET << std::endl;
-    // Convert the boundary string to a mutable character array
-    //char uploadPath[strUploadPath.size() + 1]; // +1 for null terminator
-    //strcpy(uploadPath, strUploadPath.c_str());
+	// for (size_t i = 0; i < _envVars.size(); i++)
+	// {
+	// 	std::cout << "envVars[" << i << "]: " << _envVars[i] << std::endl;
+	// }
 }
 
 std::vector<std::string> HttpRequest::getEnvVars() const
@@ -216,14 +201,7 @@ void HttpRequest::parseLocationConfig()
 		if (locationIsSet(key))
 		{
 			_locationConfig = &_config->locationConfigs[key];
-			std::cout << BG_BLUE << "location is set" << RESET << std::endl;
-			std::cout << "HttpRequest" << std::endl;
-			PRINT(HTTPREQUEST, BG_BLUE, "location is set");
-            std::cout << "key:" << key << std::endl;
-			if (_locationConfig->autoindex)
-            	std::cout << "autoindexed"  << std::endl;
-			else
-				std::cout << "autoindexed"  << std::endl;
+            // std::cout << "key:" << key << std::endl;
 			parsePath(key, i);
 			break;
 		}
@@ -242,7 +220,6 @@ void HttpRequest::parsePath(std::string &key, long i)
 	}
 	if (_path[0] == '/')
 		_path = _path.substr(1);
-	PRINT(HTTPREQUEST, BG_BLUE, "path: " << _path)
 }
 
 void HttpRequest::parseIndex()
@@ -252,13 +229,12 @@ void HttpRequest::parseIndex()
 		if (_locationConfig && _locationConfig->index != "")
 			_path = _path + _locationConfig->index;
 	}
-	PRINT(HTTPREQUEST, BG_BLUE, "path: " << _path)
 }
 
 void HttpRequest::parseMethod()
 {
 	std::string requestMethod = _incomingRequest["Method"];
-	std::cout << "Parsing method: " << requestMethod << std::endl;
+	// std::cout << "Parsing method: " << requestMethod << std::endl;
 
 	if (requestMethod == "GET" || requestMethod == "POST" || requestMethod == "DELETE")
 	{
@@ -631,7 +607,7 @@ void HttpRequest::printPostUploadRequest()
 
 void HttpRequest::printPartHeaders()
 {
-	std::cout << "Printing Multipart Headers:" << std::endl;
+	//std::cout << "Printing Multipart Headers:" << std::endl;
 	for (size_t i = 0; i < _parts.size(); i++)
 	{
 		printHeaders(_parts[i].headers);

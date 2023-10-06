@@ -38,15 +38,8 @@ int main(int argc, const char *argv[])
     	path = argv[1];
     }
     ConfigFileParser cfp(path);
-    // todolist changes end here <<<    	
     signal(SIGINT, sigIntHandler);
     signal(SIGPIPE, SIG_IGN);
-    /*std::vector<int> ports;
-    ports.push_back(8080);
-    PollingServer server(AF_INET, SOCK_STREAM, 0, ports, "0.0.0.0", 10);
-    server.launch();*/
-    // std::vector<int> ports;
-    // ports.push_back(8080);
 
     ServerManager manager = ServerManager(&cfp);
 

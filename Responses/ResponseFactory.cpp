@@ -19,8 +19,8 @@ SimpleResponse *ResponseFactory::GETresponse(HttpRequest &request)
 	else
 		response = new TextResponse(request);
 
-	if (response)
-		std::cout << BG_BLUE "cgi form response text" RESET << response->isCgi() << std::endl;
+	// if (response)
+	// 	std::cout << BG_BLUE "cgi form response text" RESET << response->isCgi() << std::endl;
 
 	return response;
 
@@ -47,7 +47,6 @@ SimpleResponse *ResponseFactory::createResponse(HttpRequest &request)
     SimpleResponse *response = NULL;
     
     std::string method = request.getMethod();
-    std::cout << "Method: " << method << std::endl;
     if (request.hasError() && !request.getError("noSlash"))
         response = new TextResponse(request);
 	else if (method == "GET" && request.getContentType() == "application/x-httpd-php")
