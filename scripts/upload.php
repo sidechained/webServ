@@ -1,10 +1,22 @@
 <?php
 
+function removeAfterDoubleHyphen($inputString) {
+	$result = strstr($inputString, '--', true); 
+	return $result !== false ? $result : $inputString;
+}
+
 $uploadPath = $_SERVER['UPLOAD_PATH'];
 $boundary = $_SERVER['BOUNDARY'];
 
-//echo "path = $uploadPath";
-//echo "path = $boundary";
+echo $uploadPath;
+// Create the directory if it does not exist
+if (is_dir($uploadPath)) {
+	echo "upload path exists <br>";
+} else {
+	echo "upload path does not exist <br>";
+	echo "creating upload path <br>";
+	mkdir($uploadPath, 0777, true);
+}
 
  // Read the HTTP request from stdin
  $request = '';
@@ -15,7 +27,6 @@ $boundary = $_SERVER['BOUNDARY'];
 // Split the request into parts using the boundary
 $parts = explode("--$boundary", $request);
 
-
 // Initialize variables to store Content-Type and content
 $content = '';
 $fileName = '';
@@ -24,9 +35,6 @@ $body = '';
 
 // Loop through each part to process the file uploads
 foreach ($parts as $part) {
-	echo "part<br>";
-	echo $part;
-
 	$part = str_replace($boundary, '', $part);
 
 	// Extract name and filename using regular expressions
@@ -47,21 +55,12 @@ foreach ($parts as $part) {
 	// Remove leading and trailing newlines from the body
 	$body = trim($part);
 
-	
-	// Output the results
-	echo "Name: $name<br>";
-	echo "Filename: $fileName<br>";
-	echo "Body:<br>$body<br>";
 	$filePath = $uploadPath . "/" . $fileName;
 
-	function removeAfterDoubleHyphen($inputString) {
-		$result = strstr($inputString, '--', true); 
-		return $result !== false ? $result : $inputString;
-	}
 	$body = removeAfterDoubleHyphen($body);
-	//$body = str_replace(["\r\n--"], "", $body);
-	echo "Body after:<br>$body<br>";
-	
+
+	//$body = preg_replace('/\n[^\n]*$/', '', $body);
+
 	// Open the file for writing
 	$file = fopen($filePath, "w");
 	
@@ -91,10 +90,8 @@ $htmlResponse = "<html>
     <title>Form Submission Result</title>
 </head>
 <body>
-    <h1>Form Submission Result</h1>
-    <p>Upload folder: $uploadPath</p>
-    <p>boundary: $boundary</p>
-    <p>Request: $request</p>
+    <h1>Upload success!</h1>
+    <a href='/uploads'>Click here to view your files</a>
 </body>
 </html>";
 

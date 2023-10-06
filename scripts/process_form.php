@@ -19,7 +19,7 @@ $htmlResponse = "<html>
 <head>
     <title>Form Submission Result</title>
 </head>
-<body>
+<body style=\"color: $color;\">
     <h1>Form Submission Result</h1>
     <p>Name: $name</p>
     <p>Color: $color</p>

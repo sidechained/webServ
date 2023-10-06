@@ -22,6 +22,7 @@ server:
 			index: test.html
 			root: /tmp
 		/:
+			uploads: /hello
 			root: /www
 			autoindex: false
 		/my_game:
