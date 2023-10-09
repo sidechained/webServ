@@ -191,6 +191,9 @@ void HttpRequest::parseLocationConfig()
 		this->addError("noSlash");
 		return;
 	}
+		if (_path.find(".php") == std::string::npos)
+			this->addError("noCGI");
+
 	_locationConfig = NULL;
 	long i = _path.size();
 	while (i >= 0)
