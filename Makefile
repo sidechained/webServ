@@ -63,7 +63,7 @@ launch: all
 
 
 siege_install:
-
+# remember to change the user, path is fine
 	cd
 	mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
 	export PATH="/home/$(USER)/homebrew/bin:$${PATH}"
