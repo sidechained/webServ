@@ -29,7 +29,10 @@ SimpleResponse *ResponseFactory::GETresponse(HttpRequest &request)
 SimpleResponse *ResponseFactory::POSTresponse(HttpRequest &request)
 {
     SimpleResponse *response = NULL;
-    response = new FormResponse(request);
+    if (request.hasError() && request.getError("noCGI"))
+        response = new TextResponse(request);
+    else
+     response = new FormResponse(request);
     return response;
 }
 
@@ -46,7 +49,10 @@ SimpleResponse *ResponseFactory::createResponse(HttpRequest &request)
 {
     SimpleResponse *response = NULL;
     
+    std::cout << BG_RED << "resource" << request.getResource() << RESET << std::endl;
     std::string method = request.getMethod();
+    //print all errors
+
     if (request.hasError() && !request.getError("noSlash"))
         response = new TextResponse(request);
 	else if (method == "GET" && request.getContentType() == "application/x-httpd-php")
