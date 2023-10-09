@@ -48,7 +48,7 @@ void ConfigFileParser::validateIPs() {
 			}
 		}
 		if (isDuplicate) {
-			std::cout << "Duplicate port number '" << ip << "' found in server config, exiting" << std::endl;
+			std::cout << "Duplicate ip '" << ip << "' found in server config, exiting" << std::endl;
 			exit(EXIT_FAILURE);
 		} 
 		seenIPs.push_back(ip);

@@ -1,5 +1,5 @@
 server:
-	ports: 8080 1111
+	ports: 8080 8080 42
 	ip: 127.0.0.1
 	client_max_body_size_mb: 10
 	locationConfigs:
