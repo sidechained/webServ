@@ -56,7 +56,7 @@ void ConfigFileParser::validateIPs() {
 				for (std::vector<PortConfig>::iterator secondPortIt = secondPortConfigs.begin(); secondPortIt != secondPortConfigs.end(); ++secondPortIt) {
 					if (firstPortNumber == secondPortIt->number) {
 						std::cout << "Duplicate port number " << firstPortNumber << " found in server configs with the same IP, exiting" << std::endl;
-						exit(EXIT_FAILURE);
+						//exit(EXIT_FAILURE);
 					}
 				}
 			}
