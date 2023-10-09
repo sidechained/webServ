@@ -31,6 +31,8 @@ OBJECTS = $(addprefix $(OBJ_DIR)/, $(FILES:.cpp=.o))
 YELLOW		=	\e[33;1m
 RESET		=	\e[0m
 
+USER = mvomiero
+
 all: $(NAME)
 
 $(NAME): $(OBJECTS)
@@ -58,6 +60,18 @@ re: fclean all
 launch: all
 	@echo "🚀 Launching $(NAME)..."
 	@./$(NAME)
+
+
+siege_install:
+
+	cd
+	mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
+	export PATH="/home/$(USER)/homebrew/bin:$${PATH}"
+	brew install siege
+	siege.config
+
+siege_run:
+#code here
 
 test: curlResolve1 curlResolve2 curlGet1 curlGet2 curlGet3 curlGetBadPort curlDelete curlPostSizeUnder curlPostSizeOver curlUnknownMethod
 
