@@ -290,7 +290,7 @@ void ServerManager::checkTimeout()
 	{
 		if (time(NULL) - (*it->second).getLastTime() > CONNECTION_TIMEOUT)
 		{
-			std::cout << BG_RED "client timeout " << time(NULL) - (*it->second).getLastTime() << RESET << std::endl;
+			//std::cout << BG_RED "client timeout " << time(NULL) - (*it->second).getLastTime() << RESET << std::endl;
 			closeConnection(it->first);
 			return;
 		}
