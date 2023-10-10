@@ -31,7 +31,7 @@ OBJECTS = $(addprefix $(OBJ_DIR)/, $(FILES:.cpp=.o))
 YELLOW		=	\e[33;1m
 RESET		=	\e[0m
 
-USER = mvomiero
+HOME = /nfs/homes/gbooth/42cursus/5_3_webserv_repo
 
 all: $(NAME)
 
@@ -61,68 +61,72 @@ launch: all
 	@echo "🚀 Launching $(NAME)..."
 	@./$(NAME)
 
-
 siege_install:
-# remember to change the user, path is fine
-	cd
-	mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
-	export PATH="/home/$(USER)/homebrew/bin:$${PATH}"
-	brew install siege
-	siege.config
+	wget http://download.joedog.org/siege/siege-3.1.4.tar.gz
+	tar -xzvf siege-3.1.4.tar.gz
+	cd siege-3.1.4 && ./configure --prefix=$(HOME)/siege
+	cd siege-3.1.4 && make
+	cd siege-3.1.4 && make install
+	rm -r siege-3.1.4
+	rm siege-3.1.4.tar.gz
+	mkdir siege/var
+
+siege_uninstall:
+	rm -r siege
 
 siege_run:
-#code here
+	./siege/bin/siege -b -c 10 -t 60s http://127.0.0.1:8080
 
-test: curlResolve1 curlResolve2 curlGet1 curlGet2 curlGet3 curlGetBadPort curlDelete curlPostSizeUnder curlPostSizeOver curlUnknownMethod
+curl_all: curl_resolve1 curl_resolve2 curl_get1 curl_get2 curl_get3 curl_get_bad_port curl_delete curl_post_size_under curl_post_size_over curl_unknown_method
 
-curlResolve1:
+curl_resolve1:
 	@echo  "\n$(YELLOW)curl --resolve example1.com:8080:$(RESET)\n" 
 	curl --resolve example1.com:8080:127.0.0.1 http://example1.com:8080
 	
-curlResolve2:
+curl_resolve2:
 	@echo  "\n$(YELLOW)curl --resolve example2.com:8080:$(RESET)\n"
 	curl --resolve example2.com:8080:127.0.0.3 http://example2.com:8080
 
-curlGet1:
+curl_get1:
 	@echo  "\n$(YELLOW) simple page get request \n curl -X GET http://127.0.0.1:8080/simple.html $(RESET)\n"
 	curl -X GET http://127.0.0.1:8080/simple.html
 
-curlGet2:
+curl_get2:
 	@echo  "\n$(YELLOW) same for a different page \n curl -X GET http://127.0.0.1:8080/form.html $(RESET)\n"
 	curl -X GET http://127.0.0.1:8080/form.html
 
-curlGet3:
+curl_get3:
 	@echo  "\n$(YELLOW) same for a different page \n curl -X GET http://127.0.0.3:4545/upload.html $(RESET)\n"
 	curl -X GET http://127.0.0.3:4545/upload.html
 
-curlGetBadPort:
+curl_get_bad_port:
 	@echo  "\n$(YELLOW) bad port - not part of server - $(RESET)\n"
 	- curl -X GET http://127.0.0.3:4500/index1.html
 
-curlDelete:
+curl_delete:
 	@echo  "\n$(YELLOW) delete request \n curl -X DELETE - file created - $(RESET)\n"
 	touch www/deleteTest.html
 	curl -X DELETE http://127.0.0.1:8080/deleteTest.html
 
-curlDeleteRepeat:
+curl_delete_repeat:
 	@echo  "\n$(YELLOW) delete request \n curl -X DELETE $(RESET)\n"
 	curl -X DELETE http://127.0.0.1:8080/deleteTest.html	
 
-curlPostSizeUnder:
+curl_post_size_under:
 	@echo  "\n$(YELLOW) post request with content-length under 500 \n $(RESET)\n"
 	# we only POST only with CGI, so using GET here
 	curl -X GET -H "Content-Type: plain/text" -H "Content-Length: 500" --data-binary @input_file_over http://127.0.0.1:8080
 	
-curlPostSizeOver:
+curl_post_size_over:
 	@echo  "\n$(YELLOW) post request with content-length over 500 \n $(RESET)\n"
 	# we only POST only with CGI, so using GET here
 	curl -X GET -H "Content-Type: plain/text" -H "Content-Length: 50000" --data-binary @input_file_over http://127.0.0.1:8080
 
-curlUnknownMethod:
+curl_unknown_method:
 	@echo  "\n$(YELLOW) unknown method \n $(RESET)\n"
 	curl -X UNKNOWN http://127.0.0.1:8080/simple.html
 	
-.PHONY: all clean fclean re launch curlResolve1 curlResolve2 curlGet1 curlGet2 curlGet3 curlGetBadPort curlDelete curlPostSizeUnder curlPostSizeOver curlUnknownMethod
+.PHONY: all clean fclean re launch siege_install siege_uninstall siege_run curl_all curl_resolve1 curl_resolve2 curl_get1 curl_get2 curl_get3 curl_get_bad_port curl_delete curl_post_size_under curl_post_size_over curl_unknown_method
 
 
 

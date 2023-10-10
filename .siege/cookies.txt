@@ -1,0 +1,5 @@
+#
+# Siege cookies file. You may edit this file to add cookies
+# manually but comments and formatting will be removed.    
+# All cookies that expire in the future will be preserved. 
+# ---------------------------------------------------------
